@@ -4,17 +4,29 @@ var ctx = canvas.getContext('2d');
 ctx.fillStyle = "black";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+
+// Init balls
 let balls = [];
-for(let i = 0; i<10; i++){
-    let ballx = Math.floor((Math.random()*200));
-    let bally = Math.floor((Math.random()*200));
-    let ballRadius = Math.floor((Math.random()*20));
-    balls.push(new Ball(ballx, bally, ballRadius))
+
+// Init players
+let players = [];
+players.push(new Player(50, 50, 10));
+
+// Init keypress events
+var keys = {}
+window.onkeydown = function(evt) {
+    keys[evt.key] = true;
+}
+window.onkeyup = function(evt) {
+    keys[evt.key] = false;
 }
 
 function update() {
     for(let ball of balls){
-        ball.update()
+        ball.update();
+    }
+    for(let player of players){
+        player.update();
     }
 }
 
@@ -24,6 +36,9 @@ function draw() {
     for(let ball of balls) {
         ball.draw();
     }
+    for(let player of players){
+        player.draw();
+    }
 }
 
 function updateAndDraw(){
@@ -31,4 +46,5 @@ function updateAndDraw(){
 }
 
 
-window.setInterval(updateAndDraw, 200);
+window.setInterval(updateAndDraw, 30);
+
