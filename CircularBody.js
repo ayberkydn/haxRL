@@ -30,7 +30,8 @@ class CircularBody {
         ctx.stroke();
     }
     checkCollisionWith(body2) {
-        if (body2.location.copy().sub(this.location).magnitude() <= this.radius) {
+        let distance = body2.location.copy().sub(this.location).magnitude();
+        if (distance <= this.radius + body2.radius) {
             console.log("collision");
         }
     }

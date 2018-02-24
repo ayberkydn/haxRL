@@ -8,11 +8,12 @@ class Scene {
     checkCollision() {
         for (let i = 0; i < this.objects.length; i++) {
             for (let j = i + 1; j < this.objects.length; j++) {
-                objects[i].checkCollisionWith(objects[j]);
+                this.objects[i].checkCollisionWith(this.objects[j]);
             }
         }
     }
     update() {
+        this.checkCollision();
         for (let object of this.objects) {
             object.update();
         }
