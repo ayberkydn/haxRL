@@ -1,6 +1,5 @@
 class Ball extends CircularBody {
-    constructor(initialLocationVec, radius, mass) {
-        super(...arguments);
+    constructor(initialX, initialY, radius, mass) {
+        super(...arguments, "white");
     }
-
 }

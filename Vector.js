@@ -15,10 +15,14 @@ class Vector {
         return this;
     }
     normalize() {
-        let norm = Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
+        let norm = this.magnitude();
         this.x /= norm;
         this.y /= norm;
         return this;
+    }
+
+    magnitude() {
+        return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
     }
     mult(n) {
         this.x *= n;
