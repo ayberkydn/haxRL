@@ -58,6 +58,20 @@ class Vector {
         return vec1.copy().div(n);
     }
 
+    inverse() {
+        this.x -= 1;
+        this.y -= 1;
+        return this;
+    }
+
+    static inverse(vec1) {
+        return vec1.copy().inverse();
+    }
+
+    static dot(vec1, vec2) {
+        return vec1.x * vec2.x + vec1.y * vec2.y;
+    }
+
     copy() {
         return Object.assign(new Vector(0, 0), this);
     }

@@ -6,12 +6,17 @@ class CircularBody {
         this.velocity = new Vector(0, 0);
         this.acceleration = new Vector(0, 0);
         this.color = color;
-        this.collisionAttenuation = 0.5;
+        this.restitution = 0.5;
     }
 
     applyForce(forceVec) {
-        let accDelta = forceVec.copy().div(this.mass);
-        this.acceleration.add(accDelta);
+        let accelerationDelta = Vector.div(forceVec, this.mass);
+        this.acceleration.add(accelerationDelta);
+    }
+
+    applyImpulse(impulseVec) {
+        let velocityDelta = Vector.div(impulseVec, this.mass);
+        this.velocity.add(velocityDelta);
     }
 
     update() {
