@@ -9,11 +9,20 @@ class Vector {
         return this;
     }
 
+    static add(vec1, vec2) {
+        return vec1.copy().add(vec2);
+    }
+
     sub(vec) {
         this.x -= vec.x;
         this.y -= vec.y;
         return this;
     }
+
+    static sub(vec1, vec2) {
+        return vec1.copy().sub(vec2);
+    }
+
     normalize() {
         let norm = this.magnitude();
         this.x /= norm;
@@ -21,19 +30,34 @@ class Vector {
         return this;
     }
 
+    static normalize(vec) {
+        return vec.copy().normalize();
+    }
+
     magnitude() {
         return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
     }
+
     mult(n) {
         this.x *= n;
         this.y *= n;
         return this;
     }
+
+    static mult(vec1, n) {
+        return vec1.copy().mult(n);
+    }
+
     div(n) {
         this.x /= n;
         this.y /= n;
         return this;
     }
+
+    static div(vec1, n) {
+        return vec1.copy().div(n);
+    }
+
     copy() {
         return Object.assign(new Vector(0, 0), this);
     }

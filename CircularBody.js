@@ -6,6 +6,7 @@ class CircularBody {
         this.velocity = new Vector(0, 0);
         this.acceleration = new Vector(0, 0);
         this.color = color;
+        this.collisionAttenuation = 0.5;
     }
 
     applyForce(forceVec) {
