@@ -43,16 +43,16 @@ class Player extends CircularBody {
 
         let diagonal = (this.up ^ this.down) & (this.left ^ this.right);
         if (this.up === true) {
-            this.applyForce(new Vector(0, -keyPower).mult(diagonal ? 1 / Math.SQRT2 : 1));
+            this.applyForce(new Vector(0, -1).mult(diagonal ? 1 / Math.SQRT2 : 1));
         }
         if (this.down === true) {
-            this.applyForce(new Vector(0, keyPower).mult(diagonal ? 1 / Math.SQRT2 : 1));
+            this.applyForce(new Vector(0, 1).mult(diagonal ? 1 / Math.SQRT2 : 1));
         }
         if (this.left === true) {
-            this.applyForce(new Vector(-keyPower, 0).mult(diagonal ? 1 / Math.SQRT2 : 1));
+            this.applyForce(new Vector(-1, 0).mult(diagonal ? 1 / Math.SQRT2 : 1));
         }
         if (this.right === true) {
-            this.applyForce(new Vector(keyPower, 0).mult(diagonal ? 1 / Math.SQRT2 : 1));
+            this.applyForce(new Vector(1, 0).mult(diagonal ? 1 / Math.SQRT2 : 1));
         }
 
     }

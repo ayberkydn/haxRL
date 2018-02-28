@@ -1,12 +1,14 @@
 class CircularBody {
-    constructor(initialX, initialY, radius, mass, color) {
+    constructor(initialX, initialY, radius, mass, restitution, damping, color) {
         this.location = new Vector(initialX, initialY);
         this.radius = radius;
         this.mass = mass;
+        this.invMass = 1 / this.mass;
         this.velocity = new Vector(0, 0);
         this.acceleration = new Vector(0, 0);
         this.color = color;
-        this.restitution = 0.5;
+        this.restitution = restitution;
+        this.damping = damping;
     }
 
     applyForce(forceVec) {
@@ -22,7 +24,7 @@ class CircularBody {
     update() {
         this.location.add(this.velocity);
         this.velocity.add(this.acceleration);
-        this.velocity.mult(attenuationCoef);
+        this.velocity.mult(this.damping);
         this.acceleration.mult(0);
     }
 

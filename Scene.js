@@ -24,8 +24,6 @@ class Scene {
         }
     }
 
-
-
     update() {
         this.checkCollisions();
         this.resolveCollisions();
@@ -36,8 +34,17 @@ class Scene {
     draw() {
         ctx.fillStyle = bgColor;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+        //first draw balls
         for (let object of this.objects) {
-            object.draw();
+            if (object.constructor.name === "Ball") {
+                object.draw();
+            }
+        }
+        //then draw players to make in front
+        for (let object of this.objects) {
+            if (object.constructor.name === "Player") {
+                object.draw();
+            }
         }
     }
 }
