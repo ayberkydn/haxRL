@@ -17,11 +17,11 @@ window.onkeyup = function (evt) {
 
 const attenuationCoef = 0.91;
 const bgColor = "green";
-var keyPower = 3; // needs to be global
+var keyPower = 1; // needs to be global
 
 //
 scene = new Scene();
-scene.addObject(new Player(initialX = 80, initialY = 80, radius = 18, mass = 5, color = "blue"));
+scene.addObject(new Player(initialX = 80, initialY = 80, radius = 18, mass = 1.7, color = "blue"));
 scene.addObject(new Ball(initialX = 250, initialY = 250, radius = 11, mass = 1));
 
 
