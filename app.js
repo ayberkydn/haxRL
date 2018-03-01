@@ -22,23 +22,52 @@ const playerRestitution = 0.4;
 const ballRestitution = 0.4;
 const playerDamping = 0.93;
 const ballDamping = 0.98;
+const topbottomMargin = 60;
+const leftrightMargin = 30;
 //
 scene = new Scene();
-scene.addObject(new Player(initialX = 80,
-    initialY = 80,
+
+scene.addObject(new Ball(
+    centerX = 250,
+    centerY = 250,
+    radius = 11,
+    mass = ballMass,
+    restitution = ballRestitution,
+    damping = ballDamping));
+
+scene.addObject(new Player(
+    centerX = 200,
+    centerY = 200,
     radius = 18,
     mass = playerMass,
     restitution = playerRestitution,
     damping = playerDamping,
     color = "blue"));
 
-scene.addObject(new Ball(initialX = 250,
-    initialY = 250,
-    radius = 11,
-    mass = ballMass,
-    restitution = ballRestitution,
-    damping = ballDamping));
 
+scene.addObject(new HorizontalBorder(
+    centerX = canvas.width / 2,
+    centerY = topbottomMargin,
+    length = canvas.width - leftrightMargin * 2,
+    restitution = 1));
+
+scene.addObject(new HorizontalBorder(
+    centerX = canvas.width / 2,
+    centerY = canvas.height - topbottomMargin,
+    length = canvas.width - leftrightMargin * 2,
+    restitution = 1));
+
+scene.addObject(new VerticalBorder(
+    centerX = leftrightMargin,
+    centerY = canvas.height / 2,
+    lenght = canvas.height - topbottomMargin * 2,
+    restitution = 1));
+
+scene.addObject(new VerticalBorder(
+    centerX = canvas.width - leftrightMargin,
+    centerY = canvas.height / 2,
+    lenght = canvas.height - topbottomMargin * 2,
+    restitution = 1));
 
 
 window.setInterval(function () {

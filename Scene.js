@@ -6,12 +6,12 @@ class Scene {
     addObject(obj) {
         this.objects.push(obj);
     }
-    checkCollisions() {
+    getCollisions() {
         for (let i = 0; i < this.objects.length; i++) {
             for (let j = i + 1; j < this.objects.length; j++) {
-                let colliding = this.objects[i].checkCollisionWith(this.objects[j]);
-                if (colliding == true) {
-                    this.collisions.push(new Collision(this.objects[i], this.objects[j]));
+                let collision = Collision.getCollision(this.objects[i], this.objects[j]);
+                if (collision) {
+                    this.collisions.push(collision);
                 }
             }
         }
@@ -25,7 +25,7 @@ class Scene {
     }
 
     update() {
-        this.checkCollisions();
+        this.getCollisions();
         this.resolveCollisions();
         for (let object of this.objects) {
             object.update();
@@ -34,17 +34,9 @@ class Scene {
     draw() {
         ctx.fillStyle = bgColor;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        //first draw balls
+
         for (let object of this.objects) {
-            if (object.constructor.name === "Ball") {
-                object.draw();
-            }
-        }
-        //then draw players to make in front
-        for (let object of this.objects) {
-            if (object.constructor.name === "Player") {
-                object.draw();
-            }
+            object.draw();
         }
     }
 }
