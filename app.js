@@ -1,10 +1,8 @@
 // Handles for rendering
-
 var canvas = document.getElementById("gameCanvas");
 var ctx = canvas.getContext('2d');
 
 // Init keypress events
-
 var keys = {};
 window.onkeydown = function (evt) {
     keys[evt.key] = true;
@@ -13,8 +11,8 @@ window.onkeyup = function (evt) {
     keys[evt.key] = false;
 };
 
-// Global Constants
 
+// Parameters
 const bgColor = "green";
 const playerMass = 3;
 const ballMass = 2;
@@ -25,6 +23,9 @@ const ballDamping = 0.98;
 const topbottomMargin = 60;
 const leftrightMargin = 30;
 //
+
+// __main__
+
 scene = new Scene();
 
 scene.addObject(new Ball(

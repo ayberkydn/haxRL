@@ -25,8 +25,11 @@ class Scene {
     }
 
     update() {
-        this.getCollisions();
-        this.resolveCollisions();
+        //Iterate 20 times for collisions
+        for (let i = 0; i < 20; i++) {
+            this.getCollisions();
+            this.resolveCollisions();
+        }
         for (let object of this.objects) {
             object.update();
         }
