@@ -1,7 +1,6 @@
-// Handles for rendering
+// Gets the handles for rendering
 var canvas = document.getElementById("gameCanvas");
 var ctx = canvas.getContext('2d');
-
 // Init keypress events
 var keys = {};
 window.onkeydown = function (evt) {
@@ -12,13 +11,18 @@ window.onkeyup = function (evt) {
 };
 
 
+
 // Parameters
-const bgColor = "green";
+const bgColor = "#688F56";
+const redColor = "#E56E56";
+const blueColor = "#5689E5";
 const playerMass = 3;
 const ballMass = 2;
 const playerRestitution = 0.4;
 const ballRestitution = 0.4;
 const playerDamping = 0.93;
+const playerkickDamping = 0.87;
+const playerkickPower = 15;
 const ballDamping = 0.98;
 const topbottomMargin = 60;
 const leftrightMargin = 30;
@@ -28,23 +32,36 @@ const leftrightMargin = 30;
 
 scene = new Scene();
 
+
 scene.addObject(new Ball(
-    centerX = 250,
-    centerY = 250,
-    radius = 11,
+    centerX = canvas.width / 2,
+    centerY = canvas.height / 2,
+    radius = 9,
     mass = ballMass,
     restitution = ballRestitution,
     damping = ballDamping));
 
 scene.addObject(new Player(
-    centerX = 200,
-    centerY = 200,
-    radius = 18,
+    centerX = 300,
+    centerY = canvas.height / 2,
+    radius = 16,
     mass = playerMass,
     restitution = playerRestitution,
     damping = playerDamping,
-    color = "blue"));
+    kickDamping = playerkickDamping,
+    kickPower = playerkickPower,
+    color = redColor));
 
+scene.addObject(new Player(
+    centerX = 500,
+    centerY = canvas.height / 2,
+    radius = 16,
+    mass = playerMass,
+    restitution = playerRestitution,
+    damping = playerDamping,
+    kickDamping = playerkickDamping,
+    kickPower = playerkickPower,
+    color = blueColor));
 
 scene.addObject(new HorizontalBorder(
     centerX = canvas.width / 2,

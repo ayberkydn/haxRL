@@ -31,12 +31,12 @@ class Collision {
         let correction = Vector.mult(this.collisionNormal, percent * Math.max(this.penetrationDepth - slop, 0) / (this.body1.invMass + this.body2.invMass));
         this.body1.center.sub(Vector.mult(correction, this.body1.invMass));
         this.body2.center.add(Vector.mult(correction, this.body2.invMass));
-        console.log("a");
     }
 
     static getCollision(body1, body2) {
         // Returns collision of corresponding type with body1 and body2, if any. 
         // else returns undefined
+        if (body1 === body2) return;
         if (body1 instanceof Border && body2 instanceof Disc) {
             // Disc-Border is allowed, Border-Disc is not.
             return Collision.getCollision(body2, body1);
@@ -55,8 +55,12 @@ class Collision {
             if (Vector.sub(body1.center, body2.center).magnitude() <= body1.radius + body2.radius) {
                 return new DDCollision(body1, body2);
             }
-        } else if (body1 instanceof Border && body2 instanceof Border) {
-            return false;
+        } else if (body1 instanceof Kicker && body2 instanceof Ball) {
+            return Collision.getCollision(body2, body1);
+        } else if (body1 instanceof Ball && body2 instanceof Kicker) {
+            if (Vector.sub(body1.center, body2.center).magnitude() <= body1.radius + body2.radius) {
+                return new KickCollision(body1, body2);
+            }
         }
     }
 }
@@ -103,6 +107,25 @@ class DHBCollision extends Collision {
             this.relativeVelocity = Vector.sub(this.body1.velocity, this.body2.velocity);
             this.velocityAlongNormal = Vector.dot(this.collisionNormal, this.relativeVelocity);
             this.penetrationDepth = this.body1.radius - Math.abs(this.body1.center.y - this.body2.center.y);
+        }
+    }
+}
+
+class KickCollision extends Collision {
+    constructor(body1, body2) {
+        if (!(body1 instanceof Ball && body2 instanceof Kicker)) {
+            throw `Wrong collision type: Not a Ball-Kicker collision`;
+        } else {
+            super(body1, body2);
+            this.collisionNormal = Vector.sub(this.body1.center, this.body2.center).normalize();
+        }
+    }
+
+    resolve() {
+        if (this.body2.active) {
+            this.body2.deactivate();
+            this.body1.applyImpulse(this.collisionNormal.mult(this.body2.kickPower));
+            new Audio("kicksound.mp3").play();
         }
     }
 }
