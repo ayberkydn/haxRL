@@ -69,18 +69,20 @@ class Scene {
     }
 
     update() {
-        //Iterate 20 times for collisions
-        for (let i = 0; i < 10; i++) {
-            this.getCollisions();
-            this.resolveCollisions();
-        }
-
         for (let objectKey in this.objects) {
             let objectList = this.objects[objectKey];
             for (let object of objectList) {
                 object.update();
             }
         }
+
+        //Iterate 20 times for collisions
+        for (let i = 0; i < 20; i++) {
+            this.getCollisions();
+            this.resolveCollisions();
+        }
+
+
     }
     draw() {
         ctx.fillStyle = bgColor;

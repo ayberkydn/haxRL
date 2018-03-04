@@ -9,7 +9,12 @@ class Collision {
     resolve() {
         //https://gamedevelopment.tutsplus.com/tutorials/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331
         //Apply corresponding forces/impulses to colliding objects
+        this.resolveImpulse();
+        this.resolvePenetration();
 
+    }
+
+    resolveImpulse() {
         // Don't handle collision if objects aren't actually colliding
         if (this.velocityAlongNormal > 0)
             return;
@@ -17,20 +22,20 @@ class Collision {
         let j = -(1 + this.restitution) * this.velocityAlongNormal;
         j /= this.body1.invMass + this.body2.invMass;
 
-        let impulse = this.collisionNormal.mult(j);
+        let impulse = Vector.mult(this.collisionNormal, j);
+
         this.body1.applyImpulse(impulse);
         this.body2.applyImpulse(impulse.mult(-1));
-        this.resolvePenetration();
 
     }
 
     resolvePenetration() {
-        //https://gamedevelopment.tutsplus.com/tutorials/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331
-        let percent = 0.1; //0.2 - 0.8 arasi imis
+        // //https://gamedevelopment.tutsplus.com/tutorials/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331
+        let percent = 1; //0.2 - 0.8 arasi imis
         let slop = 0.1; //0.01 - 0.1
         let correction = Vector.mult(this.collisionNormal, percent * Math.max(this.penetrationDepth - slop, 0) / (this.body1.invMass + this.body2.invMass));
-        this.body1.center.sub(Vector.mult(correction, this.body1.invMass));
-        this.body2.center.add(Vector.mult(correction, this.body2.invMass));
+        this.body1.center.add(Vector.mult(correction, this.body1.invMass));
+        this.body2.center.sub(Vector.mult(correction, this.body2.invMass));
     }
 
     static getCollision(body1, body2) {

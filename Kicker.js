@@ -3,7 +3,7 @@ class Kicker {
         this.player = player;
         this.active = false;
         this.kickPower = kickPower;
-        this.radius = player.radius + 3;
+        this.radius = player.radius + 3.5;
         this.center = player.center;
     }
 
