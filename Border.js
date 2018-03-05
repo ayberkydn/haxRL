@@ -1,28 +1,33 @@
 class Border extends Body {
-    constructor(centerX, centerY, restitution, visible = true) {
+    constructor(centerX, centerY, restitution, extendsTo, visible = true) {
         super(...arguments);
         this.center = new Vector(centerX, centerY);
         this.mass = Infinity;
         this.invMass = 0;
         this.color = "#C7E6BD";
         this.visible = visible;
+        this.extendsTo = null;
     }
     update() {}
 
-}
-
-class ArcBorder extends Border {
-    constructor(centerX, centerY, startAngle, endAngle, radius, visible) {
-        super(centerX, centerY, vsible);
-        this.startAngle = startAngle;
-        this.endAngle = endAngle;
-        this.radius = radius;
+    extendUp() {
+        this.extendsTo = "up";
     }
+    extendDown() {
+        this.extendsTo = "down";
+    }
+    extendLeft() {
+        this.extendsTo = "left";
+    }
+    extendRight() {
+        this.extendsTo = "right";
+    }
+
 }
 
 class HorizontalBorder extends Border {
-    constructor(centerX, centerY, length, restitution, visible) {
-        super(centerX, centerY, restitution, visible);
+    constructor(centerX, centerY, length, restitution, extendsTo, visible) {
+        super(centerX, centerY, restitution, extendsTo, visible);
         this.length = length;
     }
 
@@ -44,8 +49,8 @@ class HorizontalBorder extends Border {
 }
 
 class VerticalBorder extends Border {
-    constructor(centerX, centerY, length, restitution, visible) {
-        super(centerX, centerY, restitution, visible);
+    constructor(centerX, centerY, length, restitution, extendsTo, visible) {
+        super(centerX, centerY, restitution, extendsTo, visible);
         this.length = length;
     }
 

@@ -1,16 +1,40 @@
 class Box {
-    constructor(xLeft, xRight, yUp, yDown, restitution) {
+    constructor(xLeft, xRight, yUp, yDown, r) {
         let horizLength = xRight - xLeft;
         let vertLength = yDown - yUp;
         if (horizLength <= 0 || vertLength <= 0) {
             throw "Invalid box locations, check the parameters";
         }
         this.borders = {
-            up: new HorizontalBorder((xLeft + xRight) / 2, yUp, horizLength, restitution),
-            down: new HorizontalBorder((xLeft + xRight) / 2, yDown, horizLength, restitution),
-            left: new VerticalBorder(xLeft, (yUp + yDown) / 2, vertLength, restitution),
-            right: new VerticalBorder(xRight, (yUp + yDown) / 2, vertLength, restitution),
+            up: new HorizontalBorder(
+                centerX = (xLeft + xRight) / 2,
+                centerY = yUp,
+                length = horizLength,
+                restitution = r),
+
+            down: new HorizontalBorder(
+                centerX = (xLeft + xRight) / 2,
+                centerY = yDown,
+                length = horizLength,
+                restitution = r),
+
+            left: new VerticalBorder(
+                centerX = xLeft,
+                centerY = (yUp + yDown) / 2,
+                length = vertLength,
+                restitution = r),
+
+            right: new VerticalBorder(
+                centerX = xRight,
+                centerY = (yUp + yDown) / 2,
+                length = vertLength,
+                restitution = r),
         };
+
+        this.borders.up.extendUp();
+        this.borders.down.extendDown();
+        this.borders.left.extendLeft();
+        this.borders.right.extendRight();
 
 
     }
