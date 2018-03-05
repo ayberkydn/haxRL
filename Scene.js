@@ -5,6 +5,7 @@ class Scene {
             kickers: [],
             balls: [],
             borders: [],
+            boxes: [],
         };
 
         this.collisions = [];
@@ -18,6 +19,11 @@ class Scene {
             this.objects.balls.push(obj);
         } else if (obj instanceof Border) {
             this.objects.borders.push(obj);
+        } else if (obj instanceof Box) {
+            this.objects.boxes.push(obj);
+            for (let borderKey in obj.borders) {
+                this.objects.borders.push(obj.borders[borderKey]);
+            }
         }
         obj.scene = this;
     }

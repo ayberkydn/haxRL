@@ -18,8 +18,8 @@ const redColor = "#E56E56";
 const blueColor = "#5689E5";
 const playerMass = 3;
 const ballMass = 2;
-const playerRestitution = 0.4;
-const ballRestitution = 0.4;
+const playerRestitution = 0.45;
+const ballRestitution = 0.45;
 const playerDamping = 0.93;
 const playerkickDamping = 0.87;
 const playerkickPower = 15;
@@ -63,29 +63,13 @@ scene.addObject(new Player(
     kickPower = playerkickPower,
     color = blueColor));
 
-scene.addObject(new HorizontalBorder(
-    centerX = canvas.width / 2,
-    centerY = topbottomMargin,
-    length = canvas.width - leftrightMargin * 2,
-    restitution = 1));
-
-scene.addObject(new HorizontalBorder(
-    centerX = canvas.width / 2,
-    centerY = canvas.height - topbottomMargin,
-    length = canvas.width - leftrightMargin * 2,
-    restitution = 1));
-
-scene.addObject(new VerticalBorder(
-    centerX = leftrightMargin,
-    centerY = canvas.height / 2,
-    lenght = canvas.height - topbottomMargin * 2,
-    restitution = 1));
-
-scene.addObject(new VerticalBorder(
-    centerX = canvas.width - leftrightMargin,
-    centerY = canvas.height / 2,
-    lenght = canvas.height - topbottomMargin * 2,
-    restitution = 1));
+scene.addObject(new Box(
+    xLeft = leftrightMargin,
+    xRight = canvas.width - leftrightMargin,
+    yUp = topbottomMargin,
+    yDown = canvas.height - topbottomMargin,
+    restitution = 1
+));
 
 
 window.setInterval(function () {
