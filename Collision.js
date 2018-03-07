@@ -47,20 +47,16 @@ class Collision {
             return Collision.getCollision(body2, body1);
 
         } else if (body1 instanceof Disc && body2 instanceof HorizontalBorder) {
-            if (body1.center.y - body2.center.y < body1.radius && body2.extendsTo == "up") {
-                console.log("collision");
+            if (body1.center.y - body2.center.y < body1.radius && body2.extendsTo == Way.up) {
                 return new DHBCollision(body1, body2);
-            } else if (body2.center.y - body1.center.y < body1.radius && body2.extendsTo == "down") {
-                console.log("collision");
+            } else if (body2.center.y - body1.center.y < body1.radius && body2.extendsTo == Way.down) {
                 return new DHBCollision(body1, body2);
             }
 
         } else if (body1 instanceof Disc && body2 instanceof VerticalBorder) {
-            if (body1.center.x - body2.center.x < body1.radius && body2.extendsTo == "left") {
-                console.log("collision");
+            if (body1.center.x - body2.center.x < body1.radius && body2.extendsTo == Way.left) {
                 return new DVBCollision(body1, body2);
-            } else if (body2.center.x - body1.center.x < body1.radius && body2.extendsTo == "right") {
-                console.log("collision");
+            } else if (body2.center.x - body1.center.x < body1.radius && body2.extendsTo == Way.right) {
                 return new DVBCollision(body1, body2);
             }
 
@@ -100,9 +96,9 @@ class DVBCollision extends Collision {
             throw `Wrong collision type: Not a Disk-VB collision`;
         } else {
             super(body1, body2);
-            if (body2.extendsTo == "left") {
+            if (body2.extendsTo == Way.left) {
                 this.collisionNormal = new Vector(1, 0);
-            } else if (body2.extendsTo == "right") {
+            } else if (body2.extendsTo == Way.right) {
                 this.collisionNormal = new Vector(-1, 0);
             } else {
                 this.collisionNormal = body1.center.x > body2.center.x ? new Vector(1, 0) : new Vector(-1, 0);
@@ -122,9 +118,9 @@ class DHBCollision extends Collision {
             throw `Wrong collision type: Not a Disk-HB collision`;
         } else {
             super(body1, body2);
-            if (body2.extendsTo == "up") {
+            if (body2.extendsTo == Way.up) {
                 this.collisionNormal = new Vector(0, 1);
-            } else if (body2.extendsTo == "down") {
+            } else if (body2.extendsTo == Way.down) {
                 this.collisionNormal = new Vector(0, -1);
             } else {
                 this.collisionNormal = body1.center.y > body2.center.y ? new Vector(0, 1) : new Vector(0, -1);

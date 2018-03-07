@@ -57,7 +57,6 @@ class Scene {
         }
 
         // get ball-kicker collisions
-
         for (let ball of this.objects.balls) {
             for (let kicker of this.objects.kickers) {
                 let cls = Collision.getCollision(ball, kicker);
@@ -83,7 +82,7 @@ class Scene {
         }
 
         //Iterate 20 times for collisions
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < 10; i++) {
             this.getCollisions();
             this.resolveCollisions();
         }

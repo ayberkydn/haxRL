@@ -11,11 +11,10 @@ window.onkeyup = function (evt) {
 };
 
 
-
 // Parameters
-const bgColor = "#688F56";
-const redColor = "#E56E56";
-const blueColor = "#5689E5";
+const bgColor = Color.green;
+const redColor = Color.red;
+const blueColor = Color.blue;
 const playerMass = 3;
 const ballMass = 2;
 const playerRestitution = 0.45;

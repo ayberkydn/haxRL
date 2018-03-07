@@ -21,7 +21,7 @@ class Kicker {
 
     draw() {
         if (this.active) {
-            ctx.strokeStyle = "white";
+            ctx.strokeStyle = Color.white;
             ctx.beginPath();
             ctx.arc(this.player.center.x, this.player.center.y, this.player.radius, 0, 2 * Math.PI);
             ctx.lineWidth = 2;

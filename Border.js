@@ -4,23 +4,23 @@ class Border extends Body {
         this.center = new Vector(centerX, centerY);
         this.mass = Infinity;
         this.invMass = 0;
-        this.color = "#C7E6BD";
+        this.color = Color.goal;
         this.visible = visible;
         this.extendsTo = null;
     }
     update() {}
 
     extendUp() {
-        this.extendsTo = "up";
+        this.extendsTo = Way.up;
     }
     extendDown() {
-        this.extendsTo = "down";
+        this.extendsTo = Way.down;
     }
     extendLeft() {
-        this.extendsTo = "left";
+        this.extendsTo = Way.left;
     }
     extendRight() {
-        this.extendsTo = "right";
+        this.extendsTo = Way.right;
     }
 
 }

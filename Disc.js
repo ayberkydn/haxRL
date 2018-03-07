@@ -30,7 +30,7 @@ class Disc extends Body {
         ctx.beginPath();
         ctx.arc(this.center.x, this.center.y, this.radius, 0, 2 * Math.PI);
         ctx.fill();
-        ctx.strokeStyle = "black";
+        ctx.strokeStyle = Color.black;
         ctx.beginPath();
         ctx.arc(this.center.x, this.center.y, this.radius, 0, 2 * Math.PI);
         ctx.lineWidth = 2;
@@ -43,6 +43,6 @@ class Disc extends Body {
 
 class Ball extends Disc {
     constructor(initialX, initialY, radius, mass) {
-        super(...arguments, "white");
+        super(...arguments, Color.white);
     }
 }
