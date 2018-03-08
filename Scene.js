@@ -5,7 +5,12 @@ class Scene {
             kickers: [],
             balls: [],
             borders: [],
+            posts: [],
+        };
+
+        this.metaObjects = {
             boxes: [],
+            goals: [],
         };
 
         this.collisions = [];
@@ -20,49 +25,43 @@ class Scene {
         } else if (obj instanceof Border) {
             this.objects.borders.push(obj);
         } else if (obj instanceof Box) {
-            this.objects.boxes.push(obj);
+            this.metaObjects.boxes.push(obj);
             for (let borderKey in obj.borders) {
                 this.objects.borders.push(obj.borders[borderKey]);
             }
+        } else if (obj instanceof Goal) {
+            this.metaObjects.goals.push(obj);
+
+            this.objects.posts.push(obj.topPost);
+            this.objects.posts.push(obj.bottomPost);
         }
         obj.scene = this;
     }
 
-    getCollisions() {
-        // get disc-disc collisions
-        // // // get player-ball collisions
-        for (let player of this.objects.players) {
-            for (let ball of this.objects.balls) {
-                let cls = Collision.getCollision(player, ball);
-                if (cls) this.collisions.push(cls);
-            }
-
-        }
-
-        // // // get player-player collisions
-        for (let player of this.objects.players) {
-            for (let player2 of this.objects.players) {
-                let cls = Collision.getCollision(player, player2);
-                if (cls) this.collisions.push(cls);
-            }
-
-        }
-
-        // get disc-border collisions
-        for (let disc of this.objects.players.concat(this.objects.balls)) {
-            for (let border of this.objects.borders) {
-                let cls = Collision.getCollision(disc, border);
-                if (cls) this.collisions.push(cls);
+    getCollisions(group1, group2) {
+        for (let obj1 of group1) {
+            for (let obj2 of group2) {
+                let cls = Collision.getCollision(obj1, obj2);
+                if (cls)
+                    this.collisions.push(cls);
             }
         }
+    }
 
-        // get ball-kicker collisions
-        for (let ball of this.objects.balls) {
-            for (let kicker of this.objects.kickers) {
-                let cls = Collision.getCollision(ball, kicker);
-                if (cls) this.collisions.push(cls);
-            }
-        }
+
+    getAllCollisions() {
+        this.getCollisions(this.objects.players, this.objects.players);
+        this.getCollisions(this.objects.players, this.objects.balls);
+        this.getCollisions(this.objects.players, this.objects.borders);
+        this.getCollisions(this.objects.players, this.objects.posts);
+
+        this.getCollisions(this.objects.kickers, this.objects.balls);
+
+        this.getCollisions(this.objects.balls, this.objects.borders);
+        this.getCollisions(this.objects.balls, this.objects.posts);
+
+
+
     }
 
     resolveCollisions() {
@@ -70,7 +69,14 @@ class Scene {
             let collision = this.collisions.pop();
             collision.resolve();
         }
+    }
 
+    checkGoals() {
+        for (let goal of this.metaObjects.goals) {
+            for (let ball of this.objects.balls) {
+                goal.checkGoal(ball);
+            }
+        }
     }
 
     update() {
@@ -83,9 +89,11 @@ class Scene {
 
         //Iterate 20 times for collisions
         for (let i = 0; i < 10; i++) {
-            this.getCollisions();
+            this.getAllCollisions();
             this.resolveCollisions();
         }
+
+        this.checkGoals();
 
 
     }

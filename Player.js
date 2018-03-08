@@ -1,6 +1,11 @@
 class Player extends Disc {
     constructor(centerX, centerY, radius, mass, restitution, damping, kickDamping, kickPower, color) {
         super(centerX, centerY, radius, mass, restitution, damping, color);
+        this.upKey = "ArrowUp";
+        this.downKey = "ArrowDown";
+        this.leftKey = "ArrowLeft";
+        this.rightKey = "ArrowRight";
+        this.shootKey = "x";
         this.up = false;
         this.down = false;
         this.left = false;
@@ -16,27 +21,27 @@ class Player extends Disc {
     handleKeys() {
 
         //Handles pressed keys to set the state of player
-        if (keys.ArrowUp === true) {
+        if (keys[this.upKey] === true) {
             this.up = true;
         } else {
             this.up = false;
         }
-        if (keys.ArrowDown === true) {
+        if (keys[this.downKey] === true) {
             this.down = true;
         } else {
             this.down = false;
         }
-        if (keys.ArrowLeft === true) {
+        if (keys[this.leftKey] === true) {
             this.left = true;
         } else {
             this.left = false;
         }
-        if (keys.ArrowRight === true) {
+        if (keys[this.rightKey] === true) {
             this.right = true;
         } else {
             this.right = false;
         }
-        if (keys.x === true) {
+        if (keys[this.shootKey] === true) {
             if (this.kickPast === false) {
                 this.kicker.active = true;
             }

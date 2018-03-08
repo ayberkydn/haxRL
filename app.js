@@ -25,7 +25,7 @@ const playerkickPower = 15;
 const ballDamping = 0.98;
 const topbottomMargin = 60;
 const leftrightMargin = 30;
-//
+// 
 
 // __main__
 
@@ -68,6 +68,20 @@ scene.addObject(new Box(
     yUp = topbottomMargin,
     yDown = canvas.height - topbottomMargin,
     restitution = 1
+));
+
+scene.addObject(new Goal(
+    centerX = leftrightMargin,
+    centerY = canvas.height / 2,
+    way = Way.left,
+    length = 150
+));
+
+scene.addObject(new Goal(
+    centerX = canvas.width - leftrightMargin,
+    centerY = canvas.height / 2,
+    way = Way.right,
+    length = 150
 ));
 
 

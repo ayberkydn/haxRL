@@ -31,11 +31,10 @@ class Box {
                 restitution = r),
         };
 
-        this.borders.up.extendUp();
-        this.borders.down.extendDown();
-        this.borders.left.extendLeft();
-        this.borders.right.extendRight();
-
+        this.borders.up.extendTo(Way.up);
+        this.borders.down.extendTo(Way.down);
+        this.borders.left.extendTo(Way.left);
+        this.borders.right.extendTo(Way.right);
 
     }
 

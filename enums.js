@@ -11,5 +11,5 @@ var Color = {
     green: "#688F56",
     black: "#000000",
     white: "#FFFFFF",
-    goal: "#C7E6BD",
+    border: "#C7E6BD",
 };

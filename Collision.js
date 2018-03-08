@@ -103,6 +103,11 @@ class DVBCollision extends Collision {
             } else {
                 this.collisionNormal = body1.center.x > body2.center.x ? new Vector(1, 0) : new Vector(-1, 0);
             }
+            console.log(body2.anti);
+            if (body2.anti === true) {
+                this.collisionNormal.mult(-1);
+                console.log("asd");
+            }
             this.relativeVelocity = Vector.sub(this.body1.velocity, this.body2.velocity);
             this.velocityAlongNormal = Vector.dot(this.collisionNormal, this.relativeVelocity);
             this.penetrationDepth = this.body1.radius - Math.abs(this.body1.center.x - this.body2.center.x);
@@ -125,12 +130,17 @@ class DHBCollision extends Collision {
             } else {
                 this.collisionNormal = body1.center.y > body2.center.y ? new Vector(0, 1) : new Vector(0, -1);
             }
+
+            if (body2.anti === true) {
+
+            }
             this.relativeVelocity = Vector.sub(this.body1.velocity, this.body2.velocity);
             this.velocityAlongNormal = Vector.dot(this.collisionNormal, this.relativeVelocity);
             this.penetrationDepth = this.body1.radius - Math.abs(this.body1.center.y - this.body2.center.y);
         }
     }
 }
+
 
 class KickCollision extends Collision {
     constructor(body1, body2) {
