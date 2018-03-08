@@ -1,6 +1,8 @@
 class Player extends Disc {
     constructor(centerX, centerY, radius, mass, restitution, damping, kickDamping, kickPower, color) {
         super(centerX, centerY, radius, mass, restitution, damping, color);
+        console.log(centerX);
+
         this.upKey = "ArrowUp";
         this.downKey = "ArrowDown";
         this.leftKey = "ArrowLeft";

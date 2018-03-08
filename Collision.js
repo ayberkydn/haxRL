@@ -47,17 +47,23 @@ class Collision {
             return Collision.getCollision(body2, body1);
 
         } else if (body1 instanceof Disc && body2 instanceof HorizontalBorder) {
-            if (body1.center.y - body2.center.y < body1.radius && body2.extendsTo == Way.up) {
-                return new DHBCollision(body1, body2);
-            } else if (body2.center.y - body1.center.y < body1.radius && body2.extendsTo == Way.down) {
-                return new DHBCollision(body1, body2);
+            if (body2.center.x + body2.length / 2 > body1.center.x && body2.center.x - body2.length / 2 < body1.center.x) {
+                if (body1.center.y - body2.center.y < body1.radius && body2.extendsTo == Way.up) {
+                    return new DHBCollision(body1, body2);
+                } else if (body2.center.y - body1.center.y < body1.radius && body2.extendsTo == Way.down) {
+                    return new DHBCollision(body1, body2);
+                }
             }
 
         } else if (body1 instanceof Disc && body2 instanceof VerticalBorder) {
-            if (body1.center.x - body2.center.x < body1.radius && body2.extendsTo == Way.left) {
-                return new DVBCollision(body1, body2);
-            } else if (body2.center.x - body1.center.x < body1.radius && body2.extendsTo == Way.right) {
-                return new DVBCollision(body1, body2);
+            if (body2.center.y + body2.length / 2 > body1.center.y && body2.center.y - body2.length / 2 < body1.center.y) {
+
+                if (body1.center.x - body2.center.x < body1.radius && body2.extendsTo == Way.left) {
+
+                    return new DVBCollision(body1, body2);
+                } else if (body2.center.x - body1.center.x < body1.radius && body2.extendsTo == Way.right) {
+                    return new DVBCollision(body1, body2);
+                }
             }
 
         } else if (body1 instanceof Disc && body2 instanceof Disc) {
@@ -103,11 +109,6 @@ class DVBCollision extends Collision {
             } else {
                 this.collisionNormal = body1.center.x > body2.center.x ? new Vector(1, 0) : new Vector(-1, 0);
             }
-            console.log(body2.anti);
-            if (body2.anti === true) {
-                this.collisionNormal.mult(-1);
-                console.log("asd");
-            }
             this.relativeVelocity = Vector.sub(this.body1.velocity, this.body2.velocity);
             this.velocityAlongNormal = Vector.dot(this.collisionNormal, this.relativeVelocity);
             this.penetrationDepth = this.body1.radius - Math.abs(this.body1.center.x - this.body2.center.x);
@@ -131,9 +132,6 @@ class DHBCollision extends Collision {
                 this.collisionNormal = body1.center.y > body2.center.y ? new Vector(0, 1) : new Vector(0, -1);
             }
 
-            if (body2.anti === true) {
-
-            }
             this.relativeVelocity = Vector.sub(this.body1.velocity, this.body2.velocity);
             this.velocityAlongNormal = Vector.dot(this.collisionNormal, this.relativeVelocity);
             this.penetrationDepth = this.body1.radius - Math.abs(this.body1.center.y - this.body2.center.y);

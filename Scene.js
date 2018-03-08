@@ -31,7 +31,7 @@ class Scene {
             }
         } else if (obj instanceof Goal) {
             this.metaObjects.goals.push(obj);
-
+            this.objects.borders.push(obj.goalLine);
             this.objects.posts.push(obj.topPost);
             this.objects.posts.push(obj.bottomPost);
         }
@@ -55,8 +55,7 @@ class Scene {
         this.getCollisions(this.objects.players, this.objects.borders);
         this.getCollisions(this.objects.players, this.objects.posts);
 
-        this.getCollisions(this.objects.kickers, this.objects.balls);
-
+        this.getCollisions(this.objects.balls, this.objects.kickers);
         this.getCollisions(this.objects.balls, this.objects.borders);
         this.getCollisions(this.objects.balls, this.objects.posts);
 
@@ -74,11 +73,12 @@ class Scene {
     checkGoals() {
         for (let goal of this.metaObjects.goals) {
             for (let ball of this.objects.balls) {
-                goal.checkGoal(ball);
+                if (goal.checkGoal(ball)) {
+                    return true;
+                }
             }
         }
     }
-
     update() {
         for (let objectKey in this.objects) {
             let objectList = this.objects[objectKey];
@@ -88,13 +88,10 @@ class Scene {
         }
 
         //Iterate 20 times for collisions
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 20; i++) {
             this.getAllCollisions();
             this.resolveCollisions();
         }
-
-        this.checkGoals();
-
 
     }
     draw() {
@@ -106,5 +103,9 @@ class Scene {
                 object.draw();
             }
         }
+    }
+
+    reset() {
+        this.objects = this.startingStateObjects;
     }
 }

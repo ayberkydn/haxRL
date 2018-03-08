@@ -14,8 +14,8 @@ class Border extends Body {
         this.extendsTo = way;
     }
 
-    setAnti() {
-        this.anti = true;
+    setColor(color) {
+        this.color = color;
     }
 }
 

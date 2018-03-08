@@ -10,82 +10,29 @@ window.onkeyup = function (evt) {
     keys[evt.key] = false;
 };
 
-
 // Parameters
-const bgColor = Color.green;
-const redColor = Color.red;
-const blueColor = Color.blue;
-const playerMass = 3;
-const ballMass = 2;
-const playerRestitution = 0.45;
-const ballRestitution = 0.45;
-const playerDamping = 0.93;
-const playerkickDamping = 0.87;
-const playerkickPower = 15;
-const ballDamping = 0.98;
-const topbottomMargin = 60;
-const leftrightMargin = 30;
-// 
-
-// __main__
-
-scene = new Scene();
-
-
-scene.addObject(new Ball(
-    centerX = canvas.width / 2,
-    centerY = canvas.height / 2,
-    radius = 9,
-    mass = ballMass,
-    restitution = ballRestitution,
-    damping = ballDamping));
-
-scene.addObject(new Player(
-    centerX = 300,
-    centerY = canvas.height / 2,
-    radius = 16,
-    mass = playerMass,
-    restitution = playerRestitution,
-    damping = playerDamping,
-    kickDamping = playerkickDamping,
-    kickPower = playerkickPower,
-    color = redColor));
-
-scene.addObject(new Player(
-    centerX = 500,
-    centerY = canvas.height / 2,
-    radius = 16,
-    mass = playerMass,
-    restitution = playerRestitution,
-    damping = playerDamping,
-    kickDamping = playerkickDamping,
-    kickPower = playerkickPower,
-    color = blueColor));
-
-scene.addObject(new Box(
-    xLeft = leftrightMargin,
-    xRight = canvas.width - leftrightMargin,
-    yUp = topbottomMargin,
-    yDown = canvas.height - topbottomMargin,
-    restitution = 1
-));
-
-scene.addObject(new Goal(
-    centerX = leftrightMargin,
-    centerY = canvas.height / 2,
-    way = Way.left,
-    length = 150
-));
-
-scene.addObject(new Goal(
-    centerX = canvas.width - leftrightMargin,
-    centerY = canvas.height / 2,
-    way = Way.right,
-    length = 150
-));
+var bgColor = Color.green;
+var redColor = Color.red;
+var blueColor = Color.blue;
+var playerMass = 3;
+var ballMass = 2;
+var playerRestitution = 0.45;
+var borderRestitution = 1;
+var ballRestitution = 0.45;
+var playerDamping = 0.93;
+var playerkickDamping = 0.87;
+var playerkickPower = 15;
+var playerRadius = 16;
+var ballRadius = 9;
+var ballDamping = 0.98;
+var topbottomMargin = 60;
+var leftrightMargin = 30;
+var goalLength = 150;
+//
+var game = new Game();
 
 
 window.setInterval(function () {
-    scene.update();
-    scene.draw();
+    game.update();
+    game.draw();
 }, 30);

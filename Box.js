@@ -6,29 +6,13 @@ class Box {
             throw "Invalid box locations, check the parameters";
         }
         this.borders = {
-            up: new HorizontalBorder(
-                centerX = (xLeft + xRight) / 2,
-                centerY = yUp,
-                length = horizLength,
-                restitution = r),
+            up: new HorizontalBorder((xLeft + xRight) / 2, yUp, horizLength, r),
 
-            down: new HorizontalBorder(
-                centerX = (xLeft + xRight) / 2,
-                centerY = yDown,
-                length = horizLength,
-                restitution = r),
+            down: new HorizontalBorder((xLeft + xRight) / 2, yDown, horizLength, r),
 
-            left: new VerticalBorder(
-                centerX = xLeft,
-                centerY = (yUp + yDown) / 2,
-                length = vertLength,
-                restitution = r),
+            left: new VerticalBorder(xLeft, (yUp + yDown) / 2, vertLength, r),
 
-            right: new VerticalBorder(
-                centerX = xRight,
-                centerY = (yUp + yDown) / 2,
-                length = vertLength,
-                restitution = r),
+            right: new VerticalBorder(xRight, (yUp + yDown) / 2, vertLength, r),
         };
 
         this.borders.up.extendTo(Way.up);
