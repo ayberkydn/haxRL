@@ -11,40 +11,6 @@ class Player extends Disc {
 
     }
 
-    handleKeys() {
-        /*
-                //Handles pressed keys to set the state of player
-                if (keys[this.upKey] === true) {
-                    this.up = true;
-                } else {
-                    this.up = false;
-                }
-                if (keys[this.downKey] === true) {
-                    this.down = true;
-                } else {
-                    this.down = false;
-                }
-                if (keys[this.leftKey] === true) {
-                    this.left = true;
-                } else {
-                    this.left = false;
-                }
-                if (keys[this.rightKey] === true) {
-                    this.right = true;
-                } else {
-                    this.right = false;
-                }
-                if (keys[this.shootKey] === true) {
-                    if (this.kickPast === false) {
-                        this.kicker.active = true;
-                    }
-                    this.kickPast = true;
-                } else {
-                    this.kicker.active = false;
-                    this.kickPast = false;
-                }
-                */
-    }
     applyAction(action) {
         if (action == Action.up) {
             this.applyForce(Unitvec.up);
@@ -93,6 +59,10 @@ class Player extends Disc {
             this.kicker.active = true;
         } else if (action == Action.uprightshoot) {
             this.applyForce(Unitvec.upright);
+            this.kicker.active = true;
+        } else if (action == Action.nomove) {
+            this.kicker.active = false;
+        } else if (action == Action.nomoveshoot) {
             this.kicker.active = true;
         }
 

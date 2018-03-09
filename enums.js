@@ -29,7 +29,7 @@ var Action = {
     downright: "downright",
     right: "right",
     upright: "upright",
-    upshoot: "up",
+    upshoot: "upshoot",
     upleftshoot: "upleftshoot",
     leftshoot: "leftshoot",
     downleftshoot: "downleftshoot",

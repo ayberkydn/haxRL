@@ -63,7 +63,7 @@ class HumanAgent extends Agent {
                 } else if (right) {
                     this.player.applyAction(Action.rightshoot);
                 } else {
-                    this.player.applyAction(Action.shoot);
+                    this.player.applyAction(Action.nomoveshoot);
                 }
             }
         } else {
@@ -89,7 +89,7 @@ class HumanAgent extends Agent {
                 } else if (right) {
                     this.player.applyAction(Action.right);
                 } else {
-                    this.player.applyAction(Action.shoot);
+                    this.player.applyAction(Action.nomove);
                 }
             }
         }
