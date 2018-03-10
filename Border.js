@@ -12,6 +12,7 @@ class Border extends Body {
 
     extendTo(way) {
         this.extendsTo = way;
+        return this;
     }
 
     setColor(color) {

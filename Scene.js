@@ -78,6 +78,7 @@ class Scene {
                 }
             }
         }
+        return false;
     }
     update() {
         for (let objectKey in this.objects) {
