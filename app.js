@@ -25,9 +25,9 @@ var playerkickPower = 15;
 var playerRadius = 16;
 var ballRadius = 9;
 var ballDamping = 0.98;
-var topbottomMargin = 60;
-var leftrightMargin = 30;
-var goalLength = 150;
+var topbottomMargin = 80;
+var leftrightMargin = 60;
+var goalLength = 120;
 //
 var game = new Game();
 game.addAgent(new HumanAgent(Side.red));
