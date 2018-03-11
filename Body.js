@@ -30,5 +30,15 @@ class Body {
         return this;
     }
 
+    setColor(color) {
+        this.color = color;
+        return this;
+    }
+
+    setOuterColor(color) {
+        this.outerColor = color;
+        return this;
+    }
+
 
 }

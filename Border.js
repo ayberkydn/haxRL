@@ -14,16 +14,8 @@ class Border extends Body {
     applyImpulse() { //do nothing
     }
 
-    addCollisionMask(objClass) {
-        this.collisionMask.push(objClass);
-    }
-
     extendTo(way) {
         this.extendsTo = way;
         return this;
-    }
-
-    setColor(color) {
-        this.color = color;
     }
 }

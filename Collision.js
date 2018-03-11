@@ -64,7 +64,7 @@ class Collision {
                 break;
             }
         }
-        if ((body1_in_body2CollisionMask && body1_in_body2CollisionMask) != true) {
+        if ((body1_in_body2CollisionMask && body2_in_body1CollisionMask) != true) {
             return null;
         }
 
