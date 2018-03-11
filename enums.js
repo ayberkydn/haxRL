@@ -1,8 +1,8 @@
 var Way = {
-    up: "up",
-    down: "down",
-    left: "left",
-    right: "right",
+    up: "WAY_UP",
+    down: "WAY_DOWN",
+    left: "WAY_LEFT",
+    right: "WAY_RIGHT",
 };
 
 var Color = {
@@ -16,29 +16,29 @@ var Color = {
 
 
 var Side = {
-    red: "red",
-    blue: "blue",
+    red: "SIDE_RED",
+    blue: "SIDE_BLUE",
 };
 
 var Action = {
-    up: "up",
-    upleft: "upleft",
-    left: "left",
-    downleft: "downleft",
-    down: "down",
-    downright: "downright",
-    right: "right",
-    upright: "upright",
-    upshoot: "upshoot",
-    upleftshoot: "upleftshoot",
-    leftshoot: "leftshoot",
-    downleftshoot: "downleftshoot",
-    downshoot: "downshoot",
-    downrightshoot: "downrightshoot",
-    rightshoot: "rightshoot",
-    uprightshoot: "uprightshoot",
-    nomove: "nomove",
-    nomoveshoot: "nomoveshoot",
+    up: "ACTION_UP",
+    upleft: "ACTION_UP_LEFT",
+    left: "ACTION_LEFT",
+    downleft: "ACTION_DOWN_LEFT",
+    down: "ACTION_DOWN",
+    downright: "ACTION_DOWN_RIGHT",
+    right: "ACTION_RIGHT",
+    upright: "ACTION_UP_RIGHT",
+    upshoot: "ACTION_UP_SHOOT",
+    upleftshoot: "ACTION_UP_LEFT_SHOOT",
+    leftshoot: "ACTION_LEFT_SHOOT",
+    downleftshoot: "ACTION_DOWN_LEFT_SHOOT",
+    downshoot: "ACTION_DOWN_SHOOT",
+    downrightshoot: "ACTION_DOWN_RIGHT_SHOOT",
+    rightshoot: "ACTION_RIGHT_SHOOT",
+    uprightshoot: "ACTION_UP_RIGHT_SHOOT",
+    nomove: "ACTION_NOMOVE",
+    nomoveshoot: "ACTION_NOMOVE_SHOOT",
 };
 
 var Unitvec = {

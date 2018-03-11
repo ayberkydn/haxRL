@@ -7,7 +7,6 @@ class Collision {
 
 
     resolve() {
-        //https://gamedevelopment.tutsplus.com/tutorials/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331
         //Apply corresponding forces/impulses to colliding objects
 
         this.resolveImpulse();
@@ -16,6 +15,7 @@ class Collision {
     }
 
     resolveImpulse() {
+        // //https://gamedevelopment.tutsplus.com/tutorials/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331
         // Don't handle collision if objects aren't actually colliding
         if (this.velocityAlongNormal > 0)
             return;

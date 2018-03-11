@@ -33,8 +33,6 @@ var game = new Game();
 game.addAgent(new HumanAgent(Side.red));
 game.addAgent(new RandomAgent(Side.blue));
 
-
-
 window.setInterval(function () {
     game.update();
     game.draw();
