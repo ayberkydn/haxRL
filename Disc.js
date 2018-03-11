@@ -6,7 +6,15 @@ class Disc extends Body {
         this.invMass = 1 / this.mass;
         this.color = color;
         this.damping = damping;
+        this.hollow = false;
+        this.outerColor = Color.black;
     }
+
+    makeHollow() {
+        this.hollow = true;
+        return this;
+    }
+
 
     applyForce(forceVec) {
         let accelerationDelta = Vector.div(forceVec, this.mass);
@@ -26,23 +34,16 @@ class Disc extends Body {
     }
 
     draw() {
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.center.x, this.center.y, this.radius, 0, 2 * Math.PI);
-        ctx.fill();
-        ctx.strokeStyle = Color.black;
+        if (this.hollow == false) {
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.center.x, this.center.y, this.radius, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+        ctx.strokeStyle = this.outerColor;
         ctx.beginPath();
         ctx.arc(this.center.x, this.center.y, this.radius, 0, 2 * Math.PI);
         ctx.lineWidth = 2;
         ctx.stroke();
-    }
-}
-
-
-
-
-class Ball extends Disc {
-    constructor(initialX, initialY, radius, mass) {
-        super(...arguments, Color.white);
     }
 }

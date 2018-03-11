@@ -20,8 +20,6 @@ class Game {
         agent.game = this;
         this.agents.push(agent);
         this.scene.addObject(agent.player);
-
-
     }
 
     reset() {

@@ -9,6 +9,7 @@ class Collision {
     resolve() {
         //https://gamedevelopment.tutsplus.com/tutorials/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331
         //Apply corresponding forces/impulses to colliding objects
+
         this.resolveImpulse();
         this.resolvePenetration();
 
@@ -41,10 +42,38 @@ class Collision {
     static getCollision(body1, body2) {
         // Returns collision of corresponding type with body1 and body2, if any. 
         // else returns undefined
-        if (body1 === body2) return;
+
+        if (body1 === body2) {
+            return null;
+        }
+
+        let body1_in_body2CollisionMask = false;
+        let body2_in_body1CollisionMask = false;
+        for (let objClass of body1.collisionMask) {
+
+            if (body2 instanceof objClass) {
+                body2_in_body1CollisionMask = true;
+                break;
+            }
+        }
+        for (let objClass of body2.collisionMask) {
+
+
+            if (body1 instanceof objClass) {
+                body1_in_body2CollisionMask = true;
+                break;
+            }
+        }
+        if ((body1_in_body2CollisionMask && body1_in_body2CollisionMask) != true) {
+            return null;
+        }
+
+
         if (body1 instanceof Border && body2 instanceof Disc) {
             // Disc-Border is allowed, Border-Disc is not.
             return Collision.getCollision(body2, body1);
+
+
 
         } else if (body1 instanceof Disc && body2 instanceof HorizontalBorder) {
             if (body2.center.x + body2.length / 2 > body1.center.x && body2.center.x - body2.length / 2 < body1.center.x) {
@@ -55,106 +84,40 @@ class Collision {
                 }
             }
 
+
+
+
         } else if (body1 instanceof Disc && body2 instanceof VerticalBorder) {
             if (body2.center.y + body2.length / 2 > body1.center.y && body2.center.y - body2.length / 2 < body1.center.y) {
 
                 if (body1.center.x - body2.center.x < body1.radius && body2.extendsTo == Way.left) {
-
                     return new DVBCollision(body1, body2);
                 } else if (body2.center.x - body1.center.x < body1.radius && body2.extendsTo == Way.right) {
                     return new DVBCollision(body1, body2);
                 }
             }
 
+
+
+
         } else if (body1 instanceof Disc && body2 instanceof Disc) {
             if (Vector.sub(body1.center, body2.center).magnitude() <= body1.radius + body2.radius) {
                 return new DDCollision(body1, body2);
             }
+
+
+
+
         } else if (body1 instanceof Kicker && body2 instanceof Ball) {
             return Collision.getCollision(body2, body1);
+
+
+
+
         } else if (body1 instanceof Ball && body2 instanceof Kicker) {
             if (Vector.sub(body1.center, body2.center).magnitude() <= body1.radius + body2.radius) {
                 return new KickCollision(body1, body2);
             }
-        }
-    }
-}
-
-class DDCollision extends Collision {
-    //Disc-Disc collision
-    constructor(body1, body2) {
-        if (!(body1 instanceof Disc && body2 instanceof Disc)) {
-            throw `Wrong collision type: Not a Disk-Disk collision`;
-        } else {
-            super(body1, body2);
-            this.collisionNormal = Vector.sub(this.body1.center, this.body2.center).normalize();
-            this.relativeVelocity = Vector.sub(this.body1.velocity, this.body2.velocity);
-            this.velocityAlongNormal = Vector.dot(this.collisionNormal, this.relativeVelocity);
-            this.penetrationDepth = Math.abs(this.body1.radius + this.body2.radius - Vector.sub(this.body1.center, this.body2.center).magnitude());
-        }
-    }
-}
-
-class DVBCollision extends Collision {
-    //Disc-VerticalBorder collision
-    constructor(body1, body2) {
-        if (!(body1 instanceof Disc && body2 instanceof VerticalBorder)) {
-            throw `Wrong collision type: Not a Disk-VB collision`;
-        } else {
-            super(body1, body2);
-            if (body2.extendsTo == Way.left) {
-                this.collisionNormal = new Vector(1, 0);
-            } else if (body2.extendsTo == Way.right) {
-                this.collisionNormal = new Vector(-1, 0);
-            } else {
-                this.collisionNormal = body1.center.x > body2.center.x ? new Vector(1, 0) : new Vector(-1, 0);
-            }
-            this.relativeVelocity = Vector.sub(this.body1.velocity, this.body2.velocity);
-            this.velocityAlongNormal = Vector.dot(this.collisionNormal, this.relativeVelocity);
-            this.penetrationDepth = this.body1.radius - Math.abs(this.body1.center.x - this.body2.center.x);
-        }
-    }
-}
-
-
-class DHBCollision extends Collision {
-    //Disc-HorizontalBorder collision
-    constructor(body1, body2) {
-        if (!(body1 instanceof Disc && body2 instanceof HorizontalBorder)) {
-            throw `Wrong collision type: Not a Disk-HB collision`;
-        } else {
-            super(body1, body2);
-            if (body2.extendsTo == Way.up) {
-                this.collisionNormal = new Vector(0, 1);
-            } else if (body2.extendsTo == Way.down) {
-                this.collisionNormal = new Vector(0, -1);
-            } else {
-                this.collisionNormal = body1.center.y > body2.center.y ? new Vector(0, 1) : new Vector(0, -1);
-            }
-
-            this.relativeVelocity = Vector.sub(this.body1.velocity, this.body2.velocity);
-            this.velocityAlongNormal = Vector.dot(this.collisionNormal, this.relativeVelocity);
-            this.penetrationDepth = this.body1.radius - Math.abs(this.body1.center.y - this.body2.center.y);
-        }
-    }
-}
-
-
-class KickCollision extends Collision {
-    constructor(body1, body2) {
-        if (!(body1 instanceof Ball && body2 instanceof Kicker)) {
-            throw `Wrong collision type: Not a Ball-Kicker collision`;
-        } else {
-            super(body1, body2);
-            this.collisionNormal = Vector.sub(this.body1.center, this.body2.center).normalize();
-        }
-    }
-
-    resolve() {
-        if (this.body2.active) {
-            this.body2.deactivate();
-            this.body1.applyImpulse(this.collisionNormal.mult(this.body2.kickPower));
-            new Audio("kicksound.mp3").play();
         }
     }
 }

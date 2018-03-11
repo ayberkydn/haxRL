@@ -4,11 +4,31 @@ class Body {
         this.restitution = restitution;
         this.velocity = new Vector(0, 0);
         this.acceleration = new Vector(0, 0);
+        this.collisionMask = [Body];
     }
 
-    applyForce() {}
-    applyImpulse() {}
-    update() {}
-    draw() {}
+    applyForce() {
+        throw "applyForce not implemented";
+    }
+    applyImpulse() {
+        throw "applyImpulse not implemented";
+    }
+    update() {
+        throw "update not implemented";
+    }
+    draw() {
+        throw "draw not implemented";
+    }
+
+    setCollisionMask(maskArray) {
+        this.collisionMask = maskArray;
+        return this;
+    }
+
+    makeGhost() {
+        this.collisionMask = [];
+        return this;
+    }
+
 
 }

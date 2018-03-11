@@ -1,5 +1,9 @@
-class Kicker {
+class Kicker extends Body {
     constructor(player, kickPower) {
+        super();
+        this.outerColor = Color.white;
+        this.hollow = true;
+        this.color = Color.black;
         this.player = player;
         this.active = false;
         this.kickPower = kickPower;
@@ -13,10 +17,12 @@ class Kicker {
 
     activate() {
         this.active = true;
+        this.color = Color.white;
     }
 
     deactivate() {
         this.active = false;
+        this.color = Color.black;
     }
 
     draw() {
