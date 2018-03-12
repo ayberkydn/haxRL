@@ -11,7 +11,6 @@ class KickCollision extends Collision {
     resolve() {
         if (this.body2.active) {
             this.body2.deactivate();
-            console.log("kick");
             this.body1.applyImpulse(this.collisionNormal.mult(this.body2.kickPower));
             new Audio("kicksound.mp3").play();
         }

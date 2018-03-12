@@ -1,6 +1,11 @@
 class Game {
     constructor() {
         this.agents = [];
+
+        this.state = {
+            goal: false,
+        };
+
         this.scene = new Scene();
         this.scene.addObject(new Box(0, canvas.width, 0, canvas.height - 0, 0));
         this.scene.addObject(new Disc(canvas.width / 2, canvas.height / 2, 80, 10, 1, 1).makeGhost().makeHollow().setOuterColor(Color.border));
@@ -31,6 +36,7 @@ class Game {
 
     resetScene() {
         this.scene.reset();
+        this.state.goal = false;
     }
 
     update() {
@@ -39,8 +45,10 @@ class Game {
             agent.learn();
         }
         this.scene.update();
-        if (this.scene.checkGoals() == true) {
-            this.resetScene();
+        if (this.scene.checkGoals() && !this.state.goal) {
+            this.state.goal = true;
+            window.setTimeout(this.resetScene.bind(this), 2500);
+            new Audio("goalsound.mp3").play();
         }
     }
 

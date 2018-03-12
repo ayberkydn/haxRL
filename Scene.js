@@ -35,8 +35,12 @@ class Scene {
         } else if (obj instanceof Goal) {
             this.metaObjects.goals.push(obj);
             this.objects.borders.push(obj.goalLine);
+            this.objects.borders.push(obj.netTop);
+            this.objects.borders.push(obj.netBottom);
+            this.objects.borders.push(obj.netBack);
             this.objects.discs.push(obj.topPost);
             this.objects.discs.push(obj.bottomPost);
+
         }
         obj.scene = this;
     }

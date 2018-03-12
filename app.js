@@ -27,7 +27,7 @@ var ballRadius = 9;
 var ballDamping = 0.98;
 var topbottomMargin = 80;
 var leftrightMargin = 60;
-var goalLength = 120;
+var goalLength = 140;
 //
 var game = new Game();
 game.addAgent(new HumanAgent(Side.red));
