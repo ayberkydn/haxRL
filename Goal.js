@@ -21,12 +21,14 @@ class Goal {
         }
         if (this.way == Way.left) {
             if (ball.center.x < this.center.x && ball.center.y > this.topPost.center.y && ball.center.y < this.bottomPost.center.y) {
+                new Audio("goalsound.mp3").play();
                 return true;
             } else {
                 return false;
             }
         } else if (this.way == Way.right) {
             if (ball.center.x > this.center.x && ball.center.y > this.topPost.center.y && ball.center.y < this.bottomPost.center.y) {
+                new Audio("goalsound.mp3").play();
                 return true;
             } else {
                 return false;
