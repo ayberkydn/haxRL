@@ -19,8 +19,8 @@ var Side = {
     red: "SIDE_RED",
     blue: "SIDE_BLUE",
 };
-
-var Action = {
+/*
+var ActionV = {
     up: "ACTION_UP",
     upleft: "ACTION_UP_LEFT",
     left: "ACTION_LEFT",
@@ -40,14 +40,31 @@ var Action = {
     nomove: "ACTION_NOMOVE",
     nomoveshoot: "ACTION_NOMOVE_SHOOT",
 };
+*/
+var ActionV = {
+    up: "ACTION_VERTICAL_UP",
+    down: "ACTION_VERTICAL_DOWN",
+    nomove: "ACTION_VERTICAL_NOMOVE"
+};
+
+var ActionH = {
+    left: "ACTION_HORIZONTAL_LEFT",
+    right: "ACTION_HORIZONTAL_RIGHT",
+    nomove: "ACTION_HORIZONTAL_NOMOVE"
+};
+
+var ActionS = {
+    shoot: "ACTION_SHOOT_TRUE",
+    nomove: "ACTION_SHOOT_FALSE",
+};
 
 var Unitvec = {
     up: new Vector(0, -1),
-    upleft: new Vector(-1 / Math.SQRT2, -1 / Math.SQRT2),
+    upleft: new Vector(-Math.SQRT1_2, -Math.SQRT1_2),
     left: new Vector(-1, 0),
-    downleft: new Vector(-1 / Math.SQRT2, 1 / Math.SQRT2),
+    downleft: new Vector(-Math.SQRT1_2, Math.SQRT1_2),
     down: new Vector(0, 1),
-    downright: new Vector(1 / Math.SQRT2, 1 / Math.SQRT2),
+    downright: new Vector(Math.SQRT1_2, Math.SQRT1_2),
     right: new Vector(1, 0),
-    upright: new Vector(1 / Math.SQRT2, -1 / Math.SQRT2),
+    upright: new Vector(Math.SQRT1_2, -Math.SQRT1_2),
 };

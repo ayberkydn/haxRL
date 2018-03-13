@@ -30,7 +30,8 @@ var leftrightMargin = 60;
 var goalLength = 140;
 //
 var game = new Game();
-game.addAgent(new HumanAgent(Side.red));
+//game.addAgent(new HumanAgent(Side.blue, "w", "s", "a", "d", "q"));
+game.addAgent(new HumanAgent(Side.red, "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "x"));
 game.addAgent(new RandomAgent(Side.blue));
 
 window.setInterval(function () {

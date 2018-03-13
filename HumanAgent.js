@@ -1,11 +1,11 @@
 class HumanAgent extends Agent {
-    constructor(side) {
+    constructor(side, upKey, downKey, leftKey, rightKey, shootKey) {
         super(side);
-        this.upKey = "ArrowUp";
-        this.downKey = "ArrowDown";
-        this.leftKey = "ArrowLeft";
-        this.rightKey = "ArrowRight";
-        this.shootKey = "x";
+        this.upKey = upKey;
+        this.downKey = downKey;
+        this.leftKey = leftKey;
+        this.rightKey = rightKey;
+        this.shootKey = shootKey;
     }
 
     act() {
@@ -15,7 +15,31 @@ class HumanAgent extends Agent {
         let left = (keys[this.leftKey]) ? true : false;
         let right = (keys[this.rightKey]) ? true : false;
         let shoot = (keys[this.shootKey]) ? true : false;
+        this.shoot = shoot & !this.pastShoot;
 
+        let actionH = ActionH.nomove;
+        if (left) {
+            actionH = ActionH.left;
+        } else if (right) {
+            actionH = ActionH.right;
+        }
+
+        let actionV = ActionV.nomove;
+        if (up) {
+            actionV = ActionV.up;
+        } else if (down) {
+            actionV = ActionV.down;
+        }
+
+        let actionS = ActionS.nomove;
+        if (this.shoot) {
+            actionS = ActionS.shoot;
+        }
+
+        this.player.applyActionTrio(actionH, actionV, actionS);
+        this.pastShoot = shoot;
+
+        /*
         if (shoot) {
             if (up) {
                 if (left) {
@@ -69,7 +93,7 @@ class HumanAgent extends Agent {
                 }
             }
         }
-
+*/
     }
 
 
