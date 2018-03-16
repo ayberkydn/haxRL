@@ -1,3 +1,15 @@
+try {
+    var synaptic = require('synaptic');
+} catch (err) {
+    console.log(err);
+}
+
+try {
+    var convnetjs = require('convnetjs');
+} catch (err) {
+    console.log(err);
+}
+
 // Gets the handles for rendering
 var canvas = document.getElementById("gameCanvas");
 var ctx = canvas.getContext('2d');
@@ -32,9 +44,19 @@ var goalLength = 140;
 var game = new Game();
 //game.addAgent(new HumanAgent(Side.blue, "w", "s", "a", "d", "q"));
 game.addAgent(new HumanAgent(Side.red, "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "x"));
-game.addAgent(new RandomAgent(Side.blue));
+game.addAgent(new QLearnerAgent(Side.blue));
+
 
 window.setInterval(function () {
     game.update();
     game.draw();
 }, 30);
+
+/*
+for (let n = 0; n < 200000; n++) {
+    game.update();
+    if (n % 1000 == 0) {
+        game.draw();
+    }
+}
+*/

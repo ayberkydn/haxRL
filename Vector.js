@@ -73,6 +73,10 @@ class Vector {
         return vec1.x * vec2.x + vec1.y * vec2.y;
     }
 
+    static dist(vec1, vec2) {
+        return Vector.sub(vec1, vec2).magnitude();
+    }
+
     copy() {
         return Object.assign(new Vector(0, 0), this);
     }

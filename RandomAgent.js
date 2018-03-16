@@ -4,6 +4,7 @@ class RandomAgent extends Agent {
     }
 
     act() {
+
         let actionHIndex = Math.floor(Object.keys(ActionH).length * Math.random());
         let actionH = Object.values(ActionH)[actionHIndex];
 

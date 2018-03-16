@@ -42,13 +42,17 @@ class Game {
     update() {
         for (let agent of this.agents) {
             agent.act();
-            agent.learn();
         }
+
         this.scene.update();
         if (this.scene.checkGoals() && !this.state.goal) {
             this.state.goal = true;
             window.setTimeout(this.resetScene.bind(this), 2500);
             new Audio("goalsound.mp3").play();
+        }
+
+        for (let agent of this.agents) {
+            agent.learn();
         }
     }
 
