@@ -1,14 +1,9 @@
 try {
-    var synaptic = require('synaptic');
+    var dl = require('deeplearn');
 } catch (err) {
     console.log(err);
 }
-
-try {
-    var convnetjs = require('convnetjs');
-} catch (err) {
-    console.log(err);
-}
+dl.setBackend("cpu");
 
 // Gets the handles for rendering
 var canvas = document.getElementById("gameCanvas");
@@ -41,7 +36,7 @@ var topbottomMargin = 80;
 var leftrightMargin = 60;
 var goalLength = 140;
 //
-var game = new Game();
+var game = new GameEnvironment();
 //game.addAgent(new HumanAgent(Side.blue, "w", "s", "a", "d", "q"));
 game.addAgent(new HumanAgent(Side.red, "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "x"));
 game.addAgent(new QLearnerAgent(Side.blue));

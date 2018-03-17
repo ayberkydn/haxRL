@@ -1,4 +1,4 @@
-class Game {
+class Environment {
     constructor() {
         this.agents = [];
 

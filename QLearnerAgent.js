@@ -6,7 +6,6 @@ class QLearnerAgent extends Agent {
         this.modelV = new NeuralNetwork(6, 20, 3).setLoss("mse");
         this.modelS = new NeuralNetwork(6, 20, 2).setLoss("mse");
         this.discount = 0.99;
-        this.epsilon = 0.8; //normalde kucuk
         this.sars = {};
     }
 
@@ -26,7 +25,7 @@ class QLearnerAgent extends Agent {
             aV: actionVIndex,
             aS: actionSIndex
         };
-        this.player.applyActionTrio(actionH, actionV, actionS);
+        this.player.applyActionHVS(actionH, actionV, actionS);
 
     }
 
@@ -41,19 +40,22 @@ class QLearnerAgent extends Agent {
         ]);
     }
 
-    getReward() {
-        let distToBall = Vector.dist(this.player.center, this.game.scene.metaObjects.balls[0].center);
-        if (distToBall < 100) {
-            return 1;
-        } else {
-            return -1;
-        }
+    getReward(s, a, ss) {
+        let sBallPosition = new Vector(s[0], s[1]);
+        let sAgentPosition = new Vector(s[4], s[5]);
+        let sDiff = Vector.dist(sBallPosition, sAgentPosition);
+        let ssBallPosition = new Vector(ss[0], ss[1]);
+        let ssAgentPosition = new Vector(ss[4], ss[5]);
+        let ssDiff = Vector.dist(ssBallPosition, ssAgentPosition);
+        let gotCloser = ssDiff < sDiff;
+        return (gotCloser ? 1 : -1);
+
     }
 
     learn() {
-        this.sars.r = this.getReward();
-        console.log(this.sars.r);
         this.sars.ss = this.getStateInfo();
+        this.sars.r = this.getReward(this.sars.s, this.sars.a, this.sars.ss);
+        console.log(this.sars.r);
         this.experienceReplay.addExperience(this.sars);
         let exp = this.experienceReplay.sampleExperience();
         let {

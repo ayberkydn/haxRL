@@ -36,7 +36,7 @@ class HumanAgent extends Agent {
             actionS = ActionS.shoot;
         }
 
-        this.player.applyActionTrio(actionH, actionV, actionS);
+        this.player.applyActionHVS(actionH, actionV, actionS);
         this.pastShoot = shoot;
 
         /*

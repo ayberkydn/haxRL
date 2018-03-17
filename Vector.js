@@ -80,4 +80,17 @@ class Vector {
     copy() {
         return Object.assign(new Vector(0, 0), this);
     }
+
+    static get Unit() {
+        return {
+            up: new Vector(0, -1),
+            upleft: new Vector(-Math.SQRT1_2, -Math.SQRT1_2),
+            left: new Vector(-1, 0),
+            downleft: new Vector(-Math.SQRT1_2, Math.SQRT1_2),
+            down: new Vector(0, 1),
+            downright: new Vector(Math.SQRT1_2, Math.SQRT1_2),
+            right: new Vector(1, 0),
+            upright: new Vector(Math.SQRT1_2, -Math.SQRT1_2),
+        };
+    }
 }

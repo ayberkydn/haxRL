@@ -14,8 +14,7 @@ class RandomAgent extends Agent {
         let actionSIndex = Math.floor(Object.keys(ActionS).length * Math.random());
         let actionS = Object.values(ActionS)[actionSIndex];
 
-
-        this.player.applyActionTrio(actionH, actionV, actionS);
+        this.player.applyActionHVS(actionH, actionV, actionS);
 
     }
 
