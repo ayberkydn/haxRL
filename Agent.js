@@ -2,6 +2,10 @@ class Agent {
     constructor() {
         this.side = null;
         this.game = null;
+        this.goal = null;
+        this.ball = null;
+        this.player = null;
+        this.opponent = null;
     }
 
     setSide(side) {

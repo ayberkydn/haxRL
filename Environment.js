@@ -8,7 +8,8 @@ class Environment {
         this.state = {
             episodeEnd: false,
         };
-        this.episodeEndChecker = () => (this.scene.checkGoals() && !this.state.episodeEnd);
+        //this.episodeEndChecker = () => (this.scene.checkGoals() && !this.state.episodeEnd);
+        this.episodeEndChecker = () => (this.step == 1000);
         this.step = 0;
 
         this.scene = new Scene();
@@ -29,10 +30,15 @@ class Environment {
     }
 
     addAgent(agent, side) {
-        agent.game = this;
+        agent.env = this;
         agent.setSide(side);
         this.agents.push(agent);
         this.scene.addObject(agent.player);
+        agent.ball = this.scene.metaObjects.balls[0];
+        if (this.agents.length == 2) {
+            this.agents[0].opponent = this.agents[1];
+            this.agents[1].opponent = this.agents[0];
+        }
     }
 
     resetScene() {
@@ -41,6 +47,7 @@ class Environment {
         if (this.randomStart) {
             this.scene.metaObjects.balls[0].applyImpulse(new Vector(Math.random() - 0.5, Math.random() - 0.5).mult(20));
         }
+        this.step = 0;
     }
 
     update() {

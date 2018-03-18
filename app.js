@@ -2,7 +2,7 @@
 //Direkten bazen hayvan gibi dönme şeysini düzelt
 //Borderları start end diye refactor et
 //
-//
+//Action repeat implement
 
 
 
@@ -46,7 +46,7 @@ var topbottomMargin = 80;
 var leftrightMargin = 60;
 var goalLength = 140;
 //
-var env = new Environment( /*render*/ true, /*sound*/ true, /*resetDelay*/ false, /*randomStart*/ true);
+var env = new Environment( /*render*/ true, /*sound*/ true, /*resetDelay*/ false, /*randomStart*/ false);
 //env.addAgent(new HumanAgent(Side.blue, "w", "s", "a", "d", "q"));
 env.addAgent(new HumanAgent("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "x"), Side.red);
 env.addAgent(new QLearnerAgent(), Side.blue);
@@ -54,24 +54,14 @@ env.addAgent(new QLearnerAgent(), Side.blue);
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+episode = 0;
 window.setInterval(() => {
     env.update();
     env.draw();
+    if (env.state.episodeEnd) {
+        episode++;
+    }
 }, 30);
-window.setTimeout(() => {
-    console.log(3000 / env.step, "ms per step total");
-}, 3000);
 
 /*
 window.setInterval(() => {

@@ -67,7 +67,8 @@ class NeuralNetwork {
         return dl.tidy(() => {
             let logits = this.forward(inputMatrix);
             let labels = dl.tensor(labelsArray);
-            return this.lossFunc(labels, logits);
+            let loss = this.lossFunc(labels, logits);
+            return loss;
         });
     }
 
