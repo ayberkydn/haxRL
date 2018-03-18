@@ -1,6 +1,7 @@
 class Player extends Disc {
     constructor(centerX, centerY, radius, mass, restitution, damping, kickDamping, kickPower, color) {
         super(centerX, centerY, radius, mass, restitution, damping, color);
+        this.agent = null;
         this.up = false;
         this.down = false;
         this.left = false;
@@ -76,10 +77,12 @@ class Player extends Disc {
         let diagonalScale = diagonal ? Math.SQRT1_2 : 1;
         let shoot = (actionS == ActionS.shoot);
 
-        if (actionH == ActionH.left) {
-            this.applyForce(Vector.mult(Vector.Unit.left, diagonalScale));
-        } else if (actionH == ActionH.right) {
-            this.applyForce(Vector.mult(Vector.Unit.right, diagonalScale));
+        if (actionH == ActionH.forward) {
+            let forwardVec = this.agent.side == Side.red ? Vector.Unit.right : Vector.Unit.left;
+            this.applyForce(Vector.mult(forwardVec, diagonalScale));
+        } else if (actionH == ActionH.backward) {
+            let backwardVec = this.agent.side == Side.red ? Vector.Unit.left : Vector.Unit.right;
+            this.applyForce(Vector.mult(backwardVec, diagonalScale));
         }
 
         if (actionV == ActionV.up) {

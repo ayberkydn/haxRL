@@ -1,6 +1,6 @@
 class RandomAgent extends Agent {
-    constructor(side) {
-        super(side);
+    constructor() {
+        super();
     }
 
     act() {

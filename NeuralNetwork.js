@@ -56,7 +56,7 @@ class NeuralNetwork {
             let x = dl.tensor(inputMatrix);
             x = (x.rank == 1 ? x.expandDims(0) : x);
             let hiddenOut = x.matMul(this.W1).add(this.b1);
-            hiddenOut = dl.tanh(hiddenOut);
+            hiddenOut = dl.relu(hiddenOut);
             let out = hiddenOut.matMul(this.W2);
             return out;
         });

@@ -26,8 +26,8 @@ var ActionV = {
 };
 
 var ActionH = {
-    left: "ACTION_HORIZONTAL_LEFT",
-    right: "ACTION_HORIZONTAL_RIGHT",
+    forward: "ACTION_HORIZONTAL_FORWARD",
+    backward: "ACTION_HORIZONTAL_BACKWARD",
     nomove: "ACTION_HORIZONTAL_NOMOVE"
 };
 

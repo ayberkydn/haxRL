@@ -1,10 +1,15 @@
 class Environment {
-    constructor() {
+    constructor(render = true, sound = true, resetDelay = true, randomStart = true) {
+        this.render = render;
+        this.sound = sound;
+        this.resetDelay = resetDelay;
+        this.randomStart = randomStart;
         this.agents = [];
-
         this.state = {
-            goal: false,
+            episodeEnd: false,
         };
+        this.episodeEndChecker = () => (this.scene.checkGoals() && !this.state.episodeEnd);
+        this.step = 0;
 
         this.scene = new Scene();
         this.scene.addObject(new Box(0, canvas.width, 0, canvas.height - 0, 0));
@@ -21,22 +26,21 @@ class Environment {
         this.scene.addObject(new Goal(leftrightMargin, canvas.height / 2, Way.left, goalLength));
         this.scene.addObject(new Goal(canvas.width - leftrightMargin, canvas.height / 2, Way.right, goalLength));
         this.scene.addObject(new Ball(canvas.width / 2, canvas.height / 2, ballRadius, ballMass, ballRestitution, ballDamping));
-
     }
 
-    addAgent(agent) {
+    addAgent(agent, side) {
         agent.game = this;
+        agent.setSide(side);
         this.agents.push(agent);
         this.scene.addObject(agent.player);
     }
 
-    addScene(scene) {
-
-    }
-
     resetScene() {
         this.scene.reset();
-        this.state.goal = false;
+        this.state.episodeEnd = false;
+        if (this.randomStart) {
+            this.scene.metaObjects.balls[0].applyImpulse(new Vector(Math.random() - 0.5, Math.random() - 0.5).mult(20));
+        }
     }
 
     update() {
@@ -45,18 +49,23 @@ class Environment {
         }
 
         this.scene.update();
-        if (this.scene.checkGoals() && !this.state.goal) {
-            this.state.goal = true;
-            window.setTimeout(this.resetScene.bind(this), 2500);
-            new Audio("goalsound.mp3").play();
+        if (this.episodeEndChecker()) {
+            this.state.episodeEnd = true;
+            window.setTimeout(this.resetScene.bind(this), this.resetDelay ? 2500 : 0);
+            if (this.sound == true) {
+                new Audio("goalsound.mp3").play();
+            }
         }
 
         for (let agent of this.agents) {
             agent.learn();
         }
+        this.step += 1;
     }
 
     draw() {
-        this.scene.draw();
+        if (this.render == true) {
+            this.scene.draw();
+        }
     }
 }

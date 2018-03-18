@@ -1,6 +1,6 @@
 class HumanAgent extends Agent {
-    constructor(side, upKey, downKey, leftKey, rightKey, shootKey) {
-        super(side);
+    constructor(upKey, downKey, leftKey, rightKey, shootKey) {
+        super();
         this.upKey = upKey;
         this.downKey = downKey;
         this.leftKey = leftKey;
@@ -19,9 +19,9 @@ class HumanAgent extends Agent {
 
         let actionH = ActionH.nomove;
         if (left) {
-            actionH = ActionH.left;
+            actionH = this.side == Side.red ? ActionH.backward : ActionH.forward;
         } else if (right) {
-            actionH = ActionH.right;
+            actionH = this.side == Side.red ? ActionH.forward : ActionH.backward;
         }
 
         let actionV = ActionV.nomove;
