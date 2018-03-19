@@ -6,14 +6,9 @@ class QLearnerAgent extends Agent {
         }
         super();
         this.experienceReplay = new ExperienceReplay(1);
-        this.discount = 0.1;
+        this.discount = 0.2;
         this.sars = {};
-        this.actionRepeat = 5;
-        this.lastAction = {
-            aH: null,
-            aV: null,
-            aS: null,
-        };
+
         this.QTable = {};
         for (let n = 0; n < 80; n++) {
             for (let i = 0; i < 80; i++) {
@@ -38,7 +33,7 @@ class QLearnerAgent extends Agent {
                 aHScores[n] = this.QTable[this.sars.s.concat(n)];
             }
 
-            var softmaxChoice = (scores) => {
+            var softmax = (scores) => {
                 scores = Array.from(scores);
                 let sum = 0;
                 for (let n = 0; n < 3; n++) {
@@ -48,6 +43,11 @@ class QLearnerAgent extends Agent {
                 for (let n = 0; n < 3; n++) {
                     scores[n] /= sum;
                 }
+
+                return scores;
+            };
+
+            var choice = (probs) => {
                 for (let n = 1; n < 3; n++) {
                     scores[n] += scores[n - 1];
                 }
@@ -61,8 +61,7 @@ class QLearnerAgent extends Agent {
                 }
             };
 
-            let actionHIndex = softmaxChoice(aHScores);
-
+            let actionHIndex = choice(softmax(aHScores));
             let actionH = Object.values(ActionH)[actionHIndex];
 
             let actionVIndex = 2;
@@ -115,7 +114,7 @@ class QLearnerAgent extends Agent {
     }
 
     learn() {
-        if (this.repeatCooldown == 0) { //means last repeated action is made
+        if (this.repeatCooldown == 0) { //means its time to make a new action
 
             this.sars.ss = this.getStateInfo();
             this.sars.r = this.getReward(this.sars.s, this.sars.a, this.sars.ss);

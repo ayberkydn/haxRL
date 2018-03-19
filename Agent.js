@@ -1,7 +1,7 @@
 class Agent {
     constructor() {
         this.side = null;
-        this.game = null;
+        this.env = null;
         this.goal = null;
         this.ball = null;
         this.player = null;

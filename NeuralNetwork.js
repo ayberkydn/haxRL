@@ -7,15 +7,21 @@ class NeuralNetwork {
             throw "loss function not implemented";
         };
 
-        this.optimizer = dl.train.adam();
+        this.optimizer = dl.train.sgd(0.0001);
 
-        this.W1 = dl.variable(dl.randomNormal([nIn, nHidden]));
+        this.W1 = dl.variable(dl.randomNormal([nIn, nHidden]).mul(dl.scalar(2 / (nIn + nHidden))));
         this.b1 = dl.variable(dl.zeros([nHidden]));
-        this.W2 = dl.variable(dl.randomNormal([nHidden, nOut]));
+        this.W2 = dl.variable(dl.randomNormal([nHidden, nOut]).mul(dl.scalar(2 / (nHidden + nOut))));
         this.b2 = dl.variable(dl.zeros([nOut]));
 
     }
 
+    copyWeightsFrom(nn2) {
+        this.W1 = nn2.W1.clone();
+        this.b1 = nn2.b1.clone();
+        this.W2 = nn2.W2.clone();
+        this.b2 = nn2.b2.clone();
+    }
 
 
     setLoss(lossFunc) {
@@ -56,7 +62,7 @@ class NeuralNetwork {
             let x = dl.tensor(inputMatrix);
             x = (x.rank == 1 ? x.expandDims(0) : x);
             let hiddenOut = x.matMul(this.W1).add(this.b1);
-            hiddenOut = dl.relu(hiddenOut);
+            hiddenOut = dl.tanh(hiddenOut);
             let out = hiddenOut.matMul(this.W2);
             return out;
         });

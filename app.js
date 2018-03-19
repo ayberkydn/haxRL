@@ -1,8 +1,7 @@
 //TODO 
 //Direkten bazen hayvan gibi dönme şeysini düzelt
 //Borderları start end diye refactor et
-//
-//Action repeat implement
+//Batch replay implement et
 
 
 
@@ -18,6 +17,7 @@ dl.setBackend("cpu");
 // Gets the handles for rendering
 var canvas = document.getElementById("gameCanvas");
 var ctx = canvas.getContext('2d');
+ctx.scale(1, 1);
 // Init keypress events
 var keys = {};
 window.onkeydown = function (evt) {
@@ -46,10 +46,10 @@ var topbottomMargin = 80;
 var leftrightMargin = 60;
 var goalLength = 140;
 //
-var env = new Environment( /*render*/ true, /*sound*/ true, /*resetDelay*/ false, /*randomStart*/ false);
+var env = new Environment( /*render*/ true, /*sound*/ false, /*resetDelay*/ false, /*randomStart*/ false);
 //env.addAgent(new HumanAgent(Side.blue, "w", "s", "a", "d", "q"));
 env.addAgent(new HumanAgent("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "x"), Side.red);
-env.addAgent(new QLearnerAgent(), Side.blue);
+env.addAgent(new NNQLearnerAgent(), Side.blue);
 
 
 
@@ -61,7 +61,7 @@ window.setInterval(() => {
     if (env.state.episodeEnd) {
         episode++;
     }
-}, 30);
+}, 3);
 
 /*
 window.setInterval(() => {

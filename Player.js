@@ -10,64 +10,64 @@ class Player extends Disc {
         this.kickDamping = kickDamping;
         this.kicker = new Kicker(this, kickPower);
     }
-    /*
-        applyAction(action) {
-            if (action == Action.up) {
-                this.applyForce(Vector.Unit.up);
-                this.kicker.active = false;
-            } else if (action == Action.upleft) {
-                this.applyForce(Vector.Unit.upleft);
-                this.kicker.active = false;
-            } else if (action == Action.left) {
-                this.applyForce(Vector.Unit.left);
-                this.kicker.active = false;
-            } else if (action == Action.downleft) {
-                this.applyForce(Vector.Unit.downleft);
-                this.kicker.active = false;
-            } else if (action == Action.down) {
-                this.applyForce(Vector.Unit.down);
-                this.kicker.active = false;
-            } else if (action == Action.downright) {
-                this.applyForce(Vector.Unit.downright);
-                this.kicker.active = false;
-            } else if (action == Action.right) {
-                this.applyForce(Vector.Unit.right);
-                this.kicker.active = false;
-            } else if (action == Action.upright) {
-                this.applyForce(Vector.Unit.upright);
-                this.kicker.active = false;
-            } else if (action == Action.upshoot) {
-                this.applyForce(Vector.Unit.up);
-                this.kicker.active = true;
-            } else if (action == Action.upleftshoot) {
-                this.applyForce(Vector.Unit.upleft);
-                this.kicker.active = true;
-            } else if (action == Action.leftshoot) {
-                this.applyForce(Vector.Unit.left);
-                this.kicker.active = true;
-            } else if (action == Action.downleftshoot) {
-                this.applyForce(Vector.Unit.downleft);
-                this.kicker.active = true;
-            } else if (action == Action.downshoot) {
-                this.applyForce(Vector.Unit.down);
-                this.kicker.active = true;
-            } else if (action == Action.downrightshoot) {
-                this.applyForce(Vector.Unit.downright);
-                this.kicker.active = true;
-            } else if (action == Action.rightshoot) {
-                this.applyForce(Vector.Unit.right);
-                this.kicker.active = true;
-            } else if (action == Action.uprightshoot) {
-                this.applyForce(Vector.Unit.upright);
-                this.kicker.active = true;
-            } else if (action == Action.nomove) {
-                this.kicker.active = false;
-            } else if (action == Action.nomoveshoot) {
-                this.kicker.active = true;
-            }
 
+    applyAction(action) {
+        if (action == Action.up) {
+            this.applyForce(Vector.Unit.up);
+            this.kicker.active = false;
+        } else if (action == Action.upleft) {
+            this.applyForce(Vector.Unit.upleft);
+            this.kicker.active = false;
+        } else if (action == Action.left) {
+            this.applyForce(Vector.Unit.left);
+            this.kicker.active = false;
+        } else if (action == Action.downleft) {
+            this.applyForce(Vector.Unit.downleft);
+            this.kicker.active = false;
+        } else if (action == Action.down) {
+            this.applyForce(Vector.Unit.down);
+            this.kicker.active = false;
+        } else if (action == Action.downright) {
+            this.applyForce(Vector.Unit.downright);
+            this.kicker.active = false;
+        } else if (action == Action.right) {
+            this.applyForce(Vector.Unit.right);
+            this.kicker.active = false;
+        } else if (action == Action.upright) {
+            this.applyForce(Vector.Unit.upright);
+            this.kicker.active = false;
+        } else if (action == Action.upshoot) {
+            this.applyForce(Vector.Unit.up);
+            this.kicker.active = true;
+        } else if (action == Action.upleftshoot) {
+            this.applyForce(Vector.Unit.upleft);
+            this.kicker.active = true;
+        } else if (action == Action.leftshoot) {
+            this.applyForce(Vector.Unit.left);
+            this.kicker.active = true;
+        } else if (action == Action.downleftshoot) {
+            this.applyForce(Vector.Unit.downleft);
+            this.kicker.active = true;
+        } else if (action == Action.downshoot) {
+            this.applyForce(Vector.Unit.down);
+            this.kicker.active = true;
+        } else if (action == Action.downrightshoot) {
+            this.applyForce(Vector.Unit.downright);
+            this.kicker.active = true;
+        } else if (action == Action.rightshoot) {
+            this.applyForce(Vector.Unit.right);
+            this.kicker.active = true;
+        } else if (action == Action.uprightshoot) {
+            this.applyForce(Vector.Unit.upright);
+            this.kicker.active = true;
+        } else if (action == Action.nomove) {
+            this.kicker.active = false;
+        } else if (action == Action.nomoveshoot) {
+            this.kicker.active = true;
         }
-    */
+
+    }
+
 
 
     applyActionHVS(actionH, actionV, actionS) {

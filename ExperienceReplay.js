@@ -12,8 +12,12 @@ class ExperienceReplay {
         }
     }
 
-    sampleExperience() {
-        let randIndex = Math.floor(Math.random() * this.replay.length);
-        return this.replay[randIndex];
+    sampleExperience(batchSize = 1) {
+        let batch = [];
+        for (let n = 0; n < batchSize; n++) {
+            let randIndex = Math.floor(Math.random() * this.replay.length);
+            batch.push(this.replay[randIndex]);
+        }
+        return batch;
     }
 }

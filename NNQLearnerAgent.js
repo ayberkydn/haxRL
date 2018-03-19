@@ -1,88 +1,112 @@
 class NNQLearnerAgent extends Agent {
     constructor() {
         super();
-        this.experienceReplay = new ExperienceReplay(10000000);
-        this.brainH = new NeuralNetwork(2, 20, 3).setLoss("mse");
-        this.brainV = new NeuralNetwork(2, 20, 3).setLoss("mse");
-        this.brainS = new NeuralNetwork(2, 20, 2).setLoss("mse");
+        this.experienceReplay = new ExperienceReplay(10000);
+        let stateDim = 4;
+        let hiddenSize = 200;
+        this.brain = new NeuralNetwork(stateDim, hiddenSize, 9).setLoss("mse");
+        this.targetbrain = new NeuralNetwork(stateDim, hiddenSize, 9).setLoss("mse");
+        this.targetbrain.copyWeightsFrom(this.brain);
+
         this.discount = 0.999;
         this.sars = {};
+        this.actionRepeat = 5;
+        this.targetUpdateFreq = 10;
+        this.epsilon = 0.1;
+
+        this.repeatCooldown = 0;
+        this.targetUpdateCooldown = 0;
+        this.lastAction = null;
 
     }
 
 
     act() {
-        this.sars.s = this.getStateInfo();
-        let actionHIndex = this.brainH.predict(this.sars.s);
-        let actionH = Object.values(ActionH)[actionHIndex];
+        if (this.repeatCooldown > 0) { //repeat action
+            this.repeatCooldown--;
+            this.player.applyAction(this.lastAction);
+        } else { //select new action
+            this.repeatCooldown = this.actionRepeat;
+            this.sars.s = this.getStateInfo();
 
-        let actionVIndex = this.brainV.predict(this.sars.s);
-        let actionV = Object.values(ActionV)[2];
-
-        let actionSIndex = this.brainS.predict(this.sars.s);
-        let actionS = Object.values(ActionS)[1];
-        this.sars.a = {
-            aH: actionHIndex,
-            aV: actionVIndex,
-            aS: actionSIndex
-        };
-        this.player.applyActionHVS(actionH, actionV, actionS);
-
+            let actionIndex;
+            if (Math.random() < this.epsilon) {
+                actionIndex = Math.floor(Math.random() * 9);
+            } else {
+                actionIndex = this.brain.predict(this.sars.s);
+            }
+            let action = Object.values(Action)[actionIndex];
+            this.sars.a = actionIndex;
+            this.player.applyAction(action);
+            this.lastAction = action;
+        }
     }
 
     getStateInfo() {
         return ([
-            this.ball.center.x / 800,
-            this.player.center.x / 800,
+            this.ball.center.x,
+            this.ball.center.y,
+            this.player.center.x,
+            this.player.center.y,
         ]);
     }
 
     getReward(s, a, ss) {
-        let sDist = Math.abs(s[0] - s[1]);
-        let ssDist = Math.abs(ss[0] - ss[1]);
-        let soClose = ssDist < 0.1;
-        console.log(soClose ? 1 : -1);
-        return (soClose ? 1 : -1);
+        let sBallPos = new Vector(s[0], s[1]);
+        let sPlayerPos = new Vector(s[2], s[3]);
+
+        let ssBallPos = new Vector(ss[0], ss[1]);
+        let ssPlayerPos = new Vector(ss[2], ss[3]);
+
+        let sDist = Vector.dist(sPlayerPos, sBallPos);
+        let ssDist = Vector.dist(ssPlayerPos, ssBallPos);
+
+        let ballVelocity = -Vector.sub(ssBallPos, sBallPos).x;
+        let ballToLeft = ballVelocity > 0.5;
+        let closing = ssDist < sDist - 0.5;
+        let close = ssDist < 100;
+        let reward = close ? 1 : -1;
+        console.log(reward);
+
+        return reward;
+
 
     }
 
     learn() {
-        this.sars.ss = this.getStateInfo();
-        this.sars.r = this.getReward(this.sars.s, this.sars.a, this.sars.ss);
-        this.experienceReplay.addExperience(this.sars);
-        let exp = this.experienceReplay.sampleExperience();
-        let {
-            s,
-            a,
-            r,
-            ss
-        } = exp;
+        if (this.repeatCooldown == 0) { //means new action to be made
+            this.sars.ss = this.getStateInfo();
+            this.sars.r = this.getReward(this.sars.s, this.sars.a, this.sars.ss);
+            this.experienceReplay.addExperience(this.sars);
+            let batchSize = 1; //for now
+            let expBatch = this.experienceReplay.sampleExperience(batchSize);
 
-        let {
-            aH,
-            aV,
-            aS,
-        } = a;
+            for (let n = 0; n < batchSize; n++) {
 
-        let yH = r + this.discount * this.brainH.predict(ss, true);
-        if (this.env.state.episodeEnd) {
-            console.log("yesended");
-            yH = r;
+                let {
+                    s,
+                    a,
+                    r,
+                    ss
+                } = expBatch[n];
+
+                let y = r + this.discount * this.targetbrain.predict(ss, true);
+
+                if (this.env.state.episodeEnd) {
+                    y = r;
+                }
+
+                let target = this.brain.forward(s).dataSync();
+                target[a] = y;
+                this.brain.trainStep(s, target);
+            }
+
+            if (this.targetUpdateCooldown == 0) {
+                this.targetbrain.copyWeightsFrom(this.brain);
+                this.targetUpdateCooldown = this.targetUpdateFreq;
+            } else {
+                this.targetUpdateCooldown--;
+            }
         }
-        let targetH = this.brainH.forward(s).dataSync();
-        targetH[aH] = yH;
-        this.brainH.trainStep(s, targetH);
-        /*
-                let yV = r + this.discount * this.brainV.predict(ss, true);
-                let targetV = this.brainV.forward(s).dataSync();
-                targetV[aV] = yV;
-                this.brainV.trainStep(s, targetV);
-
-                let yS = r + this.discount * this.brainS.predict(ss, true);
-                let targetS = this.brainS.forward(s).dataSync();
-                targetS[aS] = yS;
-                this.brainS.trainStep(s, targetS);
-        */
     }
-
 }

@@ -7,6 +7,7 @@ var Action = {
     downright: "ACTION_DOWN_RIGHT",
     right: "ACTION_RIGHT",
     upright: "ACTION_UP_RIGHT",
+    nomove: "ACTION_NOMOVE",
     upshoot: "ACTION_UP_SHOOT",
     upleftshoot: "ACTION_UP_LEFT_SHOOT",
     leftshoot: "ACTION_LEFT_SHOOT",
@@ -15,7 +16,6 @@ var Action = {
     downrightshoot: "ACTION_DOWN_RIGHT_SHOOT",
     rightshoot: "ACTION_RIGHT_SHOOT",
     uprightshoot: "ACTION_UP_RIGHT_SHOOT",
-    nomove: "ACTION_NOMOVE",
     nomoveshoot: "ACTION_NOMOVE_SHOOT",
 };
 
