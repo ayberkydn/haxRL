@@ -1,16 +1,11 @@
 //TODO 
 //Direkten bazen hayvan gibi dönme şeysini düzelt
 //Borderları start end diye refactor et
-//Batch replay implement et
+
+//Epsilon annealing gibi son algoritma tricklerini implement et, parametreleri guzellestir
 
 
-
-try {
-    var dl = require('deeplearn');
-} catch (err) {
-    console.log(err);
-}
-dl.setBackend("cpu");
+dl.setBackend("webgl");
 
 
 
@@ -61,7 +56,7 @@ window.setInterval(() => {
     if (env.state.episodeEnd) {
         episode++;
     }
-}, 3);
+}, 30);
 
 /*
 window.setInterval(() => {

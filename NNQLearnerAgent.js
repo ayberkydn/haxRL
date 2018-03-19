@@ -1,12 +1,12 @@
 class NNQLearnerAgent extends Agent {
     constructor() {
         super();
-        this.experienceReplay = new ExperienceReplay(10000);
+        this.experienceReplay = new ExperienceReplay(100000);
         let stateDim = 4;
         let hiddenSize = 200;
         this.brain = new NeuralNetwork(stateDim, hiddenSize, 9).setLoss("mse");
-        this.targetbrain = new NeuralNetwork(stateDim, hiddenSize, 9).setLoss("mse");
-        this.targetbrain.copyWeightsFrom(this.brain);
+        this.targetBrain = new NeuralNetwork(stateDim, hiddenSize, 9).setLoss("mse");
+        this.targetBrain.copyWeightsFrom(this.brain);
 
         this.discount = 0.999;
         this.sars = {};
@@ -33,7 +33,7 @@ class NNQLearnerAgent extends Agent {
             if (Math.random() < this.epsilon) {
                 actionIndex = Math.floor(Math.random() * 9);
             } else {
-                actionIndex = this.brain.predict(this.sars.s);
+                actionIndex = this.brain.predict(this.sars.s)[0];
             }
             let action = Object.values(Action)[actionIndex];
             this.sars.a = actionIndex;
@@ -78,31 +78,33 @@ class NNQLearnerAgent extends Agent {
             this.sars.ss = this.getStateInfo();
             this.sars.r = this.getReward(this.sars.s, this.sars.a, this.sars.ss);
             this.experienceReplay.addExperience(this.sars);
-            let batchSize = 1; //for now
+            let batchSize = 64;
             let expBatch = this.experienceReplay.sampleExperience(batchSize);
 
             for (let n = 0; n < batchSize; n++) {
 
                 let {
-                    s,
-                    a,
-                    r,
-                    ss
-                } = expBatch[n];
-
-                let y = r + this.discount * this.targetbrain.predict(ss, true);
-
-                if (this.env.state.episodeEnd) {
-                    y = r;
+                    sBatch,
+                    aBatch,
+                    rBatch,
+                    ssBatch
+                } = expBatch;
+                let yBatch = math.add(rBatch, math.multiply(this.discount, this.targetBrain.predict(ssBatch, true)));
+                ///TODO DUZELT ALT SATIR
+                if (this.env.state.episodeEnd) { //////////BURA YANLIS!!!!!!!!!!!!!
+                    yBatch = rBatch;
                 }
 
-                let target = this.brain.forward(s).dataSync();
-                target[a] = y;
-                this.brain.trainStep(s, target);
+                let targetBatch = this.brain.forward(sBatch);
+
+                for (let n = 0; n < batchSize; n++) {
+                    targetBatch[n][aBatch[n]] = yBatch[n];
+                }
+                this.brain.trainStep(sBatch, targetBatch);
             }
 
             if (this.targetUpdateCooldown == 0) {
-                this.targetbrain.copyWeightsFrom(this.brain);
+                this.targetBrain.copyWeightsFrom(this.brain);
                 this.targetUpdateCooldown = this.targetUpdateFreq;
             } else {
                 this.targetUpdateCooldown--;

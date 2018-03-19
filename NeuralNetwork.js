@@ -1,3 +1,8 @@
+var tensorToMatrix = a => math.matrix(Array.from(a.dataSync())).reshape(a.shape);
+var tensorToArray = a => math.matrix(Array.from(a.dataSync())).reshape(a.shape)._data;
+var matrixToTensor = a => dl.tensor(a._data);
+
+
 class NeuralNetwork {
     constructor(nIn, nHidden, nOut) {
         this.nIn = nIn;
@@ -15,6 +20,7 @@ class NeuralNetwork {
         this.b2 = dl.variable(dl.zeros([nOut]));
 
     }
+
 
     copyWeightsFrom(nn2) {
         this.W1 = nn2.W1.clone();
@@ -45,19 +51,20 @@ class NeuralNetwork {
     }
 
     predict(inputMatrix, returnScore = false) {
+
         return dl.tidy(() => {
-            let out = this.forward(inputMatrix);
+            let out = this._forward(inputMatrix);
             if (returnScore) {
-                return dl.max(out).dataSync()[0];
+                return tensorToArray(dl.max(out, 1));
             } else {
-                return dl.argMax(out).dataSync()[0];
+                return tensorToArray(dl.argMax(out, 1));
             }
 
         });
     }
 
 
-    forward(inputMatrix) {
+    _forward(inputMatrix) {
         return dl.tidy(() => {
             let x = dl.tensor(inputMatrix);
             x = (x.rank == 1 ? x.expandDims(0) : x);
@@ -68,18 +75,32 @@ class NeuralNetwork {
         });
     }
 
-
-    loss(inputMatrix, labelsArray) {
+    forward(inputMatrix) {
         return dl.tidy(() => {
-            let logits = this.forward(inputMatrix);
+            let out = this._forward(inputMatrix);
+            return tensorToArray(out);
+        });
+    }
+
+
+    _loss(inputMatrix, labelsArray) {
+        return dl.tidy(() => {
+            let logits = this._forward(inputMatrix);
             let labels = dl.tensor(labelsArray);
             let loss = this.lossFunc(labels, logits);
             return loss;
         });
     }
 
+    loss(inputMatrix, labelsArray) {
+        return dl.tidy(() => {
+            let loss = this._loss(inputMatrix, labelsArray);
+            return loss.dataSync()[0];
+        });
+    }
+
     trainStep(X, y) {
-        this.optimizer.minimize(() => this.loss(X, y));
+        this.optimizer.minimize(() => this._loss(X, y));
     }
 
 }
