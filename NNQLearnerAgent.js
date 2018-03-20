@@ -1,15 +1,15 @@
 class NNQLearnerAgent extends Agent {
     constructor() {
         super();
-        this.experienceReplay = new ExperienceReplay(100000);
+        this.experienceReplay = new ExperienceReplay(100000, 100);
         let stateDim = 4;
         let hiddenSize = 200;
         this.brain = new NeuralNetwork(stateDim, hiddenSize, 9).setLoss("mse");
         this.targetBrain = new NeuralNetwork(stateDim, hiddenSize, 9).setLoss("mse");
         this.targetBrain.copyWeightsFrom(this.brain);
 
-        this.discount = 0.999;
-        this.sars = {};
+        this.discount = 0.995;
+        this.lastSARST = {};
         this.actionRepeat = 5;
         this.targetUpdateFreq = 10;
         this.epsilon = 0.1;
@@ -27,16 +27,16 @@ class NNQLearnerAgent extends Agent {
             this.player.applyAction(this.lastAction);
         } else { //select new action
             this.repeatCooldown = this.actionRepeat;
-            this.sars.s = this.getStateInfo();
+            this.lastSARST.s = this.getStateInfo();
 
             let actionIndex;
             if (Math.random() < this.epsilon) {
                 actionIndex = Math.floor(Math.random() * 9);
             } else {
-                actionIndex = this.brain.predict(this.sars.s)[0];
+                actionIndex = this.brain.predict(this.lastSARST.s)[0];
             }
             let action = Object.values(Action)[actionIndex];
-            this.sars.a = actionIndex;
+            this.lastSARST.a = actionIndex;
             this.player.applyAction(action);
             this.lastAction = action;
         }
@@ -49,6 +49,10 @@ class NNQLearnerAgent extends Agent {
             this.player.center.x,
             this.player.center.y,
         ]);
+    }
+
+    isTerminated() {
+        return this.env.step < this.actionRepeat;
     }
 
     getReward(s, a, ss) {
@@ -66,7 +70,6 @@ class NNQLearnerAgent extends Agent {
         let closing = ssDist < sDist - 0.5;
         let close = ssDist < 100;
         let reward = close ? 1 : -1;
-        console.log(reward);
 
         return reward;
 
@@ -75,39 +78,46 @@ class NNQLearnerAgent extends Agent {
 
     learn() {
         if (this.repeatCooldown == 0) { //means new action to be made
-            this.sars.ss = this.getStateInfo();
-            this.sars.r = this.getReward(this.sars.s, this.sars.a, this.sars.ss);
-            this.experienceReplay.addExperience(this.sars);
+            this.lastSARST.ss = this.getStateInfo();
+            this.lastSARST.t = this.isTerminated();
+            this.lastSARST.r = this.getReward(this.lastSARST.s, this.lastSARST.a, this.lastSARST.ss);
+            this.experienceReplay.addExperience(this.lastSARST);
             let batchSize = 64;
             let expBatch = this.experienceReplay.sampleExperience(batchSize);
 
-            for (let n = 0; n < batchSize; n++) {
-
+            if (expBatch) {
                 let {
                     sBatch,
                     aBatch,
                     rBatch,
-                    ssBatch
+                    ssBatch,
+                    tBatch,
                 } = expBatch;
-                let yBatch = math.add(rBatch, math.multiply(this.discount, this.targetBrain.predict(ssBatch, true)));
-                ///TODO DUZELT ALT SATIR
-                if (this.env.state.episodeEnd) { //////////BURA YANLIS!!!!!!!!!!!!!
-                    yBatch = rBatch;
+                let ssMaxQBatch = this.targetBrain.predict(ssBatch, true);
+
+                let yBatch = Object.assign([], rBatch);
+                for (let n = 0; n < aBatch.length; n++) {
+                    if (tBatch[n] == false) { //Nonterminal state
+                        yBatch[n] += this.discount * ssMaxQBatch[n];
+                    }
                 }
 
                 let targetBatch = this.brain.forward(sBatch);
 
-                for (let n = 0; n < batchSize; n++) {
+                for (let n = 0; n < aBatch.length; n++) {
                     targetBatch[n][aBatch[n]] = yBatch[n];
                 }
-                this.brain.trainStep(sBatch, targetBatch);
-            }
 
-            if (this.targetUpdateCooldown == 0) {
-                this.targetBrain.copyWeightsFrom(this.brain);
-                this.targetUpdateCooldown = this.targetUpdateFreq;
-            } else {
-                this.targetUpdateCooldown--;
+                let prev = this.brain.W1.clone();
+                this.brain.trainStep(sBatch, targetBatch);
+                let after = this.brain.W1.clone();
+
+                if (this.targetUpdateCooldown == 0) {
+                    this.targetBrain.copyWeightsFrom(this.brain);
+                    this.targetUpdateCooldown = this.targetUpdateFreq;
+                } else {
+                    this.targetUpdateCooldown--;
+                }
             }
         }
     }

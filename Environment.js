@@ -9,6 +9,7 @@ class Environment {
             episodeEnd: false,
         };
         //this.episodeEndChecker = () => (this.scene.checkGoals() && !this.state.episodeEnd);
+        this.episode = 1;
         this.episodeEndChecker = () => (this.step == 200);
         this.step = 0;
 
@@ -58,7 +59,11 @@ class Environment {
         this.scene.update();
         if (this.episodeEndChecker()) {
             this.state.episodeEnd = true;
-            window.setTimeout(this.resetScene.bind(this), this.resetDelay ? 2500 : 0);
+            if (this.resetDelay) {
+                window.setTimeout(this.resetScene.bind(this), 2500);
+            } else {
+                this.resetScene();
+            }
             if (this.sound == true) {
                 new Audio("goalsound.mp3").play();
             }

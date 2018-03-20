@@ -12,7 +12,7 @@ class NeuralNetwork {
             throw "loss function not implemented";
         };
 
-        this.optimizer = dl.train.sgd(0.0001);
+        this.optimizer = dl.train.sgd(0.001);
 
         this.W1 = dl.variable(dl.randomNormal([nIn, nHidden]).mul(dl.scalar(2 / (nIn + nHidden))));
         this.b1 = dl.variable(dl.zeros([nHidden]));

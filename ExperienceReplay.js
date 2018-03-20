@@ -1,6 +1,7 @@
 class ExperienceReplay {
-    constructor(capacity) {
+    constructor(capacity, minCap) {
         this.capacity = capacity;
+        this.minCap = minCap;
         this.replay = [];
     }
 
@@ -13,11 +14,16 @@ class ExperienceReplay {
     }
 
     sampleExperience(batchSize = 1) {
+        if (this.replay.length < this.minCap) {
+            return null;
+        }
+
         let batch = {
             sBatch: [],
             aBatch: [],
             rBatch: [],
             ssBatch: [],
+            tBatch: [],
         };
         for (let n = 0; n < batchSize; n++) {
             let randIndex = Math.floor(Math.random() * this.replay.length);
@@ -25,6 +31,7 @@ class ExperienceReplay {
             batch.aBatch.push(this.replay[randIndex].a);
             batch.rBatch.push(this.replay[randIndex].r);
             batch.ssBatch.push(this.replay[randIndex].ss);
+            batch.tBatch.push(this.replay[randIndex].t);
         }
         return batch;
     }

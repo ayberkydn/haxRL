@@ -3,7 +3,8 @@
 //Borderları start end diye refactor et
 
 //Epsilon annealing gibi son algoritma tricklerini implement et, parametreleri guzellestir
-
+//Jsona yazıp okumayı implement et
+//Neural network eklelayer? conv?
 
 dl.setBackend("webgl");
 
@@ -56,7 +57,7 @@ window.setInterval(() => {
     if (env.state.episodeEnd) {
         episode++;
     }
-}, 30);
+}, 3);
 
 /*
 window.setInterval(() => {
