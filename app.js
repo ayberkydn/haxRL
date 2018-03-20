@@ -4,7 +4,8 @@
 
 //Epsilon annealing gibi son algoritma tricklerini implement et, parametreleri guzellestir
 //Jsona yazıp okumayı implement et
-//Neural network eklelayer? conv?
+//Neural network flexible yap arglara göre layer olsun
+//Haxball boyutları esitle
 
 dl.setBackend("webgl");
 
@@ -13,6 +14,8 @@ dl.setBackend("webgl");
 // Gets the handles for rendering
 var canvas = document.getElementById("gameCanvas");
 var ctx = canvas.getContext('2d');
+var cHeight = canvas.height;
+var cWidth = canvas.width;
 ctx.scale(1, 1);
 // Init keypress events
 var keys = {};

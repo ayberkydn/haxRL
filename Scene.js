@@ -105,7 +105,7 @@ class Scene {
     }
     draw() {
         ctx.fillStyle = bgColor;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillRect(0, 0, cWidth, cHeight);
         for (let objectKey in this.objects) {
             let objectList = this.objects[objectKey];
             for (let object of objectList) {
@@ -117,14 +117,11 @@ class Scene {
     reset() {
         this.redStartX = 100;
         this.blueStartX = 700;
-        this.metaObjects.players[0].center.x = this.redStartX;
-        this.metaObjects.players[0].center.y = canvas.height / 2;
+        this.metaObjects.players[0].resetPosition();
         this.metaObjects.players[0].velocity.mult(0);
-        this.metaObjects.players[1].center.x = this.blueStartX;
-        this.metaObjects.players[1].center.y = canvas.height / 2;
+        this.metaObjects.players[1].resetPosition();
         this.metaObjects.players[1].velocity.mult(0);
-        this.metaObjects.balls[0].center.x = canvas.width / 2;
-        this.metaObjects.balls[0].center.y = canvas.height / 2;
+        this.metaObjects.balls[0].resetPosition();
         this.metaObjects.balls[0].velocity.mult(0);
     }
 }

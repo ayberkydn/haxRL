@@ -1,6 +1,8 @@
 class Disc extends Body {
     constructor(centerX, centerY, radius, mass, restitution, damping, color) {
         super(centerX, centerY, restitution);
+        this.startX = centerX;
+        this.startY = centerY;
         this.radius = radius;
         this.mass = mass;
         this.invMass = 1 / this.mass;
@@ -31,6 +33,11 @@ class Disc extends Body {
         this.velocity.add(this.acceleration);
         this.velocity.mult(this.damping);
         this.acceleration.mult(0);
+    }
+
+    resetPosition() {
+        this.center.x = this.startX;
+        this.center.y = this.startY;
     }
 
     draw() {

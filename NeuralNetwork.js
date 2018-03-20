@@ -1,8 +1,3 @@
-var tensorToMatrix = a => math.matrix(Array.from(a.dataSync())).reshape(a.shape);
-var tensorToArray = a => math.matrix(Array.from(a.dataSync())).reshape(a.shape)._data;
-var matrixToTensor = a => dl.tensor(a._data);
-
-
 class NeuralNetwork {
     constructor(nIn, nHidden, nOut) {
         this.nIn = nIn;
@@ -13,20 +8,20 @@ class NeuralNetwork {
         };
 
         this.optimizer = dl.train.sgd(0.001);
-
-        this.W1 = dl.variable(dl.randomNormal([nIn, nHidden]).mul(dl.scalar(2 / (nIn + nHidden))));
-        this.b1 = dl.variable(dl.zeros([nHidden]));
-        this.W2 = dl.variable(dl.randomNormal([nHidden, nOut]).mul(dl.scalar(2 / (nHidden + nOut))));
-        this.b2 = dl.variable(dl.zeros([nOut]));
+        this.params = {};
+        this.params.W1 = dl.variable(dl.randomNormal([nIn, nHidden]).mul(dl.scalar(2 / (nIn + nHidden))));
+        this.params.b1 = dl.variable(dl.zeros([nHidden]));
+        this.params.W2 = dl.variable(dl.randomNormal([nHidden, nOut]).mul(dl.scalar(2 / (nHidden + nOut))));
+        this.params.b2 = dl.variable(dl.zeros([nOut]));
 
     }
 
 
     copyWeightsFrom(nn2) {
-        this.W1 = nn2.W1.clone();
-        this.b1 = nn2.b1.clone();
-        this.W2 = nn2.W2.clone();
-        this.b2 = nn2.b2.clone();
+        this.params.W1 = nn2.params.W1.clone();
+        this.params.b1 = nn2.params.b1.clone();
+        this.params.W2 = nn2.params.W2.clone();
+        this.params.b2 = nn2.params.b2.clone();
     }
 
 
@@ -68,9 +63,9 @@ class NeuralNetwork {
         return dl.tidy(() => {
             let x = dl.tensor(inputMatrix);
             x = (x.rank == 1 ? x.expandDims(0) : x);
-            let hiddenOut = x.matMul(this.W1).add(this.b1);
+            let hiddenOut = x.matMul(this.params.W1).add(this.params.b1);
             hiddenOut = dl.tanh(hiddenOut);
-            let out = hiddenOut.matMul(this.W2);
+            let out = hiddenOut.matMul(this.params.W2).add(this.params.b2);
             return out;
         });
     }

@@ -15,50 +15,50 @@ class Player extends Disc {
         if (action == Action.up) {
             this.applyForce(Vector.Unit.up);
             this.kicker.active = false;
-        } else if (action == Action.upleft) {
-            this.applyForce(Vector.Unit.upleft);
+        } else if (action == Action.upforward) {
+            this.applyForce(this.agent.side == Side.red ? Vector.Unit.upright : Vector.Unit.upleft);
             this.kicker.active = false;
-        } else if (action == Action.left) {
-            this.applyForce(Vector.Unit.left);
+        } else if (action == Action.forward) {
+            this.applyForce(this.agent.side == Side.red ? Vector.Unit.right : Vector.Unit.left);
             this.kicker.active = false;
-        } else if (action == Action.downleft) {
-            this.applyForce(Vector.Unit.downleft);
+        } else if (action == Action.downforward) {
+            this.applyForce(this.agent.side == Side.red ? Vector.Unit.downright : Vector.Unit.downleft);
             this.kicker.active = false;
         } else if (action == Action.down) {
             this.applyForce(Vector.Unit.down);
             this.kicker.active = false;
-        } else if (action == Action.downright) {
-            this.applyForce(Vector.Unit.downright);
+        } else if (action == Action.downbackward) {
+            this.applyForce(this.agent.side == Side.red ? Vector.Unit.downleft : Vector.Unit.downright);
             this.kicker.active = false;
-        } else if (action == Action.right) {
-            this.applyForce(Vector.Unit.right);
+        } else if (action == Action.backward) {
+            this.applyForce(this.agent.side == Side.red ? Vector.Unit.left : Vector.Unit.right);
             this.kicker.active = false;
-        } else if (action == Action.upright) {
-            this.applyForce(Vector.Unit.upright);
+        } else if (action == Action.upbackward) {
+            this.applyForce(this.agent.side == Side.red ? Vector.Unit.upleft : Vector.Unit.upright);
             this.kicker.active = false;
         } else if (action == Action.upshoot) {
             this.applyForce(Vector.Unit.up);
             this.kicker.active = true;
-        } else if (action == Action.upleftshoot) {
-            this.applyForce(Vector.Unit.upleft);
+        } else if (action == Action.upforwardshoot) {
+            this.applyForce(this.agent.side == Side.red ? Vector.Unit.upright : Vector.Unit.upleft);
             this.kicker.active = true;
-        } else if (action == Action.leftshoot) {
-            this.applyForce(Vector.Unit.left);
+        } else if (action == Action.forwardshoot) {
+            this.applyForce(this.agent.side == Side.red ? Vector.Unit.right : Vector.Unit.left);
             this.kicker.active = true;
-        } else if (action == Action.downleftshoot) {
-            this.applyForce(Vector.Unit.downleft);
+        } else if (action == Action.downforwardshoot) {
+            this.applyForce(this.agent.side == Side.red ? Vector.Unit.downright : Vector.Unit.downleft);
             this.kicker.active = true;
         } else if (action == Action.downshoot) {
             this.applyForce(Vector.Unit.down);
             this.kicker.active = true;
-        } else if (action == Action.downrightshoot) {
-            this.applyForce(Vector.Unit.downright);
+        } else if (action == Action.downbackwardshoot) {
+            this.applyForce(this.agent.side == Side.red ? Vector.Unit.downleft : Vector.Unit.downright);
             this.kicker.active = true;
-        } else if (action == Action.rightshoot) {
-            this.applyForce(Vector.Unit.right);
+        } else if (action == Action.backwardshoot) {
+            this.applyForce(this.agent.side == Side.red ? Vector.Unit.left : Vector.Unit.right);
             this.kicker.active = true;
-        } else if (action == Action.uprightshoot) {
-            this.applyForce(Vector.Unit.upright);
+        } else if (action == Action.upbackwardshoot) {
+            this.applyForce(this.agent.side == Side.red ? Vector.Unit.upleft : Vector.Unit.upright);
             this.kicker.active = true;
         } else if (action == Action.nomove) {
             this.kicker.active = false;
@@ -97,16 +97,9 @@ class Player extends Disc {
             this.kicker.deactivate();
         }
 
-
-
-
-
-
-
-
-
-
     }
+
+
 
 
     update() {

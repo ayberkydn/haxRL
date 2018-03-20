@@ -11,7 +11,7 @@ class NNQLearnerAgent extends Agent {
         this.discount = 0.995;
         this.lastSARST = {};
         this.actionRepeat = 5;
-        this.targetUpdateFreq = 10;
+        this.targetUpdateFreq = 100;
         this.epsilon = 0.1;
 
         this.repeatCooldown = 0;
@@ -44,14 +44,14 @@ class NNQLearnerAgent extends Agent {
 
     getStateInfo() {
         return ([
-            this.ball.center.x,
+            this.goal.center.x,
             this.ball.center.y,
             this.player.center.x,
             this.player.center.y,
         ]);
     }
 
-    isTerminated() {
+    episodeTerminated() {
         return this.env.step < this.actionRepeat;
     }
 
@@ -79,7 +79,7 @@ class NNQLearnerAgent extends Agent {
     learn() {
         if (this.repeatCooldown == 0) { //means new action to be made
             this.lastSARST.ss = this.getStateInfo();
-            this.lastSARST.t = this.isTerminated();
+            this.lastSARST.t = this.episodeTerminated();
             this.lastSARST.r = this.getReward(this.lastSARST.s, this.lastSARST.a, this.lastSARST.ss);
             this.experienceReplay.addExperience(this.lastSARST);
             let batchSize = 64;
@@ -108,9 +108,7 @@ class NNQLearnerAgent extends Agent {
                     targetBatch[n][aBatch[n]] = yBatch[n];
                 }
 
-                let prev = this.brain.W1.clone();
                 this.brain.trainStep(sBatch, targetBatch);
-                let after = this.brain.W1.clone();
 
                 if (this.targetUpdateCooldown == 0) {
                     this.targetBrain.copyWeightsFrom(this.brain);
