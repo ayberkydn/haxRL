@@ -1,23 +1,22 @@
 class NNQLearnerAgent extends Agent {
     constructor() {
         super();
-        this.experienceReplay = new ExperienceReplay(100000, 100);
-        let stateDim = 4;
-        let hiddenSize = 200;
-        this.brain = new NeuralNetwork(stateDim, hiddenSize, 9).setLoss("mse");
-        this.targetBrain = new NeuralNetwork(stateDim, hiddenSize, 9).setLoss("mse");
-        this.targetBrain.copyWeightsFrom(this.brain);
+        this.experienceReplay = new ExperienceReplay(1000000, 1000);
+        let stateDim = 12;
+        let hiddenSize = 400;
 
         this.discount = 0.995;
         this.lastSARST = {};
-        this.actionRepeat = 5;
+        this.actionRepeat = 4;
         this.targetUpdateFreq = 100;
-        this.epsilon = 0.1;
-
+        this.epsilon = 0.15;
         this.repeatCooldown = 0;
         this.targetUpdateCooldown = 0;
-        this.lastAction = null;
-
+        this.learningRate = 0.1;
+        this.lastAction = null; //for action repeat
+        this.brain = new NeuralNetwork([stateDim, hiddenSize, hiddenSize, hiddenSize, 16]).setLoss("mse").setActivation(dl.relu).setOptimizer(dl.train.sgd(this.learningRate));
+        this.targetBrain = new NeuralNetwork([stateDim, hiddenSize, hiddenSize, hiddenSize, 16]).setLoss("mse").setActivation(dl.relu);
+        this.targetBrain.copyWeightsFrom(this.brain);
     }
 
 
@@ -25,6 +24,7 @@ class NNQLearnerAgent extends Agent {
         if (this.repeatCooldown > 0) { //repeat action
             this.repeatCooldown--;
             this.player.applyAction(this.lastAction);
+
         } else { //select new action
             this.repeatCooldown = this.actionRepeat;
             this.lastSARST.s = this.getStateInfo();
@@ -42,42 +42,8 @@ class NNQLearnerAgent extends Agent {
         }
     }
 
-    getStateInfo() {
-        return ([
-            this.goal.center.x,
-            this.ball.center.y,
-            this.player.center.x,
-            this.player.center.y,
-        ]);
-    }
-
-    episodeTerminated() {
-        return this.env.step < this.actionRepeat;
-    }
-
-    getReward(s, a, ss) {
-        let sBallPos = new Vector(s[0], s[1]);
-        let sPlayerPos = new Vector(s[2], s[3]);
-
-        let ssBallPos = new Vector(ss[0], ss[1]);
-        let ssPlayerPos = new Vector(ss[2], ss[3]);
-
-        let sDist = Vector.dist(sPlayerPos, sBallPos);
-        let ssDist = Vector.dist(ssPlayerPos, ssBallPos);
-
-        let ballVelocity = -Vector.sub(ssBallPos, sBallPos).x;
-        let ballToLeft = ballVelocity > 0.5;
-        let closing = ssDist < sDist - 0.5;
-        let close = ssDist < 100;
-        let reward = close ? 1 : -1;
-
-        return reward;
-
-
-    }
-
     learn() {
-        if (this.repeatCooldown == 0) { //means new action to be made
+        if (this.repeatCooldown == 0 || this.episodeTerminated()) { //means new action to be made
             this.lastSARST.ss = this.getStateInfo();
             this.lastSARST.t = this.episodeTerminated();
             this.lastSARST.r = this.getReward(this.lastSARST.s, this.lastSARST.a, this.lastSARST.ss);
@@ -119,4 +85,70 @@ class NNQLearnerAgent extends Agent {
             }
         }
     }
+    getStateInfo() {
+        let envCenter = this.env.scene.metaObjects.centers[0];
+        let horizontalNormalizer = cWidth / 2 - leftrightMargin;
+        let verticalNormalizer = cHeight / 2 - topbottomMargin;
+
+        let playerRelCenter = Vector.sub(this.player.center, envCenter);
+        let playerPosForward = Vector.dot(playerRelCenter, this.forwardVec) / horizontalNormalizer;
+        let playerPosUp = Vector.dot(this.player.center, this.upVec) / verticalNormalizer;
+
+        let ballRelCenter = Vector.sub(this.ball.center, envCenter);
+        let ballPosForward = Vector.dot(ballRelCenter, this.forwardVec) / horizontalNormalizer;
+        let ballPosUp = Vector.dot(ballRelCenter, this.upVec) / verticalNormalizer;
+
+        let opponentRelCenter = Vector.sub(this.opponent.player.center, envCenter);
+        let opponentPosForward = Vector.dot(opponentRelCenter, this.forwardVec) / horizontalNormalizer;
+        let opponentPosUp = Vector.dot(opponentRelCenter, this.upVec) / verticalNormalizer;
+
+        let playerVelForward = Vector.dot(this.player.velocity, this.forwardVec) / 4;
+        let playerVelUp = Vector.dot(this.player.velocity, this.upVec) / 4;
+
+        let ballVelForward = Vector.dot(this.ball.velocity, this.forwardVec) / 6;
+        let ballVelUp = Vector.dot(this.ball.velocity, this.upVec) / 6;
+
+        let opponentVelForward = Vector.dot(this.opponent.player.velocity, this.forwardVec) / 4;
+        let opponentVelUp = Vector.dot(this.opponent.player.velocity, this.upVec) / 4;
+
+        //TODO CHECK ALL
+
+        return ([
+            playerPosForward,
+            playerPosUp,
+            ballPosForward,
+            ballPosUp,
+            opponentPosForward,
+            opponentPosUp,
+            playerVelForward,
+            playerVelUp,
+            ballVelForward,
+            ballVelUp,
+            opponentVelForward,
+            opponentVelUp,
+        ]);
+    }
+
+    episodeTerminated() {
+        return this.env.episodeEnd;
+    }
+
+    getReward(s, a, ss) {
+
+        let goalScored = ss[2] > 1;
+        let goalConceded = ss[2] < -1;
+        if (goalConceded || goalScored) {
+
+            console.log("goal");
+        }
+
+        if (goalScored) {
+            return 10;
+        } else if (goalConceded) {
+            return -10;
+        } else {
+            return -0.2;
+        }
+    }
+
 }

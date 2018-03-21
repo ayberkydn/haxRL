@@ -7,7 +7,6 @@ var Action = {
     downforward: "ACTION_DOWN_FORWARD",
     forward: "ACTION_FORWARD",
     upforward: "ACTION_UP_FORWARD",
-    nomove: "ACTION_NOMOVE",
     upshoot: "ACTION_UP_SHOOT",
     upbackwardshoot: "ACTION_UP_BACKWARD_SHOOT",
     backwardshoot: "ACTION_BACKWARD_SHOOT",
@@ -16,6 +15,7 @@ var Action = {
     downforwardshoot: "ACTION_DOWN_FORWARD_SHOOT",
     forwardshoot: "ACTION_FORWARD_SHOOT",
     upforwardshoot: "ACTION_UP_FORWARD_SHOOT",
+    nomove: "ACTION_NOMOVE",
     nomoveshoot: "ACTION_NOMOVE_SHOOT",
 };
 

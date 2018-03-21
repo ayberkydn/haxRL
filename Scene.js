@@ -9,7 +9,9 @@ class Scene {
             boxes: [],
             goals: [],
             balls: [],
+            centers: [],
             players: [],
+
         };
 
         this.collisions = [];
@@ -40,7 +42,11 @@ class Scene {
             this.objects.borders.push(obj.netBack);
             this.objects.discs.push(obj.topPost);
             this.objects.discs.push(obj.bottomPost);
-
+            if (this.metaObjects.goals.length == 2) {
+                let goal1Center = this.metaObjects.goals[0].center;
+                let goal2Center = this.metaObjects.goals[1].center;
+                this.metaObjects.centers.push(Vector.add(goal1Center, goal2Center).div(2));
+            }
         }
         obj.scene = this;
     }

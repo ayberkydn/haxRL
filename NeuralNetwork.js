@@ -1,27 +1,46 @@
 class NeuralNetwork {
-    constructor(nIn, nHidden, nOut) {
-        this.nIn = nIn;
-        this.nHidden = nHidden;
-        this.nOut = nOut;
+    constructor(layerSizes) {
+        if (!(layerSizes instanceof Array)) {
+            throw "Invalid arguments, enter 1 argument as array!";
+        }
+        this.layerSizes = layerSizes;
+        this.nLayers = layerSizes.length;
+
         this.lossFunc = function () {
             throw "loss function not implemented";
         };
+        this.optimizer = {
+            minimize: () => {
+                throw "optimizer not implemented";
+            }
+        };
+        this.activation = () => {
+            throw "activation not implemented";
+        };
 
-        this.optimizer = dl.train.sgd(0.001);
-        this.params = {};
-        this.params.W1 = dl.variable(dl.randomNormal([nIn, nHidden]).mul(dl.scalar(2 / (nIn + nHidden))));
-        this.params.b1 = dl.variable(dl.zeros([nHidden]));
-        this.params.W2 = dl.variable(dl.randomNormal([nHidden, nOut]).mul(dl.scalar(2 / (nHidden + nOut))));
-        this.params.b2 = dl.variable(dl.zeros([nOut]));
+        this.params = {
+            Ws: [],
+            bs: [],
+        };
+
+        for (let n = 0; n < this.nLayers - 1; n++) {
+            this.params.Ws.push(dl.variable(dl.randomNormal([layerSizes[n], layerSizes[n + 1]]).mul(dl.scalar(2 / (layerSizes[n] + layerSizes[n + 1])))));
+            this.params.bs.push(dl.variable(dl.zeros([layerSizes[n + 1]])));
+        }
 
     }
 
 
     copyWeightsFrom(nn2) {
-        this.params.W1 = nn2.params.W1.clone();
-        this.params.b1 = nn2.params.b1.clone();
-        this.params.W2 = nn2.params.W2.clone();
-        this.params.b2 = nn2.params.b2.clone();
+        if (!arrayEqual(this.layerSizes, nn2.layerSizes)) {
+            console.log(this.layerSizes, nn2.layerSizes);
+            throw "Network architectures are not identical!";
+        } else {
+            for (let n = 0; n < this.params.Ws.length; n++) {
+                this.params.Ws[n] = nn2.params.Ws[n].clone();
+                this.params.bs[n] = nn2.params.bs[n].clone();
+            }
+        }
     }
 
 
@@ -45,6 +64,11 @@ class NeuralNetwork {
         return this;
     }
 
+    setActivation(activation) {
+        this.activation = activation;
+        return this;
+    }
+
     predict(inputMatrix, returnScore = false) {
 
         return dl.tidy(() => {
@@ -54,7 +78,6 @@ class NeuralNetwork {
             } else {
                 return tensorToArray(dl.argMax(out, 1));
             }
-
         });
     }
 
@@ -63,9 +86,12 @@ class NeuralNetwork {
         return dl.tidy(() => {
             let x = dl.tensor(inputMatrix);
             x = (x.rank == 1 ? x.expandDims(0) : x);
-            let hiddenOut = x.matMul(this.params.W1).add(this.params.b1);
-            hiddenOut = dl.tanh(hiddenOut);
-            let out = hiddenOut.matMul(this.params.W2).add(this.params.b2);
+            let hiddenOut = x;
+            for (let n = 0; n < this.nLayers - 2; n++) {
+                hiddenOut = hiddenOut.matMul(this.params.Ws[n]).add(this.params.bs[n]);
+                hiddenOut = this.activation(hiddenOut);
+            }
+            let out = hiddenOut.matMul(this.params.Ws[this.nLayers - 2]).add(this.params.bs[this.nLayers - 2]);
             return out;
         });
     }

@@ -16,7 +16,7 @@ class Agent {
         this.player.agent = this;
         this.goal = this.env.scene.metaObjects.goals[side == Side.red ? 0 : 1];
         this.forwardVec = side == Side.red ? Vector.Unit.right : Vector.Unit.left;
-        this.backwardVec = side == Side.red ? Vector.Unit.left : Vector.Unit.right;
+        this.upVec = Vector.Unit.up;
     }
 
     act() {}

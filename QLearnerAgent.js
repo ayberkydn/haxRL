@@ -33,34 +33,6 @@ class QLearnerAgent extends Agent {
                 aHScores[n] = this.QTable[this.sars.s.concat(n)];
             }
 
-            var softmax = (scores) => {
-                scores = Array.from(scores);
-                let sum = 0;
-                for (let n = 0; n < 3; n++) {
-                    scores[n] = Math.exp(scores[n]);
-                    sum += scores[n];
-                }
-                for (let n = 0; n < 3; n++) {
-                    scores[n] /= sum;
-                }
-
-                return scores;
-            };
-
-            var choice = (probs) => {
-                for (let n = 1; n < 3; n++) {
-                    scores[n] += scores[n - 1];
-                }
-                let rand = Math.random();
-                if (rand < scores[0]) {
-                    return 0;
-                } else if (rand < scores[1]) {
-                    return 1;
-                } else {
-                    return 2;
-                }
-            };
-
             let actionHIndex = choice(softmax(aHScores));
             let actionH = Object.values(ActionH)[actionHIndex];
 

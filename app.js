@@ -4,7 +4,6 @@
 
 //Epsilon annealing gibi son algoritma tricklerini implement et, parametreleri guzellestir
 //Jsona yazıp okumayı implement et
-//Neural network flexible yap arglara göre layer olsun
 //Haxball boyutları esitle
 
 dl.setBackend("webgl");
@@ -47,8 +46,10 @@ var goalLength = 140;
 //
 var env = new Environment( /*render*/ true, /*sound*/ false, /*resetDelay*/ false, /*randomStart*/ false);
 //env.addAgent(new HumanAgent(Side.blue, "w", "s", "a", "d", "q"));
-env.addAgent(new HumanAgent("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "x"), Side.red);
+//env.addAgent(new HumanAgent("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "x"), Side.red);
+env.addAgent(new NNQLearnerAgent(), Side.red);
 env.addAgent(new NNQLearnerAgent(), Side.blue);
+env.linkAgentsExperience();
 
 
 
@@ -57,7 +58,7 @@ episode = 0;
 window.setInterval(() => {
     env.update();
     env.draw();
-    if (env.state.episodeEnd) {
+    if (env.episodeEnd) {
         episode++;
     }
 }, 3);

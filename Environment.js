@@ -5,12 +5,10 @@ class Environment {
         this.resetDelay = resetDelay;
         this.randomStart = randomStart;
         this.agents = [];
-        this.state = {
-            episodeEnd: false,
-        };
-        //this.episodeEndChecker = () => (this.scene.checkGoals() && !this.state.episodeEnd);
+        this.episodeEnd = false;
+        //this.episodeEndChecker = () => (this.scene.checkGoals() && !this.episodeEnd);
         this.episode = 1;
-        this.episodeEndChecker = () => (this.step == 200);
+        this.episodeEndChecker = () => (this.step == 50000 || this.scene.checkGoals());
         this.step = 0;
 
         this.scene = new Scene();
@@ -27,7 +25,7 @@ class Environment {
         this.scene.addObject(new VerticalBorder(cWidth - leftrightMargin, cHeight - (cHeight / 2 - goalLength / 2 + topbottomMargin) / 2, cHeight / 2 - topbottomMargin - goalLength / 2, borderRestitution).extendTo(Way.right).setCollisionMask([Ball]));
         this.scene.addObject(new Goal(leftrightMargin, cHeight / 2, Way.left, goalLength));
         this.scene.addObject(new Goal(cWidth - leftrightMargin, cHeight / 2, Way.right, goalLength));
-        this.scene.addObject(new Ball(cWidth / 2, cHeight / 2, ballRadius, ballMass, ballRestitution, ballDamping));
+        this.scene.addObject(new Ball(cWidth / 3, cHeight / 2, ballRadius, ballMass, ballRestitution, ballDamping));
     }
 
     addAgent(agent, side) {
@@ -42,9 +40,18 @@ class Environment {
         }
     }
 
+    linkAgentsExperience() {
+        if (this.agents[0] instanceof NNQLearnerAgent && this.agents[1] instanceof NNQLearnerAgent) {
+            this.agents[0].experienceReplay = this.agents[1].experienceReplay;
+            console.log("Experience linking successful.");
+        } else {
+            throw "Agents missing or incompatible";
+        }
+    }
+
     resetScene() {
         this.scene.reset();
-        this.state.episodeEnd = false;
+        this.episodeEnd = false;
         if (this.randomStart) {
             this.scene.metaObjects.balls[0].applyImpulse(new Vector(Math.random() - 0.5, Math.random() - 0.5).mult(20));
         }
@@ -52,13 +59,23 @@ class Environment {
     }
 
     update() {
+
         for (let agent of this.agents) {
             agent.act();
         }
 
         this.scene.update();
+
         if (this.episodeEndChecker()) {
-            this.state.episodeEnd = true;
+            this.episodeEnd = true;
+        }
+
+
+        for (let agent of this.agents) {
+            agent.learn();
+        }
+
+        if (this.episodeEnd == true) {
             if (this.resetDelay) {
                 window.setTimeout(this.resetScene.bind(this), 2500);
             } else {
@@ -69,9 +86,6 @@ class Environment {
             }
         }
 
-        for (let agent of this.agents) {
-            agent.learn();
-        }
         this.step += 1;
     }
 
