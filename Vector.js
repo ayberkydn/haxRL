@@ -10,9 +10,6 @@ class Vector {
         return this;
     }
 
-    static add(vec1, vec2) {
-        return vec1.copy().add(vec2);
-    }
 
     sub(vec) {
         this.x -= vec.x;
@@ -20,9 +17,6 @@ class Vector {
         return this;
     }
 
-    static sub(vec1, vec2) {
-        return vec1.copy().sub(vec2);
-    }
 
     normalize() {
         let norm = this.magnitude();
@@ -31,9 +25,6 @@ class Vector {
         return this;
     }
 
-    static normalize(vec) {
-        return vec.copy().normalize();
-    }
 
     magnitude() {
         return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
@@ -45,18 +36,11 @@ class Vector {
         return this;
     }
 
-    static mult(vec1, n) {
-        return vec1.copy().mult(n);
-    }
 
     div(n) {
         this.x /= n;
         this.y /= n;
         return this;
-    }
-
-    static div(vec1, n) {
-        return vec1.copy().div(n);
     }
 
     inverse() {
@@ -65,6 +49,27 @@ class Vector {
         return this;
     }
 
+
+    copy() {
+        return Object.assign(new Vector(0, 0), this);
+    }
+
+    static div(vec1, n) {
+        return vec1.copy().div(n);
+    }
+
+    static mult(vec1, n) {
+        return vec1.copy().mult(n);
+    }
+    static add(vec1, vec2) {
+        return vec1.copy().add(vec2);
+    }
+    static sub(vec1, vec2) {
+        return vec1.copy().sub(vec2);
+    }
+    static normalize(vec) {
+        return vec.copy().normalize();
+    }
     static inverse(vec1) {
         return vec1.copy().inverse();
     }
@@ -76,11 +81,6 @@ class Vector {
     static dist(vec1, vec2) {
         return Vector.sub(vec1, vec2).magnitude();
     }
-
-    copy() {
-        return Object.assign(new Vector(0, 0), this);
-    }
-
     static get Unit() {
         return {
             up: new Vector(0, -1),

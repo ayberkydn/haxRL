@@ -1,22 +1,23 @@
 class NNQLearnerAgent extends Agent {
     constructor() {
         super();
-        this.experienceReplay = new ExperienceReplay(1000000, 1000);
-        let stateDim = 12;
-        let hiddenSize = 400;
+        this.experienceReplay = new ExperienceReplay(1000000, 100);
+        this.stateDim = 12;
+        let hiddenSize = 200;
+        this.actionSpace = 8;
+        this.learningRate = 0.01;
+        this.brain = new NeuralNetwork([this.stateDim, hiddenSize, hiddenSize, this.actionSpace]).setLoss("mse").setActivation(dl.tanh).setOptimizer(dl.train.sgd(this.learningRate));
+        this.targetBrain = new NeuralNetwork([this.stateDim, hiddenSize, hiddenSize, this.actionSpace]).setLoss("mse").setActivation(dl.tanh);
+        this.targetBrain.copyWeightsFrom(this.brain);
 
-        this.discount = 0.995;
+        this.discount = 0.5; //when reward is continuous low discount is better IMO
         this.lastSARST = {};
         this.actionRepeat = 4;
         this.targetUpdateFreq = 100;
         this.epsilon = 0.15;
         this.repeatCooldown = 0;
         this.targetUpdateCooldown = 0;
-        this.learningRate = 0.1;
         this.lastAction = null; //for action repeat
-        this.brain = new NeuralNetwork([stateDim, hiddenSize, hiddenSize, hiddenSize, 16]).setLoss("mse").setActivation(dl.relu).setOptimizer(dl.train.sgd(this.learningRate));
-        this.targetBrain = new NeuralNetwork([stateDim, hiddenSize, hiddenSize, hiddenSize, 16]).setLoss("mse").setActivation(dl.relu);
-        this.targetBrain.copyWeightsFrom(this.brain);
     }
 
 
@@ -28,10 +29,10 @@ class NNQLearnerAgent extends Agent {
         } else { //select new action
             this.repeatCooldown = this.actionRepeat;
             this.lastSARST.s = this.getStateInfo();
-
+            console.log(this.brain.forward(this.lastSARST.s)[0].map(x => x.toFixed(2)));
             let actionIndex;
             if (Math.random() < this.epsilon) {
-                actionIndex = Math.floor(Math.random() * 9);
+                actionIndex = Math.floor(Math.random() * this.actionSpace);
             } else {
                 actionIndex = this.brain.predict(this.lastSARST.s)[0];
             }
@@ -134,21 +135,25 @@ class NNQLearnerAgent extends Agent {
     }
 
     getReward(s, a, ss) {
+        /*
+                let goalScored = ss[2] > 1;
+                let goalConceded = ss[2] < -1;
+                if (goalConceded || goalScored) {
 
-        let goalScored = ss[2] > 1;
-        let goalConceded = ss[2] < -1;
-        if (goalConceded || goalScored) {
+                    console.log("goal");
+                }
 
-            console.log("goal");
-        }
+                if (goalScored) {
+                    return 10;
+                } else if (goalConceded) {
+                    return -10;
+                } else {
+                    return -0.2;
+                }
+            }
+        */
 
-        if (goalScored) {
-            return 10;
-        } else if (goalConceded) {
-            return -10;
-        } else {
-            return -0.2;
-        }
+        let ballAtOtherSide = ss[2] > 0;
+        return ballAtOtherSide ? 1 : -1;
     }
-
 }

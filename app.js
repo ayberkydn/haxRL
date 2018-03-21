@@ -3,7 +3,7 @@
 //Borderları start end diye refactor et
 
 //Epsilon annealing gibi son algoritma tricklerini implement et, parametreleri guzellestir
-//Jsona yazıp okumayı implement et
+//Jsona yazıp okumayı implement et sonra timeoutsuz calistir
 //Haxball boyutları esitle
 
 dl.setBackend("webgl");
@@ -49,18 +49,12 @@ var env = new Environment( /*render*/ true, /*sound*/ false, /*resetDelay*/ fals
 //env.addAgent(new HumanAgent("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "x"), Side.red);
 env.addAgent(new NNQLearnerAgent(), Side.red);
 env.addAgent(new NNQLearnerAgent(), Side.blue);
-env.linkAgentsExperience();
+//env.linkAgentsExperience();
 
 
-
-
-episode = 0;
 window.setInterval(() => {
     env.update();
     env.draw();
-    if (env.episodeEnd) {
-        episode++;
-    }
 }, 3);
 
 /*
@@ -68,6 +62,7 @@ window.setInterval(() => {
     env.update();
     env.draw();
 }, 0);
+
 window.setTimeout(() => {
     console.log(3000 / env.step, "ms per step total");
 }, 3000);
@@ -95,13 +90,4 @@ for (let n = 0; n < 500; n++) {
 }
 var t1 = performance.now();
 console.log((t1 - t0) / 500, "per step draw")
-*/
-
-/*
-for (let n = 0; n < 200000; n++) {
-    game.update();
-    if (n % 1000 == 0) {
-        game.draw();
-    }
-}
 */

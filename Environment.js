@@ -45,7 +45,7 @@ class Environment {
             this.agents[0].experienceReplay = this.agents[1].experienceReplay;
             console.log("Experience linking successful.");
         } else {
-            throw "Agents missing or incompatible";
+            throw "Agents missing or incompatible for exp linking";
         }
     }
 
