@@ -8,7 +8,7 @@ class Environment {
         this.episodeEnd = false;
         //this.episodeEndChecker = () => (this.scene.checkGoals() && !this.episodeEnd);
         this.episode = 1;
-        this.episodeEndChecker = () => (this.step == 2000);
+        this.episodeEndChecker = () => (this.scene.checkGoals() || this.step == 2000);
         this.step = 0;
 
         this.scene = new Scene();
@@ -25,7 +25,7 @@ class Environment {
         this.scene.addObject(new VerticalBorder(cWidth - leftrightMargin, cHeight - (cHeight / 2 - goalLength / 2 + topbottomMargin) / 2, cHeight / 2 - topbottomMargin - goalLength / 2, borderRestitution).extendTo(Way.right).setCollisionMask([Ball]));
         this.scene.addObject(new Goal(leftrightMargin, cHeight / 2, Way.left, goalLength));
         this.scene.addObject(new Goal(cWidth - leftrightMargin, cHeight / 2, Way.right, goalLength));
-        this.scene.addObject(new Ball(cWidth / 3, cHeight / 2, ballRadius, ballMass, ballRestitution, ballDamping));
+        this.scene.addObject(new Ball(cWidth / 2, cHeight / 2, ballRadius, ballMass, ballRestitution, ballDamping));
     }
 
     addAgent(agent, side) {

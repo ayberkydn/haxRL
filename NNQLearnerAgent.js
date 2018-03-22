@@ -1,10 +1,10 @@
 class NNQLearnerAgent extends Agent {
     constructor() {
         super();
-        this.experienceReplay = new ExperienceReplay(1000000, 100);
+        this.experienceReplay = new ExperienceReplay(10000, 100);
         this.stateDim = 12;
         let hiddenSize = 200;
-        this.actionSpace = 8;
+        this.actionSpace = 16;
         this.learningRate = 0.01;
         this.brain = new NeuralNetwork([this.stateDim, hiddenSize, hiddenSize, this.actionSpace]).setLoss("mse").setActivation(dl.tanh).setOptimizer(dl.train.sgd(this.learningRate));
         this.targetBrain = new NeuralNetwork([this.stateDim, hiddenSize, hiddenSize, this.actionSpace]).setLoss("mse").setActivation(dl.tanh);
@@ -151,10 +151,13 @@ class NNQLearnerAgent extends Agent {
                     return -0.2;
                 }
             }
-        */
+            
+            let ballAtUpCorner = ss[2] > 0.85 && ss[3] > 0.85;
+            console.log(ballAtUpCorner);
+            return ballAtUpCorner ? 1 : -1;
+            */
 
-        let ballAtUpCorner = ss[2] > 0.85 && ss[3] > 0.85;
-        console.log(ballAtUpCorner);
-        return ballAtUpCorner ? 1 : -1;
+        let goal = ss[2] >= 1;
+        return goal ? 1 : -1;
     }
 }
