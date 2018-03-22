@@ -32,14 +32,20 @@ class NeuralNetwork {
 
 
     copyWeightsFrom(nn2) {
+
         if (!arrayEqual(this.layerSizes, nn2.layerSizes)) {
             console.log(this.layerSizes, nn2.layerSizes);
             throw "Network architectures are not identical!";
         } else {
+
             for (let n = 0; n < this.params.Ws.length; n++) {
+                this.params.Ws[n].dispose();
                 this.params.Ws[n] = nn2.params.Ws[n].clone();
+                this.params.bs[n].dispose();
                 this.params.bs[n] = nn2.params.bs[n].clone();
             }
+
+
         }
     }
 

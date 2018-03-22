@@ -51,6 +51,7 @@ class NNQLearnerAgent extends Agent {
             this.experienceReplay.addExperience(this.lastSARST);
             let batchSize = 64;
             let expBatch = this.experienceReplay.sampleExperience(batchSize);
+            console.log(dl.memory());
 
             if (expBatch) {
                 let {
