@@ -167,7 +167,7 @@ class NNQLearnerAgent extends Agent {
         } else if (ballGoingForward) {
             return 0.1;
         } else {
-            return -1;
+            return -0.1;
         }
     }
 }
