@@ -10,7 +10,7 @@ class NNQLearnerAgent extends Agent {
         this.targetBrain = new NeuralNetwork([this.stateDim, hiddenSize, hiddenSize, this.actionSpace]).setLoss("mse").setActivation(dl.tanh);
         this.targetBrain.copyWeightsFrom(this.brain);
 
-        this.discount = 0.5; //when reward is continuous low discount is better IMO
+        this.discount = 0.9; //when reward is continuous low discount is better IMO
         this.lastSARST = {};
         this.actionRepeat = 4;
         this.targetUpdateFreq = 100;
