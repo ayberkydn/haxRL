@@ -68,6 +68,7 @@ class Environment {
 
         if (this.episodeEndChecker()) {
             this.episodeEnd = true;
+            console.clear();
         }
 
 

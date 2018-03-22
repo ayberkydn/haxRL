@@ -10,7 +10,7 @@ class NNQLearnerAgent extends Agent {
         this.targetBrain = new NeuralNetwork([this.stateDim, hiddenSize, hiddenSize, this.actionSpace]).setLoss("mse").setActivation(dl.tanh);
         this.targetBrain.copyWeightsFrom(this.brain);
 
-        this.discount = 0.9; //when reward is continuous low discount is better IMO
+        this.discount = 0.85; //when reward is continuous low discount is better IMO
         this.lastSARST = {};
         this.actionRepeat = 4;
         this.targetUpdateFreq = 100;
@@ -29,8 +29,6 @@ class NNQLearnerAgent extends Agent {
         } else { //select new action
             this.repeatCooldown = this.actionRepeat;
             this.lastSARST.s = this.getStateInfo();
-            console.clear();
-            console.log(this.brain.forward(this.lastSARST.s)[0].map(x => x.toFixed(2)));
             let actionIndex;
             if (Math.random() < this.epsilon) {
                 actionIndex = Math.floor(Math.random() * this.actionSpace);
@@ -49,6 +47,7 @@ class NNQLearnerAgent extends Agent {
             this.lastSARST.ss = this.getStateInfo();
             this.lastSARST.t = this.episodeTerminated();
             this.lastSARST.r = this.getReward(this.lastSARST.s, this.lastSARST.a, this.lastSARST.ss);
+            console.log(this.lastSARST.r)
             this.experienceReplay.addExperience(this.lastSARST);
             let batchSize = 64;
             let expBatch = this.experienceReplay.sampleExperience(batchSize);
@@ -159,6 +158,13 @@ class NNQLearnerAgent extends Agent {
             */
 
         let goal = ss[2] >= 1;
-        return goal ? 1 : -1;
+        let ballGoingForward = ss[2] - 0.01 > s[2];
+        if (goal) {
+            return 1;
+        } else if (ballGoingForward) {
+            return 0.1;
+        } else {
+            return -1;
+        }
     }
 }
