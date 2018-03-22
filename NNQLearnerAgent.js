@@ -51,7 +51,6 @@ class NNQLearnerAgent extends Agent {
             this.experienceReplay.addExperience(this.lastSARST);
             let batchSize = 64;
             let expBatch = this.experienceReplay.sampleExperience(batchSize);
-            console.log(dl.memory());
 
             if (expBatch) {
                 let {
@@ -154,7 +153,8 @@ class NNQLearnerAgent extends Agent {
             }
         */
 
-        let ballAtOtherSide = ss[2] > 0;
-        return ballAtOtherSide ? 1 : -1;
+        let ballAtUpCorner = ss[2] > 0.85 && ss[3] > 0.85;
+        console.log(ballAtUpCorner);
+        return ballAtUpCorner ? 1 : -1;
     }
 }
