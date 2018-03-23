@@ -14,7 +14,8 @@ class NNQLearnerAgent extends Agent {
         this.lastSARST = {};
         this.actionRepeat = 4;
         this.targetUpdateFreq = 100;
-        this.epsilon = 0.15;
+        this.epsilon = 1; //start as 1, linearly anneal to 0.1
+        this.learnStep = 0;
         this.repeatCooldown = 0;
         this.targetUpdateCooldown = 0;
         this.lastAction = null; //for action repeat
@@ -47,7 +48,6 @@ class NNQLearnerAgent extends Agent {
             this.lastSARST.ss = this.getStateInfo();
             this.lastSARST.t = this.episodeTerminated();
             this.lastSARST.r = this.getReward(this.lastSARST.s, this.lastSARST.a, this.lastSARST.ss);
-            console.log(this.lastSARST.r)
             this.experienceReplay.addExperience(this.lastSARST);
             let batchSize = 64;
             let expBatch = this.experienceReplay.sampleExperience(batchSize);
@@ -76,6 +76,8 @@ class NNQLearnerAgent extends Agent {
                 }
 
                 this.brain.trainStep(sBatch, targetBatch);
+                this.learnStep++;
+                this.epsilon = (Math.cos(this.learnStep * 0.0001) + 1) / 2;
 
                 if (this.targetUpdateCooldown == 0) {
                     this.targetBrain.copyWeightsFrom(this.brain);
