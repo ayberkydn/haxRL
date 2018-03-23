@@ -1,51 +1,40 @@
 class NeuralNetwork {
-    constructor(layerSizes) {
-        if (!(layerSizes instanceof Array)) {
-            throw "Invalid arguments, enter 1 argument as array!";
-        }
-        this.layerSizes = layerSizes;
-        this.nLayers = layerSizes.length;
+    constructor() {
 
         this.lossFunc = function () {
-            throw "loss function not implemented";
+            throw "Loss function not implemented";
         };
         this.optimizer = {
             minimize: () => {
-                throw "optimizer not implemented";
+                throw "Optimizer not implemented";
             }
         };
-        this.activation = () => {
-            throw "activation not implemented";
-        };
 
-        this.params = {
-            Ws: [],
-            bs: [],
-        };
+        this.layers = [];
+    }
 
-        for (let n = 0; n < this.nLayers - 1; n++) {
-            this.params.Ws.push(dl.variable(dl.randomNormal([layerSizes[n], layerSizes[n + 1]]).mul(dl.scalar(2 / (layerSizes[n] + layerSizes[n + 1])))));
-            this.params.bs.push(dl.variable(dl.zeros([layerSizes[n + 1]])));
+    addLayer(layer) {
+        if (this.layers.length == 0) {
+            if (!layer.inputShape) {
+                throw "Input layer must be defined with input shape";
+            }
+        } else {
+            layer.setInputShape(this.layers[this.layers.length - 1].outputShape);
         }
+        this.layers.push(layer);
+        return this;
 
     }
 
 
     copyWeightsFrom(nn2) {
-
-        if (!arrayEqual(this.layerSizes, nn2.layerSizes)) {
-            console.log(this.layerSizes, nn2.layerSizes);
-            throw "Network architectures are not identical!";
+        if (this.layers.length != nn2.layers.length) {
+            throw `Network topology mismatch between ${this} and ${nn2}`;
         } else {
-
-            for (let n = 0; n < this.params.Ws.length; n++) {
-                this.params.Ws[n].dispose();
-                this.params.Ws[n] = nn2.params.Ws[n].clone();
-                this.params.bs[n].dispose();
-                this.params.bs[n] = nn2.params.bs[n].clone();
+            for (let n = 0; n < this.layers.length; n++) {
+                this.layers[n].copyWeightsFrom(nn2.layers[n]);
             }
-
-
+            return this;
         }
     }
 
@@ -70,15 +59,12 @@ class NeuralNetwork {
         return this;
     }
 
-    setActivation(activation) {
-        this.activation = activation;
-        return this;
-    }
 
-    predict(inputMatrix, returnScore = false) {
+    predict(inputTensor, returnScore = false) {
 
         return dl.tidy(() => {
-            let out = this._forward(inputMatrix);
+
+            let out = this._forward(inputTensor);
             if (returnScore) {
                 return tensorToArray(dl.max(out, 1));
             } else {
@@ -88,40 +74,44 @@ class NeuralNetwork {
     }
 
 
-    _forward(inputMatrix) {
+    _forward(inputTensor, toLayer = 0) {
         return dl.tidy(() => {
-            let x = dl.tensor(inputMatrix);
-            x = (x.rank == 1 ? x.expandDims(0) : x);
-            let hiddenOut = x;
-            for (let n = 0; n < this.nLayers - 2; n++) {
-                hiddenOut = hiddenOut.matMul(this.params.Ws[n]).add(this.params.bs[n]);
-                hiddenOut = this.activation(hiddenOut);
+            if (!(inputTensor instanceof dl.Tensor)) {
+                inputTensor = dl.tensor(inputTensor);
             }
-            let out = hiddenOut.matMul(this.params.Ws[this.nLayers - 2]).add(this.params.bs[this.nLayers - 2]);
-            return out;
+            let hiddenOut = inputTensor;
+            for (let n = 0; n < (toLayer ? toLayer : this.layers.length); n++) {
+                hiddenOut = this.layers[n].forward(hiddenOut);
+            }
+
+            return hiddenOut;
+
         });
     }
 
-    forward(inputMatrix) {
+    forward(inputTensor, toLayer = 0) {
         return dl.tidy(() => {
-            let out = this._forward(inputMatrix);
+            let out = this._forward(inputTensor, toLayer);
             return tensorToArray(out);
         });
     }
 
 
-    _loss(inputMatrix, labelsArray) {
+    _loss(inputTensor, labelsArray) {
         return dl.tidy(() => {
-            let logits = this._forward(inputMatrix);
-            let labels = dl.tensor(labelsArray);
+            let logits = this._forward(inputTensor);
+            let labels = labelsArray;
+            if (!(labelsArray instanceof dl.Tensor)) {
+                labels = dl.tensor(labelsArray);
+            }
             let loss = this.lossFunc(labels, logits);
             return loss;
         });
     }
 
-    loss(inputMatrix, labelsArray) {
+    loss(inputTensor, labelsArray) {
         return dl.tidy(() => {
-            let loss = this._loss(inputMatrix, labelsArray);
+            let loss = this._loss(inputTensor, labelsArray);
             return loss.dataSync()[0];
         });
     }

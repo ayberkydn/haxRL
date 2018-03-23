@@ -52,21 +52,33 @@ env.addAgent(new NNQLearnerAgent(), Side.blue);
 //env.linkAgentsExperience();
 
 
-window.setInterval(() => {
-    env.update();
-    env.draw();
-}, 3);
-
 /*
-window.setInterval(() => {
+while (true) {
+    env.update();
+    env.draw;
+    await sleep(10);
+}
+*/
+var globalStep = 0;
+var proc = window.setInterval(() => {
     env.update();
     env.draw();
+    globalStep++;
 }, 0);
 
+var probTime = 25000;
+
 window.setTimeout(() => {
-    console.log(3000 / env.step, "ms per step total");
-}, 3000);
-*/
+    var perstep = probTime / globalStep;
+    console.log(perstep, "ms per step total");
+    clearInterval(proc);
+    window.setInterval(() => {
+        env.update();
+        env.draw();
+    }, perstep);
+}, probTime * 1.5);
+
+
 
 /*
 var t0 = performance.now();

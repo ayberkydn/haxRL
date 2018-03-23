@@ -6,9 +6,21 @@ class NNQLearnerAgent extends Agent {
         let hiddenSize = 200;
         this.actionSpace = 16;
         this.learningRate = 0.01;
-        this.brain = new NeuralNetwork([this.stateDim, hiddenSize, hiddenSize, this.actionSpace]).setLoss("mse").setActivation(dl.tanh).setOptimizer(dl.train.sgd(this.learningRate));
-        this.targetBrain = new NeuralNetwork([this.stateDim, hiddenSize, hiddenSize, this.actionSpace]).setLoss("mse").setActivation(dl.tanh);
-        this.targetBrain.copyWeightsFrom(this.brain);
+        this.brain = new NeuralNetwork()
+            .addLayer(new DenseLayer(hiddenSize, dl.relu, this.stateDim))
+            .addLayer(new DenseLayer(hiddenSize, dl.relu))
+            .addLayer(new DenseLayer(hiddenSize, dl.relu))
+            .addLayer(new DenseLayer(this.actionSpace))
+            .setLoss("mse")
+            .setOptimizer(dl.train.rmsprop(0.00025, 0.95, 0.95, 0.01));
+
+        this.targetBrain = new NeuralNetwork()
+            .addLayer(new DenseLayer(hiddenSize, dl.relu, this.stateDim))
+            .addLayer(new DenseLayer(hiddenSize, dl.relu))
+            .addLayer(new DenseLayer(hiddenSize, dl.relu))
+            .addLayer(new DenseLayer(this.actionSpace))
+            .copyWeightsFrom(this.brain);
+
 
         this.discount = 0.85; //when reward is continuous low discount is better IMO
         this.lastSARST = {};
@@ -30,9 +42,9 @@ class NNQLearnerAgent extends Agent {
         } else { //select new action
             this.repeatCooldown = this.actionRepeat;
             this.lastSARST.s = this.getStateInfo();
-           
+
             console.log(this.brain.forward(this.lastSARST.s)[0].map(x => x.toFixed(2)));
-           
+
             let actionIndex;
             if (Math.random() < this.epsilon) {
                 actionIndex = Math.floor(Math.random() * this.actionSpace);
@@ -80,7 +92,7 @@ class NNQLearnerAgent extends Agent {
 
                 this.brain.trainStep(sBatch, targetBatch);
                 this.learnStep++;
-                this.epsilon = (Math.cos(this.learnStep * 0.0001) + 1) / 2;
+                this.epsilon = (Math.cos(this.learnStep * 0.001) + 1) / 2;
 
                 if (this.targetUpdateCooldown == 0) {
                     this.targetBrain.copyWeightsFrom(this.brain);
@@ -161,7 +173,7 @@ class NNQLearnerAgent extends Agent {
             console.log(ballAtUpCorner);
             return ballAtUpCorner ? 1 : -1;
             */
-
+        /*
         let goal = ss[2] >= 1;
         let ballGoingForward = ss[2] - 0.01 > s[2];
         if (goal) {
@@ -171,5 +183,10 @@ class NNQLearnerAgent extends Agent {
         } else {
             return -0.1;
         }
+        */
+
+        let meGoingForward = ss[0] - 0.01 > s[0];
+        let meGoingUp = ss[1] - 0.01 > s[1];
+        return (meGoingForward | meGoingUp) ? 1 : -1;
     }
 }

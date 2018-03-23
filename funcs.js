@@ -43,3 +43,8 @@ var arrayEqual = (array1, array2) => {
         return true;
     }
 };
+
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
