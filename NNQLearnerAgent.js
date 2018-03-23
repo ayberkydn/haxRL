@@ -30,6 +30,9 @@ class NNQLearnerAgent extends Agent {
         } else { //select new action
             this.repeatCooldown = this.actionRepeat;
             this.lastSARST.s = this.getStateInfo();
+           
+            console.log(this.brain.forward(this.lastSARST.s)[0].map(x => x.toFixed(2)));
+           
             let actionIndex;
             if (Math.random() < this.epsilon) {
                 actionIndex = Math.floor(Math.random() * this.actionSpace);
@@ -166,7 +169,7 @@ class NNQLearnerAgent extends Agent {
         } else if (ballGoingForward) {
             return 0.1;
         } else {
-            return -1;
+            return -0.1;
         }
     }
 }
