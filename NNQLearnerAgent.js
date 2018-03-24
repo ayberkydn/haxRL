@@ -1,7 +1,7 @@
 class NNQLearnerAgent extends Agent {
     constructor() {
         super();
-        this.experienceReplay = new ExperienceReplay(10000, 100);
+        this.experienceReplay = new ExperienceReplay(100000, 1000);
         let hiddenSize = 200;
         this.actionSpace = 16;
         this.learningRate = 0.01;
@@ -43,13 +43,11 @@ class NNQLearnerAgent extends Agent {
             .copyWeightsFrom(this.brain);
 
 
-        //TODO
 
-
-        this.discount = 0.85; //when reward is continuous low discount is better IMO
-        this.lastSARST = {};
+        this.discount = 0.95; //when reward is continuous low discount is better IMO
+        this.lastSiASSiiR = {};
         this.actionRepeat = 4;
-        this.targetUpdateFreq = 2;
+        this.targetUpdateFreq = 20;
         this.epsilon = 1; //start as 1, linearly anneal to 0.1
         this.learnStep = 0;
         this.repeatCooldown = 0;
@@ -65,48 +63,52 @@ class NNQLearnerAgent extends Agent {
 
         } else { //select new action
             this.repeatCooldown = this.actionRepeat;
-            this.lastSARST.s = this.getStateInfo();
-            //console.log(this.brain.forward(this.lastSARST.s)[0].map(x => x.toFixed(2)));
-
-            let actionIndex;
-            if (Math.random() < this.epsilon) {
-                actionIndex = Math.floor(Math.random() * this.actionSpace);
-            } else {
-                actionIndex = this.brain.predict(this.lastSARST.s)[0];
-            }
-            let action = Object.values(Action)[actionIndex];
-            this.lastSARST.a = actionIndex;
-            this.player.applyAction(action);
-            this.lastAction = action;
+            this.lastSiASSiiR.s = this.getState();
+            this.lastSiASSiiR.i = this.getStateInfo();
         }
+
+        //console.log(this.brain.forward(this.lastSiASSiiR.s)[0].map(x => x.toFixed(2)));
+
+        let actionIndex;
+        if (Math.random() < this.epsilon) {
+            actionIndex = Math.floor(Math.random() * this.actionSpace);
+        } else {
+            actionIndex = this.brain.predict(this.lastSiASSiiR.s)[0];
+        }
+        let action = Object.values(Action)[actionIndex];
+        this.lastSiASSiiR.a = actionIndex;
+        this.player.applyAction(action);
+        this.lastAction = action;
     }
 
+
     learn() {
-        if (this.repeatCooldown == 0 || this.episodeTerminated()) { //means new action to be made
-            this.lastSARST.ss = this.getStateInfo();
-            this.lastSARST.t = this.episodeTerminated();
-            this.lastSARST.r = this.getReward(this.lastSARST.s, this.lastSARST.a, this.lastSARST.ss);
-            this.experienceReplay.addExperience(this.lastSARST);
-            let batchSize = 64;
+        if (this.repeatCooldown == 0 || this.episodeTerminated()) { //means new action to be made or terminal state is reached
+            this.lastSiASSiiR.ss = this.getState();
+            this.lastSiASSiiR.ii = this.getStateInfo();
+            this.lastSiASSiiR.r = this.getReward(this.lastSiASSiiR.s, this.lastSiASSiiR.i, this.lastSiASSiiR.a, this.lastSiASSiiR.ss, this.lastSiASSiiR.ii);
+            this.experienceReplay.addExperience(this.lastSiASSiiR);
+            let batchSize = 32;
             let expBatch = this.experienceReplay.sampleExperience(batchSize);
 
             if (expBatch) {
                 let {
                     sBatch,
+                    iBatch,
                     aBatch,
-                    rBatch,
                     ssBatch,
-                    tBatch,
+                    iiBatch,
+                    rBatch,
                 } = expBatch;
+
                 let ssMaxQBatch = this.targetBrain.predict(ssBatch, true);
 
                 let yBatch = Object.assign([], rBatch);
                 for (let n = 0; n < aBatch.length; n++) {
-                    if (tBatch[n] == false) { //Nonterminal state
+                    if (iiBatch[n].terminalState == false) { //Nonterminal state
                         yBatch[n] += this.discount * ssMaxQBatch[n];
                     }
                 }
-
                 let targetBatch = this.brain.forward(sBatch);
 
                 for (let n = 0; n < aBatch.length; n++) {
@@ -126,52 +128,32 @@ class NNQLearnerAgent extends Agent {
             }
         }
     }
-    getStateInfo() {
+    getState() {
         var stateImg = ctx.getImageData(0, 0, this.stateShape[1], this.stateShape[0]);
         return stateImg;
 
+    }
+
+    getStateInfo() {
+        return {
+            terminalState: this.episodeTerminated(),
+            playerLocation: this.player.center,
+            playerVelocity: this.player.velocity,
+            opponentLocation: this.opponent.player.center,
+            opponentVelocity: this.opponent.player.velocity,
+            ballLocation: this.ball.center,
+            ballVelocity: this.ball.velocity,
+        };
     }
 
     episodeTerminated() {
         return this.env.episodeEnd;
     }
 
-    getReward(s, a, ss) {
-        /*
-                let goalScored = ss[2] > 1;
-                let goalConceded = ss[2] < -1;
-                if (goalConceded || goalScored) {
+    getReward(s, i, a, ss, ii) {
 
-                    console.log("goal");
-                }
+        let goal = ii.ballLocation.x > cWidth - leftrightMargin;
+        return goal ? 1 : -0.1;
 
-                if (goalScored) {
-                    return 10;
-                } else if (goalConceded) {
-                    return -10;
-                } else {
-                    return -0.2;
-                }
-            }
-            
-            let ballAtUpCorner = ss[2] > 0.85 && ss[3] > 0.85;
-            console.log(ballAtUpCorner);
-            return ballAtUpCorner ? 1 : -1;
-            */
-        /*
-        let goal = ss[2] >= 1;
-        let ballGoingForward = ss[2] - 0.01 > s[2];
-        if (goal) {
-            return 1;
-        } else if (ballGoingForward) {
-            return 0.1;
-        } else {
-            return -0.1;
-        }
-        */
-
-        let meGoingForward = ss[0] - 0.01 > s[0];
-        let meGoingUp = ss[1] - 0.01 > s[1];
-        return (meGoingForward | meGoingUp) ? 1 : -1;
     }
 }

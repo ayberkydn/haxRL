@@ -43,7 +43,7 @@ class ConvLayer extends Layer {
 
     forward(inputTensor) {
         if (!(inputTensor instanceof dl.Tensor)) {
-            throw `Input ${x} of layer is not a Tensor`;
+            throw `Input ${inputTensor} of layer is not a Tensor`;
         } else if (inputTensor.shape.length == 3) {
             inputTensor = inputTensor.expandDims(0);
         } else if (inputTensor.shape.length != 4) {

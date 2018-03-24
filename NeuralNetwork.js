@@ -89,7 +89,6 @@ class NeuralNetwork {
                     }
                 }
             }
-            console.log(inputTensor);
 
 
             let hiddenOut = inputTensor;

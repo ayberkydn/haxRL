@@ -50,15 +50,11 @@ env.addAgent(new HumanAgent("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "
 env.addAgent(new NNQLearnerAgent(), Side.blue);
 //env.linkAgentsExperience();
 
-
-for (let n = 0; n < 500; n++) {
+setInterval(() => {
     env.update();
     env.draw();
-}
+}, 0);
 
-
-imgData = ctx.getImageData(0, 0, 800, 600);
-imgTensor = ImageDataRGBA255ToImageTensorRGB1(imgData);
 
 /*
 var globalStep = 0;

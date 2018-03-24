@@ -5,9 +5,9 @@ class ExperienceReplay {
         this.replay = [];
     }
 
-    addExperience(sars) {
+    addExperience(siarssii) {
 
-        this.replay.push(Object.assign({}, sars));
+        this.replay.push(Object.assign({}, siarssii));
         if (this.replay.length > this.capacity) {
             this.replay.shift();
         }
@@ -20,18 +20,20 @@ class ExperienceReplay {
 
         let batch = {
             sBatch: [],
+            iBatch: [],
             aBatch: [],
-            rBatch: [],
             ssBatch: [],
-            tBatch: [],
+            iiBatch: [],
+            rBatch: [],
         };
         for (let n = 0; n < batchSize; n++) {
             let randIndex = Math.floor(Math.random() * this.replay.length);
             batch.sBatch.push(this.replay[randIndex].s);
+            batch.iBatch.push(this.replay[randIndex].i);
             batch.aBatch.push(this.replay[randIndex].a);
-            batch.rBatch.push(this.replay[randIndex].r);
             batch.ssBatch.push(this.replay[randIndex].ss);
-            batch.tBatch.push(this.replay[randIndex].t);
+            batch.iiBatch.push(this.replay[randIndex].ii);
+            batch.rBatch.push(this.replay[randIndex].r);
         }
         return batch;
     }
