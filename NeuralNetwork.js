@@ -34,8 +34,9 @@ class NeuralNetwork {
             for (let n = 0; n < this.layers.length; n++) {
                 this.layers[n].copyWeightsFrom(nn2.layers[n]);
             }
-            return this;
         }
+        return this;
+
     }
 
 
@@ -77,8 +78,20 @@ class NeuralNetwork {
     _forward(inputTensor, toLayer = 0) {
         return dl.tidy(() => {
             if (!(inputTensor instanceof dl.Tensor)) {
-                inputTensor = dl.tensor(inputTensor);
+                if (inputTensor instanceof Array) {
+                    if (inputTensor[0] instanceof ImageData) { //Array of images
+                        inputTensor = inputTensor.map(img => ImageDataRGBA255ToImageTensorRGB1(img));
+                        inputTensor = dl.stack(inputTensor);
+                    } else if (inputTensor[0] instanceof Array) {
+                        inputTensor = dl.tensor(inputTensor);
+                    } else {
+                        throw `Invalid input ${inputTensor} for Neural Network`;
+                    }
+                }
             }
+            console.log(inputTensor);
+
+
             let hiddenOut = inputTensor;
             for (let n = 0; n < (toLayer ? toLayer : this.layers.length); n++) {
                 hiddenOut = this.layers[n].forward(hiddenOut);
@@ -87,6 +100,7 @@ class NeuralNetwork {
             return hiddenOut;
 
         });
+
     }
 
     forward(inputTensor, toLayer = 0) {
@@ -118,6 +132,12 @@ class NeuralNetwork {
 
     trainStep(X, y) {
         this.optimizer.minimize(() => this._loss(X, y));
+    }
+
+    summary() {
+        this.layers.map((layer) => {
+            console.log(layer.constructor.name, "inputShape", layer.inputShape, "outputShape", layer.outputShape);
+        });
     }
 
 }

@@ -2,30 +2,54 @@ class NNQLearnerAgent extends Agent {
     constructor() {
         super();
         this.experienceReplay = new ExperienceReplay(10000, 100);
-        this.stateDim = 12;
         let hiddenSize = 200;
         this.actionSpace = 16;
         this.learningRate = 0.01;
+        this.scaleH = 0.2;
+        this.scaleW = 0.2;
+        this.stateShape = [cHeight * this.scaleH, cWidth * this.scaleW, 3];
+
+
+
         this.brain = new NeuralNetwork()
-            .addLayer(new DenseLayer(hiddenSize, dl.relu, this.stateDim))
-            .addLayer(new DenseLayer(hiddenSize, dl.relu))
-            .addLayer(new DenseLayer(hiddenSize, dl.relu))
+            .addLayer(new ConvLayer([3, 3], 4, 1, "valid", dl.relu, this.stateShape))
+            .addLayer(new PoolingLayer([2, 2], "max", "valid"))
+            .addLayer(new ConvLayer([3, 3], 8, 1, "valid", dl.relu))
+            .addLayer(new PoolingLayer([2, 2], "max", "valid"))
+            .addLayer(new ConvLayer([3, 3], 16, 1, "valid", dl.relu))
+            .addLayer(new PoolingLayer([2, 2], "max", "valid"))
+            .addLayer(new ConvLayer([3, 3], 32, 1, "valid", dl.relu))
+            .addLayer(new PoolingLayer([2, 2], "max", "valid"))
+            .addLayer(new FlattenLayer())
+            .addLayer(new DenseLayer(500))
+            .addLayer(new DenseLayer(500))
             .addLayer(new DenseLayer(this.actionSpace))
             .setLoss("mse")
             .setOptimizer(dl.train.rmsprop(0.00025, 0.95, 0.95, 0.01));
 
         this.targetBrain = new NeuralNetwork()
-            .addLayer(new DenseLayer(hiddenSize, dl.relu, this.stateDim))
-            .addLayer(new DenseLayer(hiddenSize, dl.relu))
-            .addLayer(new DenseLayer(hiddenSize, dl.relu))
+            .addLayer(new ConvLayer([3, 3], 4, 1, "valid", dl.relu, this.stateShape))
+            .addLayer(new PoolingLayer([2, 2], "max", "valid"))
+            .addLayer(new ConvLayer([3, 3], 8, 1, "valid", dl.relu))
+            .addLayer(new PoolingLayer([2, 2], "max", "valid"))
+            .addLayer(new ConvLayer([3, 3], 16, 1, "valid", dl.relu))
+            .addLayer(new PoolingLayer([2, 2], "max", "valid"))
+            .addLayer(new ConvLayer([3, 3], 32, 1, "valid", dl.relu))
+            .addLayer(new PoolingLayer([2, 2], "max", "valid"))
+            .addLayer(new FlattenLayer())
+            .addLayer(new DenseLayer(500))
+            .addLayer(new DenseLayer(500))
             .addLayer(new DenseLayer(this.actionSpace))
             .copyWeightsFrom(this.brain);
+
+
+        //TODO
 
 
         this.discount = 0.85; //when reward is continuous low discount is better IMO
         this.lastSARST = {};
         this.actionRepeat = 4;
-        this.targetUpdateFreq = 100;
+        this.targetUpdateFreq = 2;
         this.epsilon = 1; //start as 1, linearly anneal to 0.1
         this.learnStep = 0;
         this.repeatCooldown = 0;
@@ -42,8 +66,7 @@ class NNQLearnerAgent extends Agent {
         } else { //select new action
             this.repeatCooldown = this.actionRepeat;
             this.lastSARST.s = this.getStateInfo();
-
-            console.log(this.brain.forward(this.lastSARST.s)[0].map(x => x.toFixed(2)));
+            //console.log(this.brain.forward(this.lastSARST.s)[0].map(x => x.toFixed(2)));
 
             let actionIndex;
             if (Math.random() < this.epsilon) {
@@ -104,47 +127,9 @@ class NNQLearnerAgent extends Agent {
         }
     }
     getStateInfo() {
-        let envCenter = this.env.scene.metaObjects.centers[0];
-        let horizontalNormalizer = cWidth / 2 - leftrightMargin;
-        let verticalNormalizer = cHeight / 2 - topbottomMargin;
+        var stateImg = ctx.getImageData(0, 0, this.stateShape[1], this.stateShape[0]);
+        return stateImg;
 
-        let playerRelCenter = Vector.sub(this.player.center, envCenter);
-        let playerPosForward = Vector.dot(playerRelCenter, this.forwardVec) / horizontalNormalizer;
-        let playerPosUp = Vector.dot(this.player.center, this.upVec) / verticalNormalizer;
-
-        let ballRelCenter = Vector.sub(this.ball.center, envCenter);
-        let ballPosForward = Vector.dot(ballRelCenter, this.forwardVec) / horizontalNormalizer;
-        let ballPosUp = Vector.dot(ballRelCenter, this.upVec) / verticalNormalizer;
-
-        let opponentRelCenter = Vector.sub(this.opponent.player.center, envCenter);
-        let opponentPosForward = Vector.dot(opponentRelCenter, this.forwardVec) / horizontalNormalizer;
-        let opponentPosUp = Vector.dot(opponentRelCenter, this.upVec) / verticalNormalizer;
-
-        let playerVelForward = Vector.dot(this.player.velocity, this.forwardVec) / 4;
-        let playerVelUp = Vector.dot(this.player.velocity, this.upVec) / 4;
-
-        let ballVelForward = Vector.dot(this.ball.velocity, this.forwardVec) / 6;
-        let ballVelUp = Vector.dot(this.ball.velocity, this.upVec) / 6;
-
-        let opponentVelForward = Vector.dot(this.opponent.player.velocity, this.forwardVec) / 4;
-        let opponentVelUp = Vector.dot(this.opponent.player.velocity, this.upVec) / 4;
-
-        //TODO CHECK ALL
-
-        return ([
-            playerPosForward,
-            playerPosUp,
-            ballPosForward,
-            ballPosUp,
-            opponentPosForward,
-            opponentPosUp,
-            playerVelForward,
-            playerVelUp,
-            ballVelForward,
-            ballVelUp,
-            opponentVelForward,
-            opponentVelUp,
-        ]);
     }
 
     episodeTerminated() {

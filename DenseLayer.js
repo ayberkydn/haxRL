@@ -33,4 +33,15 @@ class DenseLayer extends Layer {
         }
     }
 
+    copyWeightsFrom(layer2) {
+        if (!arrayEqual(this.W.shape, layer2.W.shape) || !arrayEqual(this.b.shape, layer2.b.shape)) {
+            throw `Can't copy layer. Shape mismatch between shape of ${this.W.shape} and ${layer2.W.shape}`;
+        } else {
+            this.W.dispose();
+            this.b.dispose();
+            this.W = layer2.W.clone();
+            this.b = layer2.b.clone();
+        }
+    }
+
 }

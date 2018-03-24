@@ -30,12 +30,12 @@ class ConvLayer extends Layer {
             throw `Can't construct convolutional layer. Input shape = ${inputShape} must be [height, width, channel] format.`;
         }
         this.inputShape = inputShape;
-
         if (this.pad == 'valid') {
             this.outputShape = [Math.ceil((this.inputShape[0] - this.filterShape[0] + 1) / (this.stride[0])), Math.ceil((this.inputShape[1] - this.filterShape[1] + 1) / (this.stride[1])), this.nFilters];
         } else if (this.pad == 'same') {
             this.outputShape = [Math.ceil(this.inputShape[0] / this.stride[0]), Math.ceil(this.inputShape[1] / this.stride[1]), this.nFilters];
         }
+
         //TODO SPECIFIC INITIALIZATION FOR CONV LAYER
         this.W = dl.variable(dl.randomNormal([...this.filterShape, inputShape[2], this.nFilters]));
         this.b = dl.variable(dl.zeros([...this.outputShape]));
@@ -56,4 +56,16 @@ class ConvLayer extends Layer {
             return net;
         }
     }
+
+    copyWeightsFrom(layer2) {
+        if (!arrayEqual(this.W.shape, layer2.W.shape) || !arrayEqual(this.b.shape, layer2.b.shape)) {
+            throw `Shape mismatch between ${this.W} and ${layer2.W}`;
+        } else {
+            this.W.dispose();
+            this.b.dispose();
+            this.W = layer2.W.clone();
+            this.b = layer2.b.clone();
+        }
+    }
+
 }

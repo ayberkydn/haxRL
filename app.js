@@ -15,7 +15,6 @@ var canvas = document.getElementById("gameCanvas");
 var ctx = canvas.getContext('2d');
 var cHeight = canvas.height;
 var cWidth = canvas.width;
-ctx.scale(1, 1);
 // Init keypress events
 var keys = {};
 window.onkeydown = function (evt) {
@@ -52,13 +51,16 @@ env.addAgent(new NNQLearnerAgent(), Side.blue);
 //env.linkAgentsExperience();
 
 
-/*
-while (true) {
+for (let n = 0; n < 500; n++) {
     env.update();
-    env.draw;
-    await sleep(10);
+    env.draw();
 }
-*/
+
+
+imgData = ctx.getImageData(0, 0, 800, 600);
+imgTensor = ImageDataRGBA255ToImageTensorRGB1(imgData);
+
+/*
 var globalStep = 0;
 var proc = window.setInterval(() => {
     env.update();
@@ -77,7 +79,7 @@ window.setTimeout(() => {
         env.draw();
     }, perstep);
 }, probTime * 1.5);
-
+*/
 
 
 /*
