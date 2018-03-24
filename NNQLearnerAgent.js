@@ -22,7 +22,7 @@ class NNQLearnerAgent extends Agent {
             .copyWeightsFrom(this.brain);
 
 
-        this.discount = 0.85; //when reward is continuous low discount is better IMO
+        this.discount = 0.1; //when reward is continuous low discount is better IMO
         this.lastSARST = {};
         this.actionRepeat = 4;
         this.targetUpdateFreq = 100;
