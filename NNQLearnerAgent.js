@@ -116,9 +116,9 @@ class NNQLearnerAgent extends Agent {
                 this.brain.trainStep(sBatch, targetBatch);
                 this.learnStep++;
                 if (this.epsilon > 0) {
-                    this.epsilon -= 0.0001;
+                    this.epsilon -= 0.00001;
                 } else {
-                    this.epsilon = 0.5;
+                    this.epsilon = 0;
                 }
 
                 if (this.targetUpdateCooldown == 0) {
@@ -159,7 +159,7 @@ class NNQLearnerAgent extends Agent {
         console.log("selfgoal", selfGoal);
         console.log("ballback", ballBack);
         if (selfGoal) {
-            return 10;
+            return 100;
         } else if (ballBack) {
             return 1;
         } else {
