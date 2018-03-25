@@ -115,7 +115,11 @@ class NNQLearnerAgent extends Agent {
 
                 this.brain.trainStep(sBatch, targetBatch);
                 this.learnStep++;
-                this.epsilon = (Math.cos(this.learnStep * 0.001) + 1) / 2;
+                if (this.epsilon > 0) {
+                    this.epsilon -= 0.0001;
+                } else {
+                    this.epsilon = 0.5;
+                }
 
                 if (this.targetUpdateCooldown == 0) {
                     this.targetBrain.copyWeightsFrom(this.brain);
@@ -150,8 +154,17 @@ class NNQLearnerAgent extends Agent {
 
     getReward(s, i, a, ss, ii) {
 
-        let goal = ii.ballLocation.x > cWidth - leftrightMargin;
-        return goal ? 1 : -0.1;
+        let selfGoal = ii.ballLocation.x > cWidth - leftrightMargin;
+        let ballBack = ii.ballVelocity.x > 0.1;
+        console.log("selfgoal", selfGoal);
+        console.log("ballback", ballBack);
+        if (selfGoal) {
+            return 10;
+        } else if (ballBack) {
+            return 1;
+        } else {
+            return -1;
+        }
 
     }
 }
