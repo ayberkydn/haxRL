@@ -45,7 +45,7 @@ class NNQLearnerAgent extends Agent {
         this.discount = 0.95; //when reward is continuous low discount is better IMO
         this.lastSiASSiiR = {};
         this.actionRepeat = 4;
-        this.targetUpdateFreq = 2;
+        this.targetUpdateFreq = 50;
         this.epsilon = 1; //start as 1, linearly anneal to 0.1
         this.learnStep = 0;
         this.repeatCooldown = 0;
