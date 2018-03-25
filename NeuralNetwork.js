@@ -87,6 +87,10 @@ class NeuralNetwork {
                     } else {
                         throw `Invalid input ${inputTensor} for Neural Network`;
                     }
+                } else if (inputTensor instanceof ImageData) {
+                    inputTensor = ImageDataRGBA255ToImageTensorRGB1(inputTensor);
+                } else {
+                    throw `Invalid input ${inputTensor} for Neural Network`;
                 }
             }
 

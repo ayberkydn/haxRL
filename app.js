@@ -51,8 +51,8 @@ env.addAgent(new NNQLearnerAgent(), Side.blue);
 //env.linkAgentsExperience();
 
 setInterval(() => {
-    env.update();
     env.draw();
+    env.update();
 }, 0);
 
 

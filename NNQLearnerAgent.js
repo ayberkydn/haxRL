@@ -1,10 +1,8 @@
 class NNQLearnerAgent extends Agent {
     constructor() {
         super();
-        this.experienceReplay = new ExperienceReplay(100000, 1000);
-        let hiddenSize = 200;
+        this.experienceReplay = new ExperienceReplay(100000, 200);
         this.actionSpace = 16;
-        this.learningRate = 0.01;
         this.scaleH = 0.2;
         this.scaleW = 0.2;
         this.stateShape = [cHeight * this.scaleH, cWidth * this.scaleW, 3];
@@ -47,7 +45,7 @@ class NNQLearnerAgent extends Agent {
         this.discount = 0.95; //when reward is continuous low discount is better IMO
         this.lastSiASSiiR = {};
         this.actionRepeat = 4;
-        this.targetUpdateFreq = 20;
+        this.targetUpdateFreq = 2;
         this.epsilon = 1; //start as 1, linearly anneal to 0.1
         this.learnStep = 0;
         this.repeatCooldown = 0;
@@ -65,9 +63,9 @@ class NNQLearnerAgent extends Agent {
             this.repeatCooldown = this.actionRepeat;
             this.lastSiASSiiR.s = this.getState();
             this.lastSiASSiiR.i = this.getStateInfo();
-        }
+            console.log(this.brain.forward(this.lastSiASSiiR.s)[0].map(x => x.toFixed(2)));
 
-        //console.log(this.brain.forward(this.lastSiASSiiR.s)[0].map(x => x.toFixed(2)));
+        }
 
         let actionIndex;
         if (Math.random() < this.epsilon) {
