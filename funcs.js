@@ -129,7 +129,7 @@ var scaleImageTensor = (tensor, scale) => {
         } else {
             throw "Incompatible image tensor for scaling";
         }
-        return tensor.resizeBilinear([imgHeight * scale[0], imgWidth * scale[1]]);
+        return tensor.resizeBilinear([Math.floor(imgHeight * scale[0]), Math.floor(imgWidth * scale[1])]);
     });
 };
 

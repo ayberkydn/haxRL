@@ -38,27 +38,28 @@ var playerDamping = 0.93;
 var playerkickDamping = 0.87;
 var playerkickPower = 15;
 var playerRadius = 16;
-var ballRadius = 11;
+var ballRadius = 10;
 var ballDamping = 0.98;
 var topbottomMargin = 40;
 var leftrightMargin = 55;
 var goalLength = 140;
 var middleFieldRadius = 83;
 var postRadius = 8.5;
+var scaleH = 0.20;
+var scaleW = 0.20;
 //
 var env = new Environment( /*render*/ true, /*sound*/ false, /*resetDelay*/ false, /*randomStart*/ false);
 //env.addAgent(new HumanAgent(Side.blue, "w", "s", "a", "d", "q"));
 env.addAgent(new HumanAgent("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "x"), Side.red);
-//env.addAgent(new NNQLearnerAgent(), Side.red);
 env.addAgent(new DQNAgent(), Side.blue);
 //env.linkAgentsExperience();
 
 env.draw();
 setInterval(() => {
     env.draw();
-    //drawImageTensor(sampleImageFrom(canvas, 0, 0.25), canvas2);
+    drawImageTensor(sampleImageFrom(canvas, 0, [scaleH, scaleW]), canvas2);
     env.update();
-}, 1000);
+}, 30);
 
 
 

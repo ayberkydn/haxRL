@@ -1,11 +1,11 @@
 class DQNAgent extends Agent {
     constructor() {
         super();
-        this.experienceReplay = new ExperienceReplay(10, 2);
+        this.experienceReplay = new ExperienceReplay(100000, 100);
         this.actionSpace = 16;
-        this.scaleH = 0.25;
-        this.scaleW = 0.25;
-        this.stateShape = [cHeight * this.scaleH, cWidth * this.scaleW, 1];
+        this.scaleH = scaleH;
+        this.scaleW = scaleW;
+        this.stateShape = [Math.floor(cHeight * this.scaleH), Math.floor(cWidth * this.scaleW), 1];
 
 
 
