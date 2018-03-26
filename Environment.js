@@ -13,7 +13,7 @@ class Environment {
 
         this.scene = new Scene();
         this.scene.addObject(new Box(0, cWidth, 0, cHeight - 0, 0));
-        this.scene.addObject(new Disc(cWidth / 2, cHeight / 2, 80, 10, 1, 1).makeGhost().makeHollow().setOuterColor(Color.border));
+        this.scene.addObject(new Disc(cWidth / 2, cHeight / 2, middleFieldRadius, 10, 1, 1).makeGhost().makeHollow().setOuterColor(Color.border));
         this.scene.addObject(new VerticalBorder(cWidth / 2, cHeight / 2, cHeight - 2 * topbottomMargin, null).makeGhost());
 
 

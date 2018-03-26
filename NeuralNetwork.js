@@ -84,6 +84,8 @@ class NeuralNetwork {
                         inputTensor = dl.stack(inputTensor);
                     } else if (inputTensor[0] instanceof Array) {
                         inputTensor = dl.tensor(inputTensor);
+                    } else if (inputTensor[0] instanceof dl.Tensor) {
+                        inputTensor = dl.stack(inputTensor);
                     } else {
                         throw `Invalid input ${inputTensor} for Neural Network`;
                     }

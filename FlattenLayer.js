@@ -27,4 +27,5 @@ class FlattenLayer extends Layer {
 
         return inputTensor.reshape([inputTensor.shape[0], -1]);
     }
+
 }

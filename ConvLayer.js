@@ -49,6 +49,10 @@ class ConvLayer extends Layer {
         } else if (inputTensor.shape.length != 4) {
             throw `Shape of the input = ${inputTensor.shape} is not compatible with the layer`;
         }
+        if (!arrayEqual(this.inputShape, [inputTensor.shape[1], inputTensor.shape[2], inputTensor.shape[3]])) {
+            throw `Conv layer expected ${this.inputShape}, got ${[inputTensor.shape[1], inputTensor.shape[2], inputTensor.shape[3]]}`;
+        }
+
         let net = dl.add(dl.conv2d(inputTensor, this.W, this.stride, this.pad), this.b);
         if (this.activation) {
             return this.activation(net);

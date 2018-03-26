@@ -11,8 +11,8 @@ class Goal {
             this.depthMargin = -this.depth;
         }
 
-        this.topPost = new Disc(centerX, centerY - this.length / 2, 7, Infinity, 0.2, 0).setColor(Color.border);
-        this.bottomPost = new Disc(centerX, centerY + this.length / 2, 7, Infinity, 0.2, 0).setColor(Color.border);
+        this.topPost = new Disc(centerX, centerY - this.length / 2, postRadius, Infinity, 0.2, 0).setColor(Color.border);
+        this.bottomPost = new Disc(centerX, centerY + this.length / 2, postRadius, Infinity, 0.2, 0).setColor(Color.border);
         this.goalLine = new VerticalBorder(centerX, centerY, this.length, 1);
 
         this.netBack = new VerticalBorder(centerX - this.depthMargin, centerY, this.length, 0).setColor(Color.black).setCollisionMask([Ball]).extendTo(this.way);

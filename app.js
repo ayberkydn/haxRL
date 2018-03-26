@@ -12,6 +12,7 @@ dl.setBackend("webgl");
 
 // Gets the handles for rendering
 var canvas = document.getElementById("gameCanvas");
+var canvas2 = document.getElementById("agentVisionCanvas");
 var ctx = canvas.getContext('2d');
 var cHeight = canvas.height;
 var cWidth = canvas.width;
@@ -37,11 +38,13 @@ var playerDamping = 0.93;
 var playerkickDamping = 0.87;
 var playerkickPower = 15;
 var playerRadius = 16;
-var ballRadius = 9;
+var ballRadius = 11;
 var ballDamping = 0.98;
-var topbottomMargin = 80;
-var leftrightMargin = 60;
+var topbottomMargin = 40;
+var leftrightMargin = 55;
 var goalLength = 140;
+var middleFieldRadius = 83;
+var postRadius = 8.5;
 //
 var env = new Environment( /*render*/ true, /*sound*/ false, /*resetDelay*/ false, /*randomStart*/ false);
 //env.addAgent(new HumanAgent(Side.blue, "w", "s", "a", "d", "q"));
@@ -50,10 +53,14 @@ env.addAgent(new HumanAgent("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "
 env.addAgent(new DQNAgent(), Side.blue);
 //env.linkAgentsExperience();
 
+env.draw();
 setInterval(() => {
     env.draw();
+    //drawImageTensor(sampleImageFrom(canvas, 0, 0.25), canvas2);
     env.update();
-}, 0);
+}, 1000);
+
+
 
 
 /*

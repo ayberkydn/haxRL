@@ -9,7 +9,13 @@ class ExperienceReplay {
 
         this.replay.push(Object.assign({}, siarssii));
         if (this.replay.length > this.capacity) {
+            if (this.replay[0].s instanceof dl.Tensor || this.replay[0].ss instanceof dl.Tensor) {
+                this.replay[0].s.dispose();
+                this.replay[0].ss.dispose();
+                console.log("disposed");
+            }
             this.replay.shift();
+
         }
     }
 

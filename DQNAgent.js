@@ -1,11 +1,11 @@
 class DQNAgent extends Agent {
     constructor() {
         super();
-        this.experienceReplay = new ExperienceReplay(100000, 200);
+        this.experienceReplay = new ExperienceReplay(10, 2);
         this.actionSpace = 16;
-        this.scaleH = 0.2;
-        this.scaleW = 0.2;
-        this.stateShape = [cHeight * this.scaleH, cWidth * this.scaleW, 3];
+        this.scaleH = 0.25;
+        this.scaleW = 0.25;
+        this.stateShape = [cHeight * this.scaleH, cWidth * this.scaleW, 1];
 
 
 
@@ -88,7 +88,6 @@ class DQNAgent extends Agent {
             this.experienceReplay.addExperience(this.lastSiASSiiR);
             let batchSize = 32;
             let expBatch = this.experienceReplay.sampleExperience(batchSize);
-
             if (expBatch) {
                 let {
                     sBatch,
@@ -98,7 +97,6 @@ class DQNAgent extends Agent {
                     iiBatch,
                     rBatch,
                 } = expBatch;
-
                 let ssMaxQBatch = this.targetDQN.predict(ssBatch, true);
 
                 let yBatch = Object.assign([], rBatch);
@@ -131,7 +129,7 @@ class DQNAgent extends Agent {
         }
     }
     getState() {
-        var stateImg = ctx.getImageData(0, 0, this.stateShape[1], this.stateShape[0]);
+        var stateImg = sampleImageFrom(canvas, 0, [this.scaleH, this.scaleW]);
         return stateImg;
 
     }
