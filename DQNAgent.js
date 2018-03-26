@@ -23,7 +23,7 @@ class DQNAgent extends Agent {
             .addLayer(new DenseLayer(500))
             .addLayer(new DenseLayer(this.actionSpace))
             .setLoss("mse")
-            .setOptimizer(dl.train.rmsprop(0.00025, 0.95, 0.95, 0.01))
+            .setOptimizer(dl.train.adam(0.001))
             .summary();
 
         this.targetDQN = new NeuralNetwork()
@@ -114,10 +114,10 @@ class DQNAgent extends Agent {
 
                 this.DQN.trainStep(sBatch, targetBatch);
                 this.learnStep++;
-                if (this.epsilon > 0) {
-                    this.epsilon -= 0.00001;
+                if (this.epsilon > 0.001) {
+                    this.epsilon -= 0.00003;
                 } else {
-                    this.epsilon = 0;
+                    this.epsilon = 0.001;
                 }
 
                 if (this.targetUpdateCooldown == 0) {
@@ -138,12 +138,12 @@ class DQNAgent extends Agent {
     getStateInfo() {
         return {
             terminalState: this.episodeTerminated(),
-            playerLocation: this.player.center,
-            playerVelocity: this.player.velocity,
-            opponentLocation: this.opponent.player.center,
-            opponentVelocity: this.opponent.player.velocity,
-            ballLocation: this.ball.center,
-            ballVelocity: this.ball.velocity,
+            playerLocation: this.player.center.copy(),
+            playerVelocity: this.player.velocity.copy(),
+            opponentLocation: this.opponent.player.center.copy(),
+            opponentVelocity: this.opponent.player.velocity.copy(),
+            ballLocation: this.ball.center.copy(),
+            ballVelocity: this.ball.velocity.copy(),
         };
     }
 
@@ -153,13 +153,12 @@ class DQNAgent extends Agent {
 
     getReward(s, i, a, ss, ii) {
 
-        let selfGoal = ii.ballLocation.x > cWidth - leftrightMargin;
-        let ballBack = ii.ballVelocity.x > 0.1;
-        console.log("selfgoal", selfGoal);
-        console.log("ballback", ballBack);
-        if (selfGoal) {
+        let goal = ii.ballLocation.x < leftrightMargin;
+        let ballFwd = ii.ballVelocity.x < -0.5;
+        let getCloserToBall = Vector.dist(ii.playerLocation, ii.ballLocation) + 1 < Vector.dist(i.playerLocation, i.ballLocation)      
+        if (goal) {
             return 100;
-        } else if (ballBack) {
+        } else if (ballFwd || getCloserToBall) {
             return 1;
         } else {
             return -1;
