@@ -1,4 +1,4 @@
-class NNQLearnerAgent extends Agent {
+class DDQNAgent extends Agent {
     constructor() {
         super();
         this.experienceReplay = new ExperienceReplay(100000, 200);
@@ -9,7 +9,7 @@ class NNQLearnerAgent extends Agent {
 
 
 
-        this.brain = new NeuralNetwork()
+        this.DQN = new NeuralNetwork()
             .addLayer(new ConvLayer([3, 3], 4, 1, "valid", dl.relu, this.stateShape))
             .addLayer(new PoolingLayer([2, 2], "max", "valid"))
             .addLayer(new ConvLayer([3, 3], 8, 1, "valid", dl.relu))
@@ -25,7 +25,7 @@ class NNQLearnerAgent extends Agent {
             .setLoss("mse")
             .setOptimizer(dl.train.rmsprop(0.00025, 0.95, 0.95, 0.01));
 
-        this.targetBrain = new NeuralNetwork()
+        this.targetDQN = new NeuralNetwork()
             .addLayer(new ConvLayer([3, 3], 4, 1, "valid", dl.relu, this.stateShape))
             .addLayer(new PoolingLayer([2, 2], "max", "valid"))
             .addLayer(new ConvLayer([3, 3], 8, 1, "valid", dl.relu))
@@ -38,7 +38,7 @@ class NNQLearnerAgent extends Agent {
             .addLayer(new DenseLayer(500))
             .addLayer(new DenseLayer(500))
             .addLayer(new DenseLayer(this.actionSpace))
-            .copyWeightsFrom(this.brain);
+            .copyWeightsFrom(this.DQN);
 
 
 
@@ -63,7 +63,7 @@ class NNQLearnerAgent extends Agent {
             this.repeatCooldown = this.actionRepeat;
             this.lastSiASSiiR.s = this.getState();
             this.lastSiASSiiR.i = this.getStateInfo();
-            console.log(this.brain.forward(this.lastSiASSiiR.s)[0].map(x => x.toFixed(2)));
+            console.log(this.DQN.forward(this.lastSiASSiiR.s)[0].map(x => x.toFixed(2)));
 
         }
 
@@ -71,7 +71,7 @@ class NNQLearnerAgent extends Agent {
         if (Math.random() < this.epsilon) {
             actionIndex = Math.floor(Math.random() * this.actionSpace);
         } else {
-            actionIndex = this.brain.predict(this.lastSiASSiiR.s)[0];
+            actionIndex = this.DQN.predict(this.lastSiASSiiR.s)[0];
         }
         let action = Object.values(Action)[actionIndex];
         this.lastSiASSiiR.a = actionIndex;
@@ -99,7 +99,7 @@ class NNQLearnerAgent extends Agent {
                     rBatch,
                 } = expBatch;
 
-                let ssMaxQBatch = this.targetBrain.predict(ssBatch, true);
+                let ssMaxQBatch = this.targetDQN.predict(ssBatch, true);
 
                 let yBatch = Object.assign([], rBatch);
                 for (let n = 0; n < aBatch.length; n++) {
@@ -107,13 +107,13 @@ class NNQLearnerAgent extends Agent {
                         yBatch[n] += this.discount * ssMaxQBatch[n];
                     }
                 }
-                let targetBatch = this.brain.forward(sBatch);
+                let targetBatch = this.DQN.forward(sBatch);
 
                 for (let n = 0; n < aBatch.length; n++) {
                     targetBatch[n][aBatch[n]] = yBatch[n];
                 }
 
-                this.brain.trainStep(sBatch, targetBatch);
+                this.DQN.trainStep(sBatch, targetBatch);
                 this.learnStep++;
                 if (this.epsilon > 0) {
                     this.epsilon -= 0.00001;
@@ -122,7 +122,7 @@ class NNQLearnerAgent extends Agent {
                 }
 
                 if (this.targetUpdateCooldown == 0) {
-                    this.targetBrain.copyWeightsFrom(this.brain);
+                    this.targetDQN.copyWeightsFrom(this.DQN);
                     this.targetUpdateCooldown = this.targetUpdateFreq;
                 } else {
                     this.targetUpdateCooldown--;

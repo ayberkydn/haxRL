@@ -47,7 +47,7 @@ var env = new Environment( /*render*/ true, /*sound*/ false, /*resetDelay*/ fals
 //env.addAgent(new HumanAgent(Side.blue, "w", "s", "a", "d", "q"));
 env.addAgent(new HumanAgent("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "x"), Side.red);
 //env.addAgent(new NNQLearnerAgent(), Side.red);
-env.addAgent(new NNQLearnerAgent(), Side.blue);
+env.addAgent(new DQNAgent(), Side.blue);
 //env.linkAgentsExperience();
 
 setInterval(() => {
