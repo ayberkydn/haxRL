@@ -1,7 +1,7 @@
 class DQNAgent extends Agent {
     constructor() {
         super();
-        this.experienceReplay = new ExperienceReplay(100000, 100);
+        this.experienceReplay = new ExperienceReplay(10000, 100);
         this.actionSpace = 16;
         this.scaleH = scaleH;
         this.scaleW = scaleW;
@@ -23,7 +23,8 @@ class DQNAgent extends Agent {
             .addLayer(new DenseLayer(500))
             .addLayer(new DenseLayer(this.actionSpace))
             .setLoss("mse")
-            .setOptimizer(dl.train.rmsprop(0.00025, 0.95, 0.95, 0.01));
+            .setOptimizer(dl.train.rmsprop(0.00025, 0.95, 0.95, 0.01))
+            .summary();
 
         this.targetDQN = new NeuralNetwork()
             .addLayer(new ConvLayer([3, 3], 4, 1, "valid", dl.relu, this.stateShape))

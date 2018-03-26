@@ -59,7 +59,7 @@ setInterval(() => {
     env.draw();
     drawImageTensor(sampleImageFrom(canvas, 0, [scaleH, scaleW]), canvas2);
     env.update();
-}, 30);
+}, 0);
 
 
 

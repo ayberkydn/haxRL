@@ -143,6 +143,7 @@ class NeuralNetwork {
         this.layers.map((layer) => {
             console.log(layer.constructor.name, "inputShape", layer.inputShape, "outputShape", layer.outputShape);
         });
+        return this;
     }
 
 }
