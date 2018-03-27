@@ -8,33 +8,43 @@ class DoubleDQNAgent extends Agent {
 
 
 
-        this.DQN = new NeuralNetwork()
-            .addLayer(new ConvLayer([3, 3], 4, 1, "valid", dl.relu, this.stateShape))
+        this.DQN = new NeuralNetwork(this.stateShape)
+            .addLayer(new ConvLayer([3, 3], 4, 1, "valid"))
+            .addLayer(new ActivationLayer(dl.relu))
             .addLayer(new PoolingLayer([2, 2], "max", "valid"))
-            .addLayer(new ConvLayer([3, 3], 8, 1, "valid", dl.relu))
+            .addLayer(new ConvLayer([3, 3], 8, 1, "valid"))
+            .addLayer(new ActivationLayer(dl.relu))
             .addLayer(new PoolingLayer([2, 2], "max", "valid"))
-            .addLayer(new ConvLayer([3, 3], 16, 1, "valid", dl.relu))
+            .addLayer(new ConvLayer([3, 3], 16, 1, "valid"))
+            .addLayer(new ActivationLayer(dl.relu))
             .addLayer(new PoolingLayer([2, 2], "max", "valid"))
-            .addLayer(new ConvLayer([3, 3], 32, 1, "valid", dl.relu))
+            .addLayer(new ConvLayer([3, 3], 32, 1, "valid"))
+            .addLayer(new ActivationLayer(dl.relu))
             .addLayer(new PoolingLayer([2, 2], "max", "valid"))
             .addLayer(new FlattenLayer())
-            .addLayer(new DenseLayer(512, dl.relu))
+            .addLayer(new DenseLayer(512))
+            .addLayer(new ActivationLayer(dl.relu))
             .addLayer(new DenseLayer(this.actionSpace))
             .setLoss("mse")
             .setOptimizer(dl.train.adam(0.001))
             .summary();
 
-        this.targetDQN = new NeuralNetwork()
-            .addLayer(new ConvLayer([3, 3], 4, 1, "valid", dl.relu, this.stateShape))
+        this.targetDQN = new NeuralNetwork(this.stateShape)
+            .addLayer(new ConvLayer([3, 3], 4, 1, "valid"))
+            .addLayer(new ActivationLayer(dl.relu))
             .addLayer(new PoolingLayer([2, 2], "max", "valid"))
-            .addLayer(new ConvLayer([3, 3], 8, 1, "valid", dl.relu))
+            .addLayer(new ConvLayer([3, 3], 8, 1, "valid"))
+            .addLayer(new ActivationLayer(dl.relu))
             .addLayer(new PoolingLayer([2, 2], "max", "valid"))
-            .addLayer(new ConvLayer([3, 3], 16, 1, "valid", dl.relu))
+            .addLayer(new ConvLayer([3, 3], 16, 1, "valid"))
+            .addLayer(new ActivationLayer(dl.relu))
             .addLayer(new PoolingLayer([2, 2], "max", "valid"))
-            .addLayer(new ConvLayer([3, 3], 32, 1, "valid", dl.relu))
+            .addLayer(new ConvLayer([3, 3], 32, 1, "valid"))
+            .addLayer(new ActivationLayer(dl.relu))
             .addLayer(new PoolingLayer([2, 2], "max", "valid"))
             .addLayer(new FlattenLayer())
-            .addLayer(new DenseLayer(512, dl.relu))
+            .addLayer(new DenseLayer(512))
+            .addLayer(new ActivationLayer(dl.relu))
             .addLayer(new DenseLayer(this.actionSpace))
             .copyWeightsFrom(this.DQN);
 
@@ -46,6 +56,7 @@ class DoubleDQNAgent extends Agent {
         this.actionRepeat = 4;
         this.targetUpdateFreq = 500;
         this.epsilon = 1; //start as 1, linearly anneal to 0.1
+        this.batchSize = 32;
         this.learnStep = 0;
         this.repeatCooldown = 0;
         this.targetUpdateCooldown = 0;
@@ -62,6 +73,7 @@ class DoubleDQNAgent extends Agent {
             this.repeatCooldown = this.actionRepeat;
             this.lastSiASSiiR.s = this.getState();
             this.lastSiASSiiR.i = this.getStateInfo();
+            console.log((this.DQN.forward(this.lastSiASSiiR.s)[0]).map(x => x.toFixed(2)));
 
 
             let actionIndex;
@@ -69,7 +81,6 @@ class DoubleDQNAgent extends Agent {
                 actionIndex = Math.floor(Math.random() * this.actionSpace);
             } else {
                 actionIndex = this.DQN.predict(this.lastSiASSiiR.s)[0];
-                console.log(softmax(this.DQN.forward(this.lastSiASSiiR.s)[0]).map(x => x.toFixed(2)));
             }
             let action = Object.values(Action)[actionIndex];
             this.lastSiASSiiR.a = actionIndex;
@@ -85,8 +96,8 @@ class DoubleDQNAgent extends Agent {
             this.lastSiASSiiR.ii = this.getStateInfo();
             this.lastSiASSiiR.r = this.getReward(this.lastSiASSiiR.s, this.lastSiASSiiR.i, this.lastSiASSiiR.a, this.lastSiASSiiR.ss, this.lastSiASSiiR.ii);
             this.experienceReplay.addExperience(this.lastSiASSiiR);
-            let batchSize = 32;
-            let expBatch = this.experienceReplay.sampleExperience(batchSize);
+
+            let expBatch = this.experienceReplay.sampleExperience(this.batchSize);
             if (expBatch) {
                 let {
                     sBatch,
@@ -123,7 +134,7 @@ class DoubleDQNAgent extends Agent {
                 this.DQN.trainStep(sBatch, targetBatch);
                 this.learnStep++;
                 if (this.epsilon > 0.001) {
-                    this.epsilon -= 0.00003;
+                    this.epsilon -= 0.0005;
                 } else {
                     this.epsilon = 0.001;
                 }
@@ -171,8 +182,6 @@ class DoubleDQNAgent extends Agent {
         } else if (ballFwd || getCloserToBall) {
             reward = 1;
         }
-
-        console.log("reward", reward);
         return reward;
 
     }

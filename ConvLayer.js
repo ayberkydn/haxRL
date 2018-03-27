@@ -1,5 +1,5 @@
 class ConvLayer extends Layer {
-    constructor(filterShape, nFilters, stride = 1, pad = 'valid', activation = null, inputShape = null) {
+    constructor(filterShape, nFilters, stride = 1, pad = 'valid', inputShape = null) {
         super();
         if (filterShape.length != 2) {
             throw `Can't construct convolutional layer. Filter shape = ${filterShape} must be [height, width] format.`;
@@ -16,7 +16,6 @@ class ConvLayer extends Layer {
         this.nFilters = nFilters;
         this.stride = stride;
         this.pad = pad;
-        this.activation = activation;
 
         if (inputShape) {
             this.setInputShape(inputShape);
@@ -54,11 +53,8 @@ class ConvLayer extends Layer {
         }
 
         let net = dl.add(dl.conv2d(inputTensor, this.W, this.stride, this.pad), this.b);
-        if (this.activation) {
-            return this.activation(net);
-        } else {
-            return net;
-        }
+        return net;
+
     }
 
     copyWeightsFrom(layer2) {

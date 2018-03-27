@@ -7,7 +7,6 @@
 
 
 //LAYERS REFACTOR
-//-dense basina once flatten yap uyarisi
 //-activation ayri layer
 //-networke input shape init
 
@@ -63,66 +62,23 @@ env.addAgent(new DoubleDQNAgent(), Side.blue);
 
 env.draw();
 
-
+/*
 setInterval(() => {
     env.draw();
     env.update();
 }, 0);
+*/
 
-/*
+for (let n = 0; n < 500; n++) {
+    env.draw();
+    env.update();
+}
+
 let t1 = performance.now();
-for (let n = 0; n < 5000; n++) {
+for (let n = 0; n < 500; n++) {
     env.draw();
     env.update();
 }
 let t2 = performance.now();
 
 console.log(t2 / 5000 - t1 / 5000, "ms per frame");
-*/
-
-
-/*
-var globalStep = 0;
-var proc = window.setInterval(() => {
-    env.update();
-    env.draw();
-    globalStep++;
-}, 0);
-
-var probTime = 25000;
-
-window.setTimeout(() => {
-    var perstep = probTime / globalStep;
-    console.log(perstep, "ms per step total");
-    clearInterval(proc);
-    window.setInterval(() => {
-        env.update();
-        env.draw();
-    }, perstep);
-}, probTime * 1.5);
-*/
-
-
-/*
-var t0 = performance.now();
-for (let n = 0; n < 500; n++) {
-    env.update();
-    env.draw();
-}
-var t1 = performance.now();
-console.log((t1 - t0) / 500, "per step total")
-
-var t0 = performance.now();
-for (let n = 0; n < 500; n++) {
-    env.update();
-}
-var t1 = performance.now();
-console.log((t1 - t0) / 500, "per step update")
-
-var t0 = performance.now();
-for (let n = 0; n < 500; n++) {
-    env.draw();
-}
-var t1 = performance.now();
-console.log((t1 - t0) / 500, "per step draw")
-*/

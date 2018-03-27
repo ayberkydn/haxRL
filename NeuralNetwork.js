@@ -1,5 +1,10 @@
 class NeuralNetwork {
-    constructor() {
+    constructor(inputShape) {
+        if (!inputShape) {
+            throw "Specify an input shape to initialize network";
+        } else {
+            this.inputShape = inputShape;
+        }
 
         this.lossFunc = function () {
             throw "Loss function not implemented";
@@ -15,9 +20,7 @@ class NeuralNetwork {
 
     addLayer(layer) {
         if (this.layers.length == 0) {
-            if (!layer.inputShape) {
-                throw "Input layer must be defined with input shape";
-            }
+            layer.setInputShape(this.inputShape);
         } else {
             layer.setInputShape(this.layers[this.layers.length - 1].outputShape);
         }
@@ -29,7 +32,7 @@ class NeuralNetwork {
 
     copyWeightsFrom(nn2) {
         if (this.layers.length != nn2.layers.length) {
-            throw `Network topology mismatch between ${this} and ${nn2}`;
+            throw `Network topology mismatch between two networks.`;
         } else {
             for (let n = 0; n < this.layers.length; n++) {
                 this.layers[n].copyWeightsFrom(nn2.layers[n]);

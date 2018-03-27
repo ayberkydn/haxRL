@@ -1,8 +1,7 @@
 class DenseLayer extends Layer {
-    constructor(outputShape, activation, inputShape = null) {
+    constructor(outputShape, inputShape = null) {
         super();
         this.outputShape = outputShape;
-        this.activation = activation;
         if (inputShape) {
             this.setInputShape(inputShape);
         }
@@ -16,20 +15,17 @@ class DenseLayer extends Layer {
 
     forward(inputTensor) {
         if (!(inputTensor instanceof dl.Tensor)) {
-            throw `Input ${x} of layer is not a Tensor`;
+            throw `Input ${inputTensor} of layer is not a Tensor`;
         } else if (inputTensor.rank == 1) {
             inputTensor = inputTensor.expandDims(0);
         }
 
         if (inputTensor.rank != 2) {
-            throw `Input ${inputTensor} is not a rank 2 tensor`;
+            throw `Input tensor of shape ${inputTensor.shape} is not a rank 2 tensor, consider flatten layer.`;
         } else {
             let net = dl.add(dl.matMul(inputTensor, this.W), this.b);
-            if (this.activation) {
-                return this.activation(net);
-            } else {
-                return net;
-            }
+            return net;
+
         }
     }
 
