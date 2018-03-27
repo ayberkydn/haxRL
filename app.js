@@ -4,7 +4,14 @@
 
 //Epsilon annealing gibi son algoritma tricklerini implement et, parametreleri guzellestir
 //Jsona yazıp okumayı implement et sonra timeoutsuz calistir
-//Haxball boyutları esitle
+
+
+//LAYERS REFACTOR
+//-dense basina once flatten yap uyarisi
+//-activation ayri layer
+//-networke input shape init
+
+
 
 dl.setBackend("webgl");
 
@@ -51,17 +58,27 @@ var scaleW = 0.20;
 var env = new Environment( /*render*/ true, /*sound*/ false, /*resetDelay*/ false, /*randomStart*/ false);
 //env.addAgent(new HumanAgent(Side.blue, "w", "s", "a", "d", "q"));
 env.addAgent(new HumanAgent("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "x"), Side.red);
-env.addAgent(new DQNAgent(), Side.blue);
+env.addAgent(new DoubleDQNAgent(), Side.blue);
 //env.linkAgentsExperience();
 
 env.draw();
+
+
 setInterval(() => {
     env.draw();
-    drawImageTensor(sampleImageFrom(canvas, 0, [scaleH, scaleW]), canvas2);
     env.update();
 }, 0);
 
+/*
+let t1 = performance.now();
+for (let n = 0; n < 5000; n++) {
+    env.draw();
+    env.update();
+}
+let t2 = performance.now();
 
+console.log(t2 / 5000 - t1 / 5000, "ms per frame");
+*/
 
 
 /*

@@ -8,7 +8,7 @@ class Environment {
         this.episodeEnd = false;
         //this.episodeEndChecker = () => (this.scene.checkGoals() && !this.episodeEnd);
         this.episode = 1;
-        this.episodeEndChecker = () => (this.scene.checkGoals() || this.step == 2000);
+        this.episodeEndChecker = () => (this.scene.checkGoals() || this.step == 200);
         this.step = 0;
 
         this.scene = new Scene();

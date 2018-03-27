@@ -123,6 +123,9 @@ class NeuralNetwork {
             if (!(labelsArray instanceof dl.Tensor)) {
                 labels = dl.tensor(labelsArray);
             }
+            if (labels.shape.length == 1) {
+                labels = labels.expandDims(0);
+            }
             let loss = this.lossFunc(labels, logits);
             return loss;
         });

@@ -1,8 +1,7 @@
 class DQNAgent extends Agent {
     constructor() {
         super();
-        this.experienceReplay = new ExperienceReplay(10000, 100);
-        this.actionSpace = 16;
+        this.actionSpace = 4;
         this.scaleH = scaleH;
         this.scaleW = scaleW;
         this.stateShape = [Math.floor(cHeight * this.scaleH), Math.floor(cWidth * this.scaleW), 1];
@@ -19,8 +18,7 @@ class DQNAgent extends Agent {
             .addLayer(new ConvLayer([3, 3], 32, 1, "valid", dl.relu))
             .addLayer(new PoolingLayer([2, 2], "max", "valid"))
             .addLayer(new FlattenLayer())
-            .addLayer(new DenseLayer(500))
-            .addLayer(new DenseLayer(500))
+            .addLayer(new DenseLayer(512, dl.relu))
             .addLayer(new DenseLayer(this.actionSpace))
             .setLoss("mse")
             .setOptimizer(dl.train.adam(0.001))
@@ -36,17 +34,17 @@ class DQNAgent extends Agent {
             .addLayer(new ConvLayer([3, 3], 32, 1, "valid", dl.relu))
             .addLayer(new PoolingLayer([2, 2], "max", "valid"))
             .addLayer(new FlattenLayer())
-            .addLayer(new DenseLayer(500))
-            .addLayer(new DenseLayer(500))
+            .addLayer(new DenseLayer(512, dl.relu))
             .addLayer(new DenseLayer(this.actionSpace))
             .copyWeightsFrom(this.DQN);
 
 
-
-        this.discount = 0.95; //when reward is continuous low discount is better IMO
+        this.experienceReplayCapacity = 10000;
+        this.experienceReplay = new ExperienceReplay(this.experienceReplayCapacity, 100);
+        this.discount = 0.25; //when reward is continuous low discount is better IMO
         this.lastSiASSiiR = {};
         this.actionRepeat = 4;
-        this.targetUpdateFreq = 50;
+        this.targetUpdateFreq = 500;
         this.epsilon = 1; //start as 1, linearly anneal to 0.1
         this.learnStep = 0;
         this.repeatCooldown = 0;
@@ -64,20 +62,20 @@ class DQNAgent extends Agent {
             this.repeatCooldown = this.actionRepeat;
             this.lastSiASSiiR.s = this.getState();
             this.lastSiASSiiR.i = this.getStateInfo();
-            console.log(this.DQN.forward(this.lastSiASSiiR.s)[0].map(x => x.toFixed(2)));
 
-        }
 
-        let actionIndex;
-        if (Math.random() < this.epsilon) {
-            actionIndex = Math.floor(Math.random() * this.actionSpace);
-        } else {
-            actionIndex = this.DQN.predict(this.lastSiASSiiR.s)[0];
+            let actionIndex;
+            if (Math.random() < this.epsilon) {
+                actionIndex = Math.floor(Math.random() * this.actionSpace);
+            } else {
+                actionIndex = this.DQN.predict(this.lastSiASSiiR.s)[0];
+                console.log(softmax(this.DQN.forward(this.lastSiASSiiR.s)[0]).map(x => x.toFixed(2)));
+            }
+            let action = Object.values(Action)[actionIndex];
+            this.lastSiASSiiR.a = actionIndex;
+            this.player.applyAction(action);
+            this.lastAction = action;
         }
-        let action = Object.values(Action)[actionIndex];
-        this.lastSiASSiiR.a = actionIndex;
-        this.player.applyAction(action);
-        this.lastAction = action;
     }
 
 
@@ -98,6 +96,8 @@ class DQNAgent extends Agent {
                     iiBatch,
                     rBatch,
                 } = expBatch;
+
+
                 let ssMaxQBatch = this.targetDQN.predict(ssBatch, true);
 
                 let yBatch = Object.assign([], rBatch);
@@ -131,6 +131,7 @@ class DQNAgent extends Agent {
     }
     getState() {
         var stateImg = sampleImageFrom(canvas, 0, [this.scaleH, this.scaleW]);
+        drawImageTensor(stateImg, canvas2, false);
         return stateImg;
 
     }
@@ -155,14 +156,16 @@ class DQNAgent extends Agent {
 
         let goal = ii.ballLocation.x < leftrightMargin;
         let ballFwd = ii.ballVelocity.x < -0.5;
-        let getCloserToBall = Vector.dist(ii.playerLocation, ii.ballLocation) + 1 < Vector.dist(i.playerLocation, i.ballLocation)      
+        let getCloserToBall = Vector.dist(ii.playerLocation, ii.ballLocation) + 1 < Vector.dist(i.playerLocation, i.ballLocation);
+        let reward = -1;
         if (goal) {
-            return 100;
+            reward = 100;
         } else if (ballFwd || getCloserToBall) {
-            return 1;
-        } else {
-            return -1;
+            reward = 1;
         }
+
+        console.log("reward", reward);
+        return reward;
 
     }
 }

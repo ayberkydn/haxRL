@@ -1,11 +1,10 @@
-class DDQNAgent extends Agent {
+class DoubleDQNAgent extends Agent {
     constructor() {
         super();
-        this.experienceReplay = new ExperienceReplay(100000, 200);
-        this.actionSpace = 16;
-        this.scaleH = 0.2;
-        this.scaleW = 0.2;
-        this.stateShape = [cHeight * this.scaleH, cWidth * this.scaleW, 3];
+        this.actionSpace = 4;
+        this.scaleH = scaleH;
+        this.scaleW = scaleW;
+        this.stateShape = [Math.floor(cHeight * this.scaleH), Math.floor(cWidth * this.scaleW), 1];
 
 
 
@@ -19,11 +18,11 @@ class DDQNAgent extends Agent {
             .addLayer(new ConvLayer([3, 3], 32, 1, "valid", dl.relu))
             .addLayer(new PoolingLayer([2, 2], "max", "valid"))
             .addLayer(new FlattenLayer())
-            .addLayer(new DenseLayer(500))
-            .addLayer(new DenseLayer(500))
+            .addLayer(new DenseLayer(512, dl.relu))
             .addLayer(new DenseLayer(this.actionSpace))
             .setLoss("mse")
-            .setOptimizer(dl.train.rmsprop(0.00025, 0.95, 0.95, 0.01));
+            .setOptimizer(dl.train.adam(0.001))
+            .summary();
 
         this.targetDQN = new NeuralNetwork()
             .addLayer(new ConvLayer([3, 3], 4, 1, "valid", dl.relu, this.stateShape))
@@ -35,17 +34,17 @@ class DDQNAgent extends Agent {
             .addLayer(new ConvLayer([3, 3], 32, 1, "valid", dl.relu))
             .addLayer(new PoolingLayer([2, 2], "max", "valid"))
             .addLayer(new FlattenLayer())
-            .addLayer(new DenseLayer(500))
-            .addLayer(new DenseLayer(500))
+            .addLayer(new DenseLayer(512, dl.relu))
             .addLayer(new DenseLayer(this.actionSpace))
             .copyWeightsFrom(this.DQN);
 
 
-
-        this.discount = 0.95; //when reward is continuous low discount is better IMO
+        this.experienceReplayCapacity = 10000;
+        this.experienceReplay = new ExperienceReplay(this.experienceReplayCapacity, 100);
+        this.discount = 0.25; //when reward is continuous low discount is better IMO
         this.lastSiASSiiR = {};
         this.actionRepeat = 4;
-        this.targetUpdateFreq = 50;
+        this.targetUpdateFreq = 500;
         this.epsilon = 1; //start as 1, linearly anneal to 0.1
         this.learnStep = 0;
         this.repeatCooldown = 0;
@@ -63,20 +62,20 @@ class DDQNAgent extends Agent {
             this.repeatCooldown = this.actionRepeat;
             this.lastSiASSiiR.s = this.getState();
             this.lastSiASSiiR.i = this.getStateInfo();
-            console.log(this.DQN.forward(this.lastSiASSiiR.s)[0].map(x => x.toFixed(2)));
 
-        }
 
-        let actionIndex;
-        if (Math.random() < this.epsilon) {
-            actionIndex = Math.floor(Math.random() * this.actionSpace);
-        } else {
-            actionIndex = this.DQN.predict(this.lastSiASSiiR.s)[0];
+            let actionIndex;
+            if (Math.random() < this.epsilon) {
+                actionIndex = Math.floor(Math.random() * this.actionSpace);
+            } else {
+                actionIndex = this.DQN.predict(this.lastSiASSiiR.s)[0];
+                console.log(softmax(this.DQN.forward(this.lastSiASSiiR.s)[0]).map(x => x.toFixed(2)));
+            }
+            let action = Object.values(Action)[actionIndex];
+            this.lastSiASSiiR.a = actionIndex;
+            this.player.applyAction(action);
+            this.lastAction = action;
         }
-        let action = Object.values(Action)[actionIndex];
-        this.lastSiASSiiR.a = actionIndex;
-        this.player.applyAction(action);
-        this.lastAction = action;
     }
 
 
@@ -88,7 +87,6 @@ class DDQNAgent extends Agent {
             this.experienceReplay.addExperience(this.lastSiASSiiR);
             let batchSize = 32;
             let expBatch = this.experienceReplay.sampleExperience(batchSize);
-
             if (expBatch) {
                 let {
                     sBatch,
@@ -99,9 +97,18 @@ class DDQNAgent extends Agent {
                     rBatch,
                 } = expBatch;
 
-                let ssMaxQBatch = this.targetDQN.predict(ssBatch, true);
+
+                let ssMaxQBatchIndex = this.DQN.predict(ssBatch, false);
+                let ssMaxQBatchValues = this.targetDQN.forward(ssBatch);
+                let ssMaxQBatch = [];
+                for (let n = 0; n < ssMaxQBatchIndex.length; n++) {
+                    ssMaxQBatch.push(ssMaxQBatchValues[n][ssMaxQBatchIndex[n]]);
+                }
 
                 let yBatch = Object.assign([], rBatch);
+
+
+
                 for (let n = 0; n < aBatch.length; n++) {
                     if (iiBatch[n].terminalState == false) { //Nonterminal state
                         yBatch[n] += this.discount * ssMaxQBatch[n];
@@ -115,10 +122,10 @@ class DDQNAgent extends Agent {
 
                 this.DQN.trainStep(sBatch, targetBatch);
                 this.learnStep++;
-                if (this.epsilon > 0) {
-                    this.epsilon -= 0.00001;
+                if (this.epsilon > 0.001) {
+                    this.epsilon -= 0.00003;
                 } else {
-                    this.epsilon = 0;
+                    this.epsilon = 0.001;
                 }
 
                 if (this.targetUpdateCooldown == 0) {
@@ -131,7 +138,8 @@ class DDQNAgent extends Agent {
         }
     }
     getState() {
-        var stateImg = ctx.getImageData(0, 0, this.stateShape[1], this.stateShape[0]);
+        var stateImg = sampleImageFrom(canvas, 0, [this.scaleH, this.scaleW]);
+        drawImageTensor(stateImg, canvas2, false);
         return stateImg;
 
     }
@@ -139,12 +147,12 @@ class DDQNAgent extends Agent {
     getStateInfo() {
         return {
             terminalState: this.episodeTerminated(),
-            playerLocation: this.player.center,
-            playerVelocity: this.player.velocity,
-            opponentLocation: this.opponent.player.center,
-            opponentVelocity: this.opponent.player.velocity,
-            ballLocation: this.ball.center,
-            ballVelocity: this.ball.velocity,
+            playerLocation: this.player.center.copy(),
+            playerVelocity: this.player.velocity.copy(),
+            opponentLocation: this.opponent.player.center.copy(),
+            opponentVelocity: this.opponent.player.velocity.copy(),
+            ballLocation: this.ball.center.copy(),
+            ballVelocity: this.ball.velocity.copy(),
         };
     }
 
@@ -154,17 +162,18 @@ class DDQNAgent extends Agent {
 
     getReward(s, i, a, ss, ii) {
 
-        let selfGoal = ii.ballLocation.x > cWidth - leftrightMargin;
-        let ballBack = ii.ballVelocity.x > 0.1;
-        console.log("selfgoal", selfGoal);
-        console.log("ballback", ballBack);
-        if (selfGoal) {
-            return 100;
-        } else if (ballBack) {
-            return 1;
-        } else {
-            return -1;
+        let goal = ii.ballLocation.x < leftrightMargin;
+        let ballFwd = ii.ballVelocity.x < -0.5;
+        let getCloserToBall = Vector.dist(ii.playerLocation, ii.ballLocation) + 1 < Vector.dist(i.playerLocation, i.ballLocation);
+        let reward = -1;
+        if (goal) {
+            reward = 100;
+        } else if (ballFwd || getCloserToBall) {
+            reward = 1;
         }
+
+        console.log("reward", reward);
+        return reward;
 
     }
 }

@@ -4,7 +4,7 @@ var matrixToTensor = a => dl.tensor(a._data);
 
 
 var softmax = (scoresIn) => {
-    scores = Object.assign([], scoresIn[0]);
+    scores = Object.assign([], scoresIn);
     let sum = 0;
     for (let n = 0; n < scores.length; n++) {
         scores[n] = Math.exp(scores[n]);
@@ -145,7 +145,7 @@ var sampleImageFrom = (canvas, channel = 0, scale = [1, 1]) => {
     });
 };
 
-var drawImageTensor = (tensor, canvas) => {
+var drawImageTensor = (tensor, canvas, dispose = true) => {
     return dl.tidy(() => {
         if (tensor.shape.length != 3) {
             throw `Invalid tensor of shape ${tensor.shape}`;
@@ -160,7 +160,9 @@ var drawImageTensor = (tensor, canvas) => {
             }
             let context = canvas.getContext("2d");
             context.putImageData(imgData, 0, 0);
-            tensor.dispose();
+            if (dispose == true) {
+                tensor.dispose();
+            }
         }
     });
 
