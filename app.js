@@ -62,16 +62,18 @@ env.addAgent(new ANNAgent(), Side.blue);
 
 env.draw();
 
-
+/*
 setInterval(() => {
     env.update();
 }, 0);
+*/
 
 
-// for (let n = 0; n < 500; n++) {
-//     env.draw();
-//     env.update();
-// }
+
+for (let n = 0; n < 5000; n++) {
+    env.draw();
+    env.update();
+}
 
 // let t1 = performance.now();
 // for (let n = 0; n < 500; n++) {

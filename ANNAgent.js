@@ -63,7 +63,7 @@ class ANNAgent extends Agent {
             if (Math.random() < this.epsilon) {
                 actionIndex = Math.floor(Math.random() * this.actionSpace);
             } else {
-                actionIndex = this.ANN.predict(this.lastSiASSiiR.s)[0];
+                actionIndex = this.ANN.predict([this.lastSiASSiiR.s])[0];
             }
             let action = Object.values(Action)[actionIndex];
             this.lastSiASSiiR.a = actionIndex;
