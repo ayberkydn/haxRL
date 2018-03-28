@@ -90,7 +90,7 @@ class NeuralNetwork {
                     } else if (inputTensor[0] instanceof dl.Tensor) {
                         inputTensor = dl.stack(inputTensor);
                     } else {
-                        throw `Invalid input ${inputTensor} for Neural Network`;
+                        throw `Invalid input for Neural Network, consider wrapping your input in a batch.`;
                     }
                 } else if (inputTensor instanceof ImageData) {
                     inputTensor = ImageDataRGBA255ToImageTensorRGB1(inputTensor);

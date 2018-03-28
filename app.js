@@ -57,28 +57,27 @@ var scaleW = 0.20;
 var env = new Environment( /*render*/ true, /*sound*/ false, /*resetDelay*/ false, /*randomStart*/ false);
 //env.addAgent(new HumanAgent(Side.blue, "w", "s", "a", "d", "q"));
 env.addAgent(new HumanAgent("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "x"), Side.red);
-env.addAgent(new DoubleDQNAgent(), Side.blue);
+env.addAgent(new ANNAgent(), Side.blue);
 //env.linkAgentsExperience();
 
 env.draw();
 
-/*
+
 setInterval(() => {
-    env.draw();
     env.update();
-}, 0);
-*/
+}, 100);
 
-for (let n = 0; n < 500; n++) {
-    env.draw();
-    env.update();
-}
 
-let t1 = performance.now();
-for (let n = 0; n < 500; n++) {
-    env.draw();
-    env.update();
-}
-let t2 = performance.now();
+// for (let n = 0; n < 500; n++) {
+//     env.draw();
+//     env.update();
+// }
 
-console.log(t2 / 5000 - t1 / 5000, "ms per frame");
+// let t1 = performance.now();
+// for (let n = 0; n < 500; n++) {
+//     env.draw();
+//     env.update();
+// }
+// let t2 = performance.now();
+
+// console.log(t2 / 5000 - t1 / 5000, "ms per frame");

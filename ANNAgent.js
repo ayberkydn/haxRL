@@ -1,40 +1,34 @@
-class DQNAgent extends Agent {
+class ANNAgent extends Agent {
     constructor() {
         super();
         this.actionSpace = 4;
         this.scaleH = scaleH;
         this.scaleW = scaleW;
-        this.stateShape = [Math.floor(cHeight * this.scaleH), Math.floor(cWidth * this.scaleW), 1];
+        this.stateShape = 12;
 
 
 
-        this.DQN = new NeuralNetwork(this.stateShape)
-            .addLayer(new ConvLayer([3, 3], 4, 1, "valid"))
+        this.ANN = new NeuralNetwork(this.stateShape)
+            .addLayer(new DenseLayer(200))
             .addLayer(new ActivationLayer(dl.relu))
-            .addLayer(new PoolingLayer([2, 2], "max", "valid"))
-            .addLayer(new ConvLayer([3, 3], 8, 1, "valid"))
+            .addLayer(new DenseLayer(200))
             .addLayer(new ActivationLayer(dl.relu))
-            .addLayer(new PoolingLayer([2, 2], "max", "valid"))
-            .addLayer(new FlattenLayer())
-            .addLayer(new DenseLayer(128))
+            .addLayer(new DenseLayer(200))
             .addLayer(new ActivationLayer(dl.relu))
             .addLayer(new DenseLayer(this.actionSpace))
             .setLoss("mse")
             .setOptimizer(dl.train.adam(0.01))
             .summary();
 
-        this.targetDQN = new NeuralNetwork(this.stateShape)
-            .addLayer(new ConvLayer([3, 3], 4, 1, "valid"))
+        this.targetANN = new NeuralNetwork(this.stateShape)
+            .addLayer(new DenseLayer(200))
             .addLayer(new ActivationLayer(dl.relu))
-            .addLayer(new PoolingLayer([2, 2], "max", "valid"))
-            .addLayer(new ConvLayer([3, 3], 8, 1, "valid"))
+            .addLayer(new DenseLayer(200))
             .addLayer(new ActivationLayer(dl.relu))
-            .addLayer(new PoolingLayer([2, 2], "max", "valid"))
-            .addLayer(new FlattenLayer())
-            .addLayer(new DenseLayer(128))
+            .addLayer(new DenseLayer(200))
             .addLayer(new ActivationLayer(dl.relu))
             .addLayer(new DenseLayer(this.actionSpace))
-            .copyWeightsFrom(this.DQN);
+            .copyWeightsFrom(this.ANN);
 
 
         this.experienceReplayCapacity = 10000;
@@ -62,7 +56,7 @@ class DQNAgent extends Agent {
             this.repeatCooldown = this.actionRepeat;
             this.lastSiASSiiR.s = this.getState();
             this.lastSiASSiiR.i = this.getStateInfo();
-            console.log((this.DQN.forward(this.lastSiASSiiR.s)[0]).map(x => x.toFixed(2)));
+            console.log((this.ANN.forward([this.lastSiASSiiR.s])[0]).map(x => x.toFixed(2)));
 
 
             let actionIndex;
@@ -70,7 +64,7 @@ class DQNAgent extends Agent {
                 actionIndex = Math.floor(Math.random() * this.actionSpace);
                 actionIndex = 3;
             } else {
-                actionIndex = this.DQN.predict(this.lastSiASSiiR.s)[0];
+                actionIndex = this.ANN.predict(this.lastSiASSiiR.s)[0];
             }
             let action = Object.values(Action)[actionIndex];
             this.lastSiASSiiR.a = actionIndex;
@@ -99,8 +93,8 @@ class DQNAgent extends Agent {
                 } = expBatch;
 
 
-                let ssMaxQBatchIndex = this.targetDQN.predict(ssBatch, false);
-                let ssMaxQBatchValues = this.targetDQN.forward(ssBatch);
+                let ssMaxQBatchIndex = this.targetANN.predict(ssBatch, false);
+                let ssMaxQBatchValues = this.targetANN.forward(ssBatch);
                 let ssMaxQBatch = [];
                 for (let n = 0; n < ssMaxQBatchIndex.length; n++) {
                     ssMaxQBatch.push(ssMaxQBatchValues[n][ssMaxQBatchIndex[n]]);
@@ -114,14 +108,14 @@ class DQNAgent extends Agent {
                         yBatch[n] += this.discount * ssMaxQBatch[n];
                     }
                 }
-                let targetBatch = this.DQN.forward(sBatch);
+                let targetBatch = this.ANN.forward(sBatch);
 
                 for (let n = 0; n < aBatch.length; n++) {
                     targetBatch[n][aBatch[n]] = yBatch[n];
                 }
 
                 // console.log("-------------------------")
-                // console.log("state values", this.DQN.forward(sBatch)[0]);
+                // console.log("state values", this.ANN.forward(sBatch)[0]);
                 // console.log("next state values", ssMaxQBatchValues[0]);
                 // console.log("next state max index", ssMaxQBatchIndex[0]);
                 // console.log("next state max value", ssMaxQBatch[0])
@@ -131,11 +125,11 @@ class DQNAgent extends Agent {
                 // console.log("target value", rBatch[0] + this.discount * ssMaxQBatch[0])
                 // console.log("chosen action", aBatch[0]);
                 // console.log("target actions", targetBatch[0]);
-                // console.log("state values after train", this.DQN.forward(sBatch)[0])
+                // console.log("state values after train", this.ANN.forward(sBatch)[0])
                 // console.log("-------------------------")
 
 
-                this.DQN.trainStep(sBatch, targetBatch);
+                this.ANN.trainStep(sBatch, targetBatch);
 
 
                 this.learnStep++;
@@ -146,7 +140,7 @@ class DQNAgent extends Agent {
                 }
 
                 if (this.targetUpdateCooldown == 0) {
-                    this.targetDQN.copyWeightsFrom(this.DQN);
+                    this.targetANN.copyWeightsFrom(this.ANN);
                     this.targetUpdateCooldown = this.targetUpdateFreq;
                 } else {
                     this.targetUpdateCooldown--;
@@ -155,9 +149,36 @@ class DQNAgent extends Agent {
         }
     }
     getState() {
-        var stateImg = sampleImageFrom(canvas, 0, [this.scaleH, this.scaleW]);
-        drawImageTensor(stateImg, canvas2, false);
-        return stateImg;
+        let sInfo = this.getStateInfo();
+        let center = Vector.add(this.goal.center, this.opponent.goal.center).div(2);
+        let fwdNormFact = 1 / (cWidth / 2 - leftrightMargin);
+        let upNormFact = 1 / (cHeight / 2 - topbottomMargin);
+        let velNormFact = 0.2;
+
+        let playerRelLoc = Vector.sub(sInfo.playerLocation, center);
+        let opponentRelLoc = Vector.sub(sInfo.opponentLocation, center);
+        let ballRelLoc = Vector.sub(sInfo.ballLocation, center);
+
+        let playerRelForward = Vector.dot(playerRelLoc, this.forwardVec) * fwdNormFact;
+        let playerRelUp = Vector.dot(playerRelLoc, this.upVec) * upNormFact;
+
+        let opponentRelForward = Vector.dot(opponentRelLoc, this.forwardVec) * fwdNormFact;
+        let opponentRelUp = Vector.dot(opponentRelLoc, this.upVec) * upNormFact;
+
+        let ballRelForward = Vector.dot(ballRelLoc, this.forwardVec) * fwdNormFact;
+        let ballRelUp = Vector.dot(ballRelLoc, this.upVec) * upNormFact;
+
+        let playerVelForward = Vector.dot(sInfo.playerVelocity, this.forwardVec) * velNormFact;
+        let playerVelUp = Vector.dot(sInfo.playerVelocity, this.upVec) * velNormFact;
+
+        let opponentVelForward = Vector.dot(sInfo.opponentVelocity, this.forwardVec) * velNormFact;
+        let opponentVelUp = Vector.dot(sInfo.opponentVelocity, this.upVec) * velNormFact;
+
+        let ballVelForward = Vector.dot(sInfo.ballVelocity, this.forwardVec) * velNormFact;
+        let ballVelUp = Vector.dot(sInfo.ballVelocity, this.upVec) * velNormFact;
+
+        //console.log([playerRelForward, playerRelUp, opponentRelForward, opponentRelUp, ballRelForward, ballRelUp, playerVelForward, playerVelUp, opponentVelForward, opponentVelUp, ballVelForward, ballVelUp].map(x => x.toFixed(2)));
+        return [playerRelForward, playerRelUp, opponentRelForward, opponentRelUp, ballRelForward, ballRelUp, playerVelForward, playerVelUp, opponentVelForward, opponentVelUp, ballVelForward, ballVelUp];
 
     }
 
@@ -165,10 +186,10 @@ class DQNAgent extends Agent {
         return {
             terminalState: this.episodeTerminated(),
             playerLocation: this.player.center.copy(),
-            playerVelocity: this.player.velocity.copy(),
             opponentLocation: this.opponent.player.center.copy(),
-            opponentVelocity: this.opponent.player.velocity.copy(),
             ballLocation: this.ball.center.copy(),
+            playerVelocity: this.player.velocity.copy(),
+            opponentVelocity: this.opponent.player.velocity.copy(),
             ballVelocity: this.ball.velocity.copy(),
         };
     }
@@ -179,16 +200,13 @@ class DQNAgent extends Agent {
 
     getReward(s, i, a, ss, ii) {
 
-        let goal = ii.ballLocation.x < leftrightMargin;
-        let ballFwd = ii.ballVelocity.x < -0.5;
-        let getCloserToBall = Vector.dist(ii.playerLocation, ii.ballLocation) + 1 < Vector.dist(i.playerLocation, i.ballLocation);
+        let goal = ss[4] > 1;
+        let ballFwd = ss[10] > 0.2;
         let reward;
         if (goal) {
             reward = 1000;
         } else if (ballFwd) {
             reward = 5;
-        } else if (getCloserToBall) {
-            reward = 1;
         } else {
             reward = -1;
         }

@@ -59,7 +59,7 @@ class ConvLayer extends Layer {
 
     copyWeightsFrom(layer2) {
         if (!arrayEqual(this.W.shape, layer2.W.shape) || !arrayEqual(this.b.shape, layer2.b.shape)) {
-            throw `Shape mismatch between ${this.W} and ${layer2.W}`;
+            throw `Shape mismatch between tensors of shape ${this.W.shape} and ${layer2.W.shape} while copying weights`;
         } else {
             this.W.dispose();
             this.b.dispose();
