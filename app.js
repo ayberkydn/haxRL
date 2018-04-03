@@ -65,7 +65,7 @@ env.draw();
 
 setInterval(() => {
     env.update();
-}, 30);
+}, 10);
 
 
 
