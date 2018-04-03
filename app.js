@@ -54,7 +54,7 @@ var postRadius = 8.5;
 var scaleH = 0.20;
 var scaleW = 0.20;
 //
-var env = new Environment( /*render*/ true, /*sound*/ false, /*resetDelay*/ false, /*randomStart*/ false);
+var env = new Environment( /*render*/ true, /*sound*/ false, /*resetDelay*/ false, /*randomStart*/ true);
 //env.addAgent(new HumanAgent(Side.blue, "w", "s", "a", "d", "q"));
 env.addAgent(new HumanAgent("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "x"), Side.red);
 env.addAgent(new ANNAgent(), Side.blue);
@@ -65,16 +65,22 @@ env.draw();
 
 setInterval(() => {
     env.update();
-}, 10);
+}, 0);
 
 
+/*
 
+ for (let n = 0; n < 500; n++) {
+     env.draw();
+     env.update();
+ }
+ let t1 = performance.now();
+ for (let n = 0; n < 5000; n++) {
+     env.draw();
+     env.update();
+ }
 
-// let t1 = performance.now();
-// for (let n = 0; n < 500; n++) {
-//     env.draw();
-//     env.update();
-// }
-// let t2 = performance.now();
+ let t2 = performance.now();
 
-// console.log(t2 / 5000 - t1 / 5000, "ms per frame");
+ console.log(t2 / 5000 - t1 / 5000, "ms per frame");
+*/

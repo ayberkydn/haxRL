@@ -11,31 +11,23 @@ class ANNAgent extends Agent {
         this.ANN = new NeuralNetwork(this.stateShape)
             .addLayer(new DenseLayer(200))
             .addLayer(new ActivationLayer(dl.relu))
-            .addLayer(new DenseLayer(200))
-            .addLayer(new ActivationLayer(dl.relu))
-            .addLayer(new DenseLayer(200))
-            .addLayer(new ActivationLayer(dl.relu))
             .addLayer(new DenseLayer(this.actionSpace))
             .setLoss("mse")
-            .setOptimizer(dl.train.adam(0.01))
+            .setOptimizer(dl.train.adam(0.001))
             .summary();
 
         this.targetANN = new NeuralNetwork(this.stateShape)
-            .addLayer(new DenseLayer(200))
-            .addLayer(new ActivationLayer(dl.relu))
-            .addLayer(new DenseLayer(200))
-            .addLayer(new ActivationLayer(dl.relu))
             .addLayer(new DenseLayer(200))
             .addLayer(new ActivationLayer(dl.relu))
             .addLayer(new DenseLayer(this.actionSpace))
             .copyWeightsFrom(this.ANN);
 
 
-        this.experienceReplayCapacity = 20000;
+        this.experienceReplayCapacity = 30000;
         this.experienceReplayStarting = 500;
         this.batchSize = 32;
         this.experienceReplay = new ExperienceReplay(this.experienceReplayCapacity, this.experienceReplayStarting);
-        this.discount = 0.95; //when reward is continuous low discount is better IMO
+        this.discount = 0.8; //when reward is continuous low discount is better IMO
         this.lastSiASSiiR = {};
         this.actionRepeat = 4;
         this.targetUpdateFreq = this.experienceReplayStarting;
@@ -139,7 +131,7 @@ class ANNAgent extends Agent {
 
                 this.learnStep++;
                 if (this.epsilon > 0.001) {
-                    this.epsilon -= 0.0001;
+                    this.epsilon -= 0.00001;
                 } else {
                     this.epsilon = 0.001;
                 }
