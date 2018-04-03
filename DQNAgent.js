@@ -117,7 +117,13 @@ class DQNAgent extends Agent {
                 let targetBatch = this.DQN.forward(sBatch);
 
                 for (let n = 0; n < aBatch.length; n++) {
-                    targetBatch[n][aBatch[n]] = yBatch[n];
+                    if (targetBatch[n][aBatch[n]] - yBatch[n] > 1) {
+                        targetBatch[n][aBatch[n]] -= 1;
+                    } else if (targetBatch[n][aBatch[n]] - yBatch[n] < -1) {
+                        targetBatch[n][aBatch[n]] += 1;
+                    } else {
+                        targetBatch[n][aBatch[n]] = yBatch[n];
+                    }
                 }
 
                 // console.log("-------------------------")

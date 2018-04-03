@@ -1,4 +1,4 @@
-class ANNAgent extends Agent {
+class PGAgent extends Agent {
     constructor() {
         super();
         this.actionSpace = 4;
@@ -9,30 +9,16 @@ class ANNAgent extends Agent {
 
 
         this.ANN = new NeuralNetwork(this.stateShape)
-            .addLayer(new DenseLayer(200))
+            .addLayer(new DenseLayer(50))
             .addLayer(new ActivationLayer(dl.relu))
-            .addLayer(new DenseLayer(200))
-            .addLayer(new ActivationLayer(dl.relu))
-            .addLayer(new DenseLayer(200))
+            .addLayer(new DenseLayer(50))
             .addLayer(new ActivationLayer(dl.relu))
             .addLayer(new DenseLayer(this.actionSpace))
             .setLoss("mse")
             .setOptimizer(dl.train.adam(0.01))
             .summary();
 
-        this.targetANN = new NeuralNetwork(this.stateShape)
-            .addLayer(new DenseLayer(200))
-            .addLayer(new ActivationLayer(dl.relu))
-            .addLayer(new DenseLayer(200))
-            .addLayer(new ActivationLayer(dl.relu))
-            .addLayer(new DenseLayer(200))
-            .addLayer(new ActivationLayer(dl.relu))
-            .addLayer(new DenseLayer(this.actionSpace))
-            .copyWeightsFrom(this.ANN);
 
-
-        this.experienceReplayCapacity = 20000;
-        this.experienceReplayStarting = 500;
         this.batchSize = 32;
         this.experienceReplay = new ExperienceReplay(this.experienceReplayCapacity, this.experienceReplayStarting);
         this.discount = 0.95; //when reward is continuous low discount is better IMO
@@ -40,6 +26,8 @@ class ANNAgent extends Agent {
         this.actionRepeat = 4;
         this.targetUpdateFreq = this.experienceReplayStarting;
         this.epsilon = 1; //start as 1, linearly anneal to 0.1
+        this.epsilonAnnealingRate = 0.0001;
+        this.epsilonFinal = 0.001;
         this.learnStep = 0;
         this.repeatCooldown = 0;
         this.targetUpdateCooldown = 0;
@@ -110,13 +98,7 @@ class ANNAgent extends Agent {
                 let targetBatch = this.ANN.forward(sBatch);
 
                 for (let n = 0; n < aBatch.length; n++) {
-                    if (targetBatch[n][aBatch[n]] - yBatch[n] > 1) {
-                        targetBatch[n][aBatch[n]] -= 1;
-                    } else if (targetBatch[n][aBatch[n]] - yBatch[n] < -1) {
-                        targetBatch[n][aBatch[n]] += 1;
-                    } else {
-                        targetBatch[n][aBatch[n]] = yBatch[n];
-                    }
+                    targetBatch[n][aBatch[n]] = yBatch[n];
                 }
 
                 // console.log("-------------------------")
@@ -138,10 +120,10 @@ class ANNAgent extends Agent {
 
 
                 this.learnStep++;
-                if (this.epsilon > 0.001) {
-                    this.epsilon -= 0.0001;
+                if (this.epsilon > this.epsilonFinal) {
+                    this.epsilon -= this.epsilonAnnealingRate;
                 } else {
-                    this.epsilon = 0.001;
+                    this.epsilon = this.epsilonFinal;
                 }
 
                 if (this.targetUpdateCooldown == 0) {
@@ -207,11 +189,14 @@ class ANNAgent extends Agent {
 
         let goal = ss[4] > 1;
         let ballFwd = ss[10] > 0.2;
-        let sDistToBall = Vector.dist(new Vector(s[4], s[5]), new Vector(s[0], s[1]));
-        let ssDistToBall = Vector.dist(new Vector(ss[4], ss[5]), new Vector(ss[0], ss[1]));
-        let closing = ssDistToBall + 0.02 < sDistToBall;
-
-        let reward = goal * 5 + ballFwd * 0.2 + closing * 0.2 - 0.1;
+        let reward;
+        if (goal) {
+            reward = 1000;
+        } else if (ballFwd) {
+            reward = 5;
+        } else {
+            reward = -1;
+        }
         return reward;
 
     }
