@@ -54,7 +54,7 @@ class Vector:
         return "Vector: ({}, {})".format(self.x, self.y)
     
 
-class Unit(Enum):
+class UnitVec:
     up = Vector(0, -1)
     upleft = Vector(-math.sqrt(0.5), -math.sqrt(0.5))
     left = Vector(-1, 0)

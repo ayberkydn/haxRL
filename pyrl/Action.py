@@ -1,6 +1,4 @@
-from enum import Enum
-
-class Action(Enum):
+class Action:
     
     up = "ACTION_UP"
     down = "ACTION_DOWN"
