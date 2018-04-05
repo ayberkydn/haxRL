@@ -101,9 +101,7 @@
 #
 #    }
 #
-#
-#
-#
+
 #    update() {
 #        if (this.kicker.active) {
 #            this.damping = this.kickDamping;
