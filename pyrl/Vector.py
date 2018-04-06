@@ -53,6 +53,9 @@ class Vector:
     def __str__(self):
         return "Vector: ({}, {})".format(self.x, self.y)
     
+    def __eq__(self, vec2):
+        return self.x == vec2.x and self.y == vec2.y
+    
 
 class UnitVec:
     up = Vector(0, -1)

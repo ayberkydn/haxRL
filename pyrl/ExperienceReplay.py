@@ -5,7 +5,7 @@ class ExperienceReplay():
     def __init__(self, capacity):
         self.replay = deque(maxlen = capacity)
         
-    def sample(self, batch_size):
+    def sample_experience(self, batch_size):
         rand_ind = np.random.randint(0, len(self.replay), batch_size)
         exp_batch = []
         for n in rand_ind:
@@ -13,7 +13,7 @@ class ExperienceReplay():
         return exp_batch
     
         
-    def store(self, exp):
+    def add_experience(self, exp):
         assert (type(exp) == tuple)        
         self.replay.append(exp)
             

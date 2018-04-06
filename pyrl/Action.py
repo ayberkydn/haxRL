@@ -1,4 +1,5 @@
-class Action:
+from enum import Enum
+class Action(Enum):
     
     up = "ACTION_UP"
     down = "ACTION_DOWN"
@@ -18,7 +19,6 @@ class Action:
     downforwardshoot = "ACTION_DOWN_FORWARD_SHOOT"
     downbackwardshoot = "ACTION_DOWN_BACKWARD_SHOOT"
     nomove = "ACTION_NOMOVE"
-
 
 
 class ActionV:

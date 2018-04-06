@@ -29,12 +29,12 @@ def show(image):
 
 def get_collision(body1, body2):
     #Returns collision of corresponding type with body1 and body2, if any. 
-    #else returns undefined 
-    if body1 == body2:
+    #else returns None
+    if body1.center == body2.center:
         return
     
-    body1_in_body2_mask = isinstance(body1, body2.collision_mask)
-    body2_in_body1_mask = isinstance(body2, body1.collision_mask)
+    body1_in_body2_mask = isinstance(body1, tuple(body2.collision_mask))
+    body2_in_body1_mask = isinstance(body2, tuple(body1.collision_mask))
     
     if not body1_in_body2_mask or not body2_in_body1_mask:
         return
@@ -62,18 +62,18 @@ def get_collision(body1, body2):
             
     elif isinstance(body1, Disc) and isinstance(body2, VerticalBorder):
         if body2.center.y + body2.length / 2 > body1.center.y and body2.center.y - body2.length / 2 < body1.center.y:#
-            if body1.center.x - body2.center.x < body1.radius and body2.extendsTo == Way.left:
+            if body1.center.x - body2.center.x < body1.radius and body2.extends_to == Way.left:
                 return DVBCollision(body1, body2)
-            elif body2.center.x - body1.center.x < body1.radius and body2.extendsTo == Way.right:
+            elif body2.center.x - body1.center.x < body1.radius and body2.extends_to == Way.right:
                 return DVBCollision(body1, body2)
                       
 
 
     elif isinstance(body1, Disc) and isinstance(body2, VerticalBorder):
         if body2.center.y + body2.length / 2 > body1.center.y and body2.center.y - body2.length / 2 < body1.center.y:
-            if body1.center.x - body2.center.x < body1.radius and body2.extendsTo == Way.left:
+            if body1.center.x - body2.center.x < body1.radius and body2.extends_to == Way.left:
                 return DVBCollision(body1, body2)
-            elif body2.center.x - body1.center.x < body1.radius and body2.extendsTo == Way.right:
+            elif body2.center.x - body1.center.x < body1.radius and body2.extends_to == Way.right:
                 return DVBCollision(body1, body2)
             
     elif isinstance(body1, Disc) and isinstance(body2, Disc):

@@ -5,7 +5,7 @@ class Collision:
         assert (isinstance(body1, Body) and isinstance(body2, Body))
         self.body1 = body1
         self.body2 = body2
-        self.restitution = min(body1.restitution, body2.restituion)
+        self.restitution = min(body1.restitution, body2.restitution)
         
     def resolve(self):
         self.resolve_impulse()
@@ -23,8 +23,8 @@ class Collision:
         
         impulse = self.collision_normal.mult(j)
         
-        self.body1.applyImpulse(impulse)
-        self.body2.applyImpulse(impulse.mult(-1))
+        self.body1.apply_impulse(impulse)
+        self.body2.apply_impulse(impulse.mult(-1))
 
 
     def resolve_penetration(self):

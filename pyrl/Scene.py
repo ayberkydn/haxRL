@@ -25,7 +25,7 @@ class Scene:
         self.collisions = []
     
 
-    def addObject(self, obj):
+    def add_object(self, obj):
         if isinstance(obj, Disc):
             self.objects['discs'].append(obj)
 
@@ -34,13 +34,13 @@ class Scene:
             self.meta_objects['players'].append(obj)
             
         elif isinstance(obj, Ball):
-            self.meta_objects.balls.append(obj)
+            self.meta_objects['balls'].append(obj)
         elif isinstance(obj, Border):
             self.objects['borders'].append(obj)
         elif isinstance(obj, Box):
             self.meta_objects['boxes'].append(obj)
             for border_key in obj.borders:
-                self.objects.borders.append(obj.borders[border_key])
+                self.objects['borders'].append(obj.borders[border_key])
     
         elif isinstance(obj, Goal):
             self.meta_objects['goals'].append(obj)
@@ -53,7 +53,7 @@ class Scene:
             if (len(self.meta_objects['goals']) == 2):
                 goal1_center = self.meta_objects['goals'][0].center
                 goal2_center = self.meta_objects['goals'][1].center
-                self.meta_objects.centers.append(goal1_center.add(goal2_center).div(2))
+                self.meta_objects['centers'].append(goal1_center.add(goal2_center).div(2))
 
         obj.scene = self
 

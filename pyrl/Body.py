@@ -6,7 +6,7 @@ class Body:
         self.restitution = restitution
         self.velocity = Vector(0, 0)
         self.acceleration = Vector(0, 0)
-        self.collisionMask = [Body]
+        self.collision_mask = (Body, )
         
         
     def apply_force(self):
@@ -22,11 +22,11 @@ class Body:
         raise NotImplementedError("draw not implemented")
         
     def set_collision_mask(self, mask_array):
-        self.collisionMask = mask_array[:]
+        self.collisionMask = tuple(mask_array)
         return self
     
     def make_ghost(self):
-        self.collisionMask = []
+        self.collisionMask = tuple()
         return self
     
     def set_color(self, color):
@@ -37,3 +37,5 @@ class Body:
         self.outer_color = color
         return self
 
+    def __str__(self):
+        return "Body: Center = {} \n restitution = {} \n velocity {}".format(self.center, self.restitution, self.velocity)

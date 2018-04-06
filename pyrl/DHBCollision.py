@@ -8,7 +8,7 @@ class DHBCollision(Collision):
     #Disc-VerticalBorder collision
     def __init__(self, body1, body2):
         assert isinstance(body1, Disc) and isinstance(body2, HorizontalBorder)
-        super.__init__(body1, body2)
+        super().__init__(body1, body2)
         if body2.extends_to == Way.left:
             self.collision_normal = Vector(1, 0)
         elif body2.extends_to == Way.right:

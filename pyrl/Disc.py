@@ -21,6 +21,7 @@ class Disc(Body):
         
     def make_hollow(self):
         self.hollow = True
+        return self
         
     def apply_force(self, force_vec):
         assert isinstance(force_vec, Vector)

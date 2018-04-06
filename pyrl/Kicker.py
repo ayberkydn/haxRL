@@ -4,7 +4,7 @@ from Color import Color
 
 class Kicker(Body):
     def __init__(self, player, kick_power):
-        super().__init__(player.center_x, player.center_y, 0)
+        super().__init__(player.center.x, player.center.y, 0)
         self.outer_color = Color.white
         self.color = Color.black
         self.hollow = True

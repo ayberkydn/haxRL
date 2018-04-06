@@ -12,7 +12,7 @@ class Border(Body):
         self.color = Color.border
         self.visible = visible
         self.extends_to = None
-        self.collisionMask = [Disc]
+        self.collision_mask = [Disc]
    
     def extend_to(self, way):
         assert isinstance(way, Way)
@@ -22,7 +22,7 @@ class Border(Body):
     def update(self):
         pass
 
-    def apply_impulse(self):
+    def apply_impulse(self, impulse):
         pass
 
 
