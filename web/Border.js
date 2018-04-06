@@ -1,7 +1,6 @@
 class Border extends Body {
     constructor(centerX, centerY, restitution, visible = true, ghost = false) {
         super(...arguments);
-        this.center = new Vector(centerX, centerY);
         this.mass = Infinity;
         this.invMass = 0;
         this.color = Color.border;

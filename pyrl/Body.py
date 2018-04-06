@@ -7,7 +7,6 @@ class Body:
         self.velocity = Vector(0, 0)
         self.acceleration = Vector(0, 0)
         self.collisionMask = [Body]
-        print("anan")
         
         
     def apply_force(self):
