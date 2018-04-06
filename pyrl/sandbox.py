@@ -1,11 +1,13 @@
-import gym
-import time
-import numpy as np
-from DQNAgent import DQNAgent
-from funcs import preprocess_state, show
-import matplotlib.pyplot as plt
-import scipy
-
-
-
-env = gym.make('Pong-v0')
+class Anan:
+    def __init__(self):
+        self.x = 1
+        
+    def upx(self):
+        self.x += 1
+        
+    def uppx(self):
+        self.upx()
+        
+    def defy(self, y):
+        self.y = y
+a = Anan()
