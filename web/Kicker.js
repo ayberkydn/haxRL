@@ -1,6 +1,6 @@
 class Kicker extends Body {
     constructor(player, kickPower) {
-        super();
+        super(player.centerX, player.centerY, 0);
         this.outerColor = Color.white;
         this.hollow = true;
         this.color = Color.black;

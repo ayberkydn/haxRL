@@ -48,7 +48,7 @@ class ANNAgent extends Agent {
             this.repeatCooldown = this.actionRepeat;
             this.lastSiASSiiR.s = this.getState();
             this.lastSiASSiiR.i = this.getStateInfo();
-            console.log((this.ANN.forward([this.lastSiASSiiR.s])[0]).map(x => x.toFixed(2)));
+            //console.log((this.ANN.forward([this.lastSiASSiiR.s])[0]).map(x => x.toFixed(2)));
 
 
             let actionIndex;

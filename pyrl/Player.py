@@ -1,5 +1,16 @@
-## -*- coding: utf-8 -*-
-#
+from Disc import Disc
+from Kicker import Kicker
+
+class Player(Disc):
+    def __init__(self, center_x, center_y, radius, mass, restitution, damping, kick_damping, kick_power, color):
+        super().__init__(center_x, center_y, radius, mass, restitution, damping, color)
+        self.agent = None
+        self.nonkick_damping = damping
+        self.kick_damping = kick_damping
+        self.kicker = Kicker(self, kick_power)
+
+
+
 #class Player extends Disc {
 #    constructor(centerX, centerY, radius, mass, restitution, damping, kickDamping, kickPower, color) {
 #        super(centerX, centerY, radius, mass, restitution, damping, color);

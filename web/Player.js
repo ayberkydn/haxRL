@@ -2,10 +2,6 @@ class Player extends Disc {
     constructor(centerX, centerY, radius, mass, restitution, damping, kickDamping, kickPower, color) {
         super(centerX, centerY, radius, mass, restitution, damping, color);
         this.agent = null;
-        this.up = false;
-        this.down = false;
-        this.left = false;
-        this.right = false;
         this.nonkickDamping = damping;
         this.kickDamping = kickDamping;
         this.kicker = new Kicker(this, kickPower);
