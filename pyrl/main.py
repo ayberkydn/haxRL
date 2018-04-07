@@ -11,22 +11,22 @@ import scipy
 import pickle
 from Environment import Environment
 from RandomAgent import ForwardAgent
+from HumanAgent import HumanAgent
 from Side import Side
 from time import sleep
-
+import pygame
 # Parameters
 
 
 
 
 env = Environment(render = True, sound = False, reset_delay = False, random_start = False)
-env.add_agent(ForwardAgent(), Side.red);
+env.add_agent(HumanAgent(pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT, pygame.K_x), Side.red);
 env.add_agent(ForwardAgent(), Side.blue);
 
 
-for n in range(500):
+for n in range(5000):
     env.update()
-    sleep(0.02)
     
 
 

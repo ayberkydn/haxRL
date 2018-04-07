@@ -11,7 +11,7 @@ class Kicker(Body):
         self.player = player
         self.active = False
         self.kick_power = kick_power
-        self.radius = player.radius 
+        self.radius = player.radius + 3
         self.center = player.center
         
         

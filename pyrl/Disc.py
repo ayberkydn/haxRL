@@ -41,13 +41,17 @@ class Disc(Body):
         self.acceleration = self.acceleration.mult(0)
     
 
+    def reset_position(self):
+        self.center = Vector(self.start_x, self.start_y)
+        self.velocity = Vector(0, 0)
+        
     def draw(self):
         if self.hollow == False:
             pygame.draw.circle(self.scene.screen, self.color, (int(self.center.x), int(self.center.y)), int(self.radius), 0)
         
-        pygame.draw.circle(self.scene.screen, self.outer_color, (int(self.center.x), int(self.center.y)), int(self.radius), 2)
+        pygame.draw.circle(self.scene.screen, self.outer_color, (int(self.center.x), int(self.center.y)), int(self.radius + 2), 2)
         
-
+        
 
 
 

@@ -95,38 +95,9 @@ class Player(Disc):
         super().update()
 
 
-#
-#    draw() {
-#        super.draw();
-#        this.kicker.draw();
-#    }
-#}
-#    applyActionHVS(actionH, actionV, actionS) {
-#        // TODO
-#        // HVS sirasında degilse exception yolla
-#        let diagonal = (actionH != ActionH.nomove) && (actionV != ActionV.nomove);
-#        let diagonalScale = diagonal ? Math.SQRT1_2 : 1;
-#        let shoot = (actionS == ActionS.shoot);
-#
-#        if (actionH == ActionH.forward) {
-#            let forwardVec = this.agent.side == Side.red ? Vector.Unit.right : Vector.Unit.left;
-#            this.applyForce(Vector.mult(forwardVec, diagonalScale));
-#        } else if (actionH == ActionH.backward) {
-#            let backwardVec = this.agent.side == Side.red ? Vector.Unit.left : Vector.Unit.right;
-#            this.applyForce(Vector.mult(backwardVec, diagonalScale));
-#        }
-#
-#        if (actionV == ActionV.up) {
-#            this.applyForce(Vector.mult(Vector.Unit.up, diagonalScale));
-#        } else if (actionV == ActionV.down) {
-#            this.applyForce(Vector.mult(Vector.Unit.down, diagonalScale));
-#        }
-#
-#        if (actionS == ActionS.shoot) {
-#            this.kicker.activate();
-#        } else if (actionS == ActionS.nomove) {
-#            this.kicker.deactivate();
-#        }
-#
-#    }
-#
+
+    def draw(self):
+        super().draw();
+        self.kicker.draw()
+
+    
