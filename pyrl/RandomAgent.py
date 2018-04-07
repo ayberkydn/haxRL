@@ -7,7 +7,7 @@ class ForwardAgent(Agent):
         
     
     def act(self):
-        self.player.apply_action(Action.forward)
+        self.player.apply_action(Action.upforwardshoot)
         
         
 

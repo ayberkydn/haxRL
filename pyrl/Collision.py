@@ -16,7 +16,7 @@ class Collision:
         
         #Don't handle collision if objects aren't actually colliding
         if self.velocity_along_normal > 0:
-            return;
+            return
             
         j = -(1 + self.restitution) * self.velocity_along_normal
         j /= self.body1.inv_mass + self.body2.inv_mass

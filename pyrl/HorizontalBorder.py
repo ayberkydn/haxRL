@@ -1,4 +1,5 @@
 from Border import Border
+import pygame
 
 class HorizontalBorder(Border):
     def __init__(self, center_x, center_y, length, restitution, visible = True, ghost = False):
@@ -8,20 +9,12 @@ class HorizontalBorder(Border):
     
     
     def draw(self):
-        pass
-#    
-#   draw() {
-#        if (this.visible) {
-#            ctx.strokeStyle = this.color;
-#            ctx.beginPath();
-#            let startX = this.center.x - this.length / 2;
-#            let startY = this.center.y;
-#            let endX = this.center.x + this.length / 2;
-#            let endY = startY;
-#            ctx.moveTo(startX, startY);
-#            ctx.lineTo(endX, endY);
-#            ctx.stroke();
-#        }
-#    }
-
-        
+        if self.visible:
+            start_x = self.center.x - self.length / 2
+            start_y = self.center.y
+            end_x = self.center.x + self.length / 2
+            end_y = start_y
+            
+            pygame.draw.lines(self.scene.screen, self.color, False, [(start_x, start_y), (end_x, end_y)], 3)
+            
+            

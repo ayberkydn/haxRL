@@ -12,20 +12,22 @@ import pickle
 from Environment import Environment
 from RandomAgent import ForwardAgent
 from Side import Side
+from time import sleep
 
 # Parameters
 
 
 
 
-env = Environment(render = False, sound = False, reset_delay = False, random_start = False)
+env = Environment(render = True, sound = False, reset_delay = False, random_start = False)
 env.add_agent(ForwardAgent(), Side.red);
 env.add_agent(ForwardAgent(), Side.blue);
 
 
-for n in range(100):
+for n in range(500):
     env.update()
-
+    sleep(0.02)
+    
 
 
 #

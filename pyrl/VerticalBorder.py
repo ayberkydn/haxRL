@@ -1,16 +1,23 @@
 from Border import Border
+import pygame
 
 class VerticalBorder(Border):
     def __init__(self, center_x, center_y, length, restitution, visible = True, ghost = False):
         super().__init__(center_x, center_y, restitution, visible, ghost)
         self.length = length
         
-    
-    
+
+
     def draw(self):
-        pass
-##    
-#
+        if self.visible:
+            start_x = self.center.x
+            start_y = self.center.y - self.length / 2
+            end_x = start_x
+            end_y = self.center.y + self.length / 2
+            
+            pygame.draw.lines(self.scene.screen, self.color, False, [(start_x, start_y), (end_x, end_y)], 3)
+            
+            
 #    draw() {
 #        if (this.visible) {
 #            ctx.strokeStyle = this.color;

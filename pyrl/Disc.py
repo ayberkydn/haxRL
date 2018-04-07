@@ -2,6 +2,7 @@ from Body import Body
 import math
 from Color import Color
 from Vector import Vector
+import pygame
 
 class Disc(Body):
     def __init__(self, center_x, center_y, radius, mass, restitution, damping, color):
@@ -40,8 +41,12 @@ class Disc(Body):
         self.acceleration = self.acceleration.mult(0)
     
 
-a = Disc(1,2,3,4,5,6,7)
-
+    def draw(self):
+        if self.hollow == False:
+            pygame.draw.circle(self.scene.screen, self.color, (int(self.center.x), int(self.center.y)), int(self.radius), 0)
+        
+        pygame.draw.circle(self.scene.screen, self.outer_color, (int(self.center.x), int(self.center.y)), int(self.radius), 2)
+        
 
 
 

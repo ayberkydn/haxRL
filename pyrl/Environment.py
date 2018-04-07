@@ -27,7 +27,7 @@ class Environment :
         self.episode_end_checker = lambda : (self.scene.check_goals() or self.step == 1000)
         self.step = 0
 
-        self.scene =  Scene()
+        self.scene =  Scene(c_width, c_height)
         self.scene.add_object(Box(0, c_width, 0, c_height - 0, 0))
         self.scene.add_object(Disc(c_width / 2, c_height / 2, middle_field_radius, 10, 1, 1, Color.white).make_ghost().make_hollow().set_outer_color(Color.border))
         self.scene.add_object(VerticalBorder(c_width / 2, c_height / 2, c_height - 2 * topbottom_margin, None).make_ghost())
@@ -90,17 +90,8 @@ class Environment :
                  print("sound not implemented")
         
 
-        self.draw()
+        if self.render: self.scene.draw()
 
         self.step += 1
     
-
-    def draw(self):
-        pass
-        
-        #if (self.render == True) :
-         #   self.scene.draw()
-        
-    
-# -*- coding: utf-8 -*-
 

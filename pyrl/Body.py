@@ -22,11 +22,11 @@ class Body:
         raise NotImplementedError("draw not implemented")
         
     def set_collision_mask(self, mask_array):
-        self.collisionMask = tuple(mask_array)
+        self.collision_mask = tuple(mask_array)
         return self
     
     def make_ghost(self):
-        self.collisionMask = tuple()
+        self.collision_mask = tuple()
         return self
     
     def set_color(self, color):

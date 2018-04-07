@@ -5,10 +5,16 @@ from Ball import Ball
 from Box import Box
 from Goal import Goal
 from Border import Border
-
+import pygame
+from config import bg_color
 
 class Scene:
-    def __init__(self):
+    def __init__(self, width, height):
+        pygame.init()
+        self.screen = pygame.display.set_mode((width, height))
+        self.width = width
+        self.heigth = height
+        
         self.objects = {
             "borders": [],
             "discs": [],
@@ -31,6 +37,7 @@ class Scene:
 
         if isinstance(obj, Player):
             self.objects['discs'].append(obj.kicker)
+            obj.kicker.scene = self
             self.meta_objects['players'].append(obj)
             
         elif isinstance(obj, Ball):
@@ -41,15 +48,23 @@ class Scene:
             self.meta_objects['boxes'].append(obj)
             for border_key in obj.borders:
                 self.objects['borders'].append(obj.borders[border_key])
-    
+                obj.borders[border_key].scene = self
+                
         elif isinstance(obj, Goal):
             self.meta_objects['goals'].append(obj)
             self.objects['borders'].append(obj.goal_line)
+            obj.goal_line.scene = self
             self.objects['borders'].append(obj.net_top)
+            obj.net_top.scene = self
             self.objects['borders'].append(obj.net_bottom)
+            obj.net_bottom.scene = self
             self.objects['borders'].append(obj.net_back)
+            obj.net_back.scene = self
             self.objects['discs'].append(obj.top_post)
+            obj.top_post.scene = self
             self.objects['discs'].append(obj.bottom_post)
+            obj.bottom_post.scene = self
+            
             if (len(self.meta_objects['goals']) == 2):
                 goal1_center = self.meta_objects['goals'][0].center
                 goal2_center = self.meta_objects['goals'][1].center
@@ -117,7 +132,18 @@ class Scene:
         self.meta_objects['balls'][0].reset_position()
         self.meta_objects['balls'][0].velocity = self.meta_objects['balls'][0].velocity.mult(0)
         
-#
+
+
+    def draw(self):
+        self.screen.fill(bg_color)
+        for object_key in ['borders', 'discs']:
+            print(object_key)
+            object_list = self.objects[object_key]
+            for obj in object_list:
+                obj.draw()
+        
+        pygame.display.update()
+
 #    draw() {
 #        ctx.fillStyle = bgColor
 #        ctx.fillRect(0, 0, cWidth, cHeight)

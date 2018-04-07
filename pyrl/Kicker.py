@@ -1,6 +1,6 @@
 from Body import Body
 from Color import Color
-
+import pygame
 
 class Kicker(Body):
     def __init__(self, player, kick_power):
@@ -11,7 +11,7 @@ class Kicker(Body):
         self.player = player
         self.active = False
         self.kick_power = kick_power
-        self.radius = player.radius + 3.5
+        self.radius = player.radius 
         self.center = player.center
         
         
@@ -27,7 +27,9 @@ class Kicker(Body):
         self.center = self.player.center
 
     def draw(self):
-        pass
+        pygame.draw.circle(self.scene.screen, self.color, (int(self.center.x), int(self.center.y)), int(self.radius), 2)
+        
+
 
 #    draw() {
 #        if (this.active) {
