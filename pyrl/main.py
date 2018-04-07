@@ -9,7 +9,7 @@ from funcs import preprocess_state, show
 import matplotlib.pyplot as plt
 import scipy
 import pickle
-from Environment import Environment
+from Environment import HaxballEnvironment
 from RandomAgent import ForwardAgent
 from HumanAgent import HumanAgent
 from Side import Side
@@ -20,9 +20,9 @@ import pygame
 
 
 
-env = Environment(render = True, sound = False, reset_delay = False, random_start = False)
+env = HaxballEnvironment(render = True, sound = False, reset_delay = False, random_start = False)
 env.add_agent(HumanAgent(pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT, pygame.K_x), Side.red);
-env.add_agent(ForwardAgent(), Side.blue);
+env.add_agent(ANNAgent(), Side.blue);
 
 
 for n in range(5000):

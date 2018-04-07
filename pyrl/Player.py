@@ -84,6 +84,8 @@ class Player(Disc):
             
         elif action == Action.nomoveshoot:
             self.kicker.activate()
+            
+            
 
 
     def update(self):

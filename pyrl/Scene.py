@@ -12,6 +12,7 @@ class Scene:
     def __init__(self, width, height):
         pygame.init()
         self.screen = pygame.display.set_mode((width, height))
+        self.screen.set_alpha(None)
         self.width = width
         self.heigth = height
         
@@ -137,7 +138,6 @@ class Scene:
     def draw(self):
         self.screen.fill(bg_color)
         for object_key in ['borders', 'discs']:
-            print(object_key)
             object_list = self.objects[object_key]
             for obj in object_list:
                 obj.draw()

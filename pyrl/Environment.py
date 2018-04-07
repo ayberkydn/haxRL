@@ -14,7 +14,7 @@ from config import c_width, c_height, middle_field_radius, topbottom_margin, \
 leftright_margin, border_restitution, goal_length, ball_radius, ball_mass, \
 ball_restitution, ball_damping
 
-class Environment :
+class HaxballEnvironment :
     def __init__(self, render = True, sound = True, reset_delay = True, random_start = True):
         self.render = render
         self.sound = sound
@@ -95,3 +95,25 @@ class Environment :
         self.step += 1
     
 
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
