@@ -7,6 +7,8 @@ from Goal import Goal
 from Border import Border
 import pygame
 from config import bg_color
+import numpy as np
+from scipy.misc import imresize
 
 class Scene:
     def __init__(self, width, height):
@@ -31,7 +33,13 @@ class Scene:
 
         self.collisions = []
     
-
+    def get_scene_as_array(self):
+        img_arr_t = np.array(pygame.surfarray.array3d(self.screen))
+        img_arr = np.swapaxes(img_arr_t, 0, 1)
+        resized = imresize(img_arr, (84, 84), 'bilinear')
+        single_channel = resized[:,:,0]
+        return single_channel
+    
     def add_object(self, obj):
         if isinstance(obj, Disc):
             self.objects['discs'].append(obj)

@@ -1,35 +1,21 @@
+import numpy as np
 from collections import deque
-import math
-import random
 
-class ExperienceReplay:
+class ExperienceReplay():
     def __init__(self, capacity):
-        self.capacity = capacity
         self.replay = deque(maxlen = capacity)
+        
+    def sample(self, batch_size):
+        rand_ind = np.random.randint(0, len(self.replay), batch_size)
+        exp_batch = []
+        for n in rand_ind:
+            exp_batch.append(self.replay[n])
+        return exp_batch
     
-
-    def add_experience(self, siarssii):
-        self.replay.append(siarssii.copy())
         
-
-    def sample_experience(self, batch_size = 1):
-        batch = {
-            "s_batch": [],
-            "i_batch": [],
-            "a_batch": [],
-            "ss_batch": [],
-            "ii_batch": [],
-            "r_batch": [],
-        }
+    def store(self, exp):
+        assert (type(exp) == tuple)        
+        self.replay.append(exp)
+            
         
-        for n in range(batch_size):
-            rand_index = math.floor(random.random() * len(self.replay))
-            batch['s_batch'].append(self.replay[rand_index]['s'])
-            batch['i_batch'].append(self.replay[rand_index]['i'])
-            batch['a_batch'].append(self.replay[rand_index]['a'])
-            batch['ss_batch'].append(self.replay[rand_index]['ss'])
-            batch['ii_batch'].append(self.replay[rand_index]['ii'])
-            batch['r_batch'].append(self.replay[rand_index]['r'])
-        
-        return batch
     

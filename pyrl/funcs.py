@@ -4,7 +4,6 @@ from Border import Border
 from VerticalBorder import VerticalBorder
 from HorizontalBorder import HorizontalBorder
 from Disc import Disc
-from Collision import Collision
 from DHBCollision import DHBCollision
 from DVBCollision import DVBCollision
 from KickCollision import KickCollision
@@ -41,7 +40,7 @@ def get_collision(body1, body2):
     
     if isinstance(body1, Border) and isinstance(body2, Disc):
         # Disc-Border is allowed, Border-Disc is not.
-        return Collision.get_collision(body2, body1)
+        return get_collision(body2, body1)
     
     if isinstance(body1, Disc) and isinstance(body2, HorizontalBorder):
         ##Disc-HB collision
@@ -81,7 +80,7 @@ def get_collision(body1, body2):
             return DDCollision(body1, body2)
 
     elif isinstance(body1, Kicker) and isinstance(body2, Ball):
-        return Collision.get_collision(body2, body1)
+        return get_collision(body2, body1)
 
 
     elif isinstance(body1, Ball) and isinstance(body2, Kicker):
