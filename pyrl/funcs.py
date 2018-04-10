@@ -15,11 +15,13 @@ from Ball import Ball
 
 
 def preprocess_state(state):
-    assert len(state.shape) == 3
-    cropped = state.mean(axis=2, keepdims=True)[40:-20]
-    normalized = cropped / 255
-    return scipy.misc.imresize(normalized[:,:,0], [84, 84])
-
+    if len(state.shape) == 1:
+        return state
+    elif len(state.shape) == 3:
+        single_channel = state[:,:,0]
+        return scipy.misc.imresize(single_channel, [84, 84])
+    else:
+        raise TypeError
 
 def show(image):
     plt.imshow(image)
@@ -31,7 +33,7 @@ def get_collision(body1, body2):
     #else returns None
     if body1.center == body2.center:
         return
-    
+
     body1_in_body2_mask = isinstance(body1, tuple(body2.collision_mask))
     body2_in_body1_mask = isinstance(body2, tuple(body1.collision_mask))
     

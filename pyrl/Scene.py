@@ -36,9 +36,7 @@ class Scene:
     def get_scene_as_array(self):
         img_arr_t = np.array(pygame.surfarray.array3d(self.screen))
         img_arr = np.swapaxes(img_arr_t, 0, 1)
-        resized = imresize(img_arr, (84, 84), 'bilinear')
-        single_channel = resized[:,:,0]
-        return single_channel
+        return img_arr
     
     def add_object(self, obj):
         if isinstance(obj, Disc):
@@ -151,14 +149,3 @@ class Scene:
                 obj.draw()
         
         pygame.display.update()
-
-#    draw() {
-#        ctx.fillStyle = bgColor
-#        ctx.fillRect(0, 0, cWidth, cHeight)
-#        for (let objectKey in self.objects) {
-#            let objectList = self.objects[objectKey]
-#            for (let object of objectList) {
-#                object.draw()
-#            }
-#        }
-#    }

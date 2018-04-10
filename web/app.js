@@ -54,10 +54,10 @@ var postRadius = 8.5;
 var scaleH = 0.20;
 var scaleW = 0.20;
 //
-var env = new Environment( /*render*/ true, /*sound*/ false, /*resetDelay*/ false, /*randomStart*/ true);
-//env.addAgent(new HumanAgent(Side.blue, "w", "s", "a", "d", "q"));
-env.addAgent(new HumanAgent("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "x"), Side.red);
-env.addAgent(new ANNAgent(), Side.blue);
+var env = new Environment( /*render*/ true, /*sound*/ false, /*resetDelay*/ true, /*randomStart*/ true);
+env.addAgent(new HumanAgent("w", "s", "a", "d", "q"), Side.red);
+env.addAgent(new HumanAgent("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "."), Side.blue);
+//env.addAgent(new ANNAgent(), Side.blue);
 //env.linkAgentsExperience();
 
 env.draw();

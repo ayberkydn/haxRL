@@ -1,7 +1,7 @@
 import numpy as np
 from collections import deque
 
-class ExperienceReplay():
+class ExperienceReplay:
     def __init__(self, capacity):
         self.replay = deque(maxlen = capacity)
         

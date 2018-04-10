@@ -12,5 +12,6 @@ class StateSequence:
         self.states = np.concatenate([self.states, state], axis = -1)
         self.states = np.delete(self.states, 0, -1)
         assert self.states.shape == tuple(self.shape)
+        
     def get_sequence(self):
         return self.states[:]
