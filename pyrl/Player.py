@@ -22,37 +22,38 @@ class Player(Disc):
         self.kicker = Kicker(self, kick_power)
 
     def apply_action(self, action):
+        
         assert isinstance(action, Action)
         if action == Action.up:
             self.apply_force(UnitVec.up)
             self.kicker.deactivate()
             
-        elif action == Action.upleft:
-            self.apply_force(UnitVec.upleft)
+        elif action == Action.upforward:
+            self.apply_force(UnitVec.upright if self.side == Side.red else UnitVec.upleft)
             self.kicker.deactivate()
         
-        elif action == Action.left:
-            self.apply_force(UnitVec.left)
+        elif action == Action.forward:
+            self.apply_force(UnitVec.right if self.side == Side.red else UnitVec.left)
             self.kicker.deactivate()
 
-        elif action == Action.downleft:
-            self.apply_force(UnitVec.downleft)
+        elif action == Action.downforward:
+            self.apply_force(UnitVec.downright if self.side == Side.red else UnitVec.downleft)
             self.kicker.deactivate()
 
         elif action == Action.down:
             self.apply_force(UnitVec.down)
             self.kicker.deactivate()
 
-        elif action == Action.downright:
-            self.apply_force(UnitVec.downright)
+        elif action == Action.downbackward:
+            self.apply_force(UnitVec.downleft if self.side == Side.red else UnitVec.downright)
             self.kicker.deactivate()
 
-        elif action == Action.right:
-            self.apply_force(UnitVec.right)
+        elif action == Action.backward:
+            self.apply_force(UnitVec.left if self.side == Side.red else UnitVec.right)
             self.kicker.deactivate()
 
-        elif action == Action.upright:
-            self.apply_force(UnitVec.upright)
+        elif action == Action.upbackward:
+            self.apply_force(UnitVec.upleft if self.side == Side.red else UnitVec.upright)
             self.kicker.deactivate()
 
         elif action == Action.nomove:
@@ -62,15 +63,15 @@ class Player(Disc):
             self.apply_force(UnitVec.up)
             self.kicker.activate()
             
-        elif action == Action.upleftshoot:
+        elif action == Action.upforwardshoot:
             self.apply_force(UnitVec.upright if self.side == Side.red else UnitVec.upleft)
             self.kicker.activate()
         
-        elif action == Action.leftshoot:
+        elif action == Action.forwardshoot:
             self.apply_force(UnitVec.right if self.side == Side.red else UnitVec.left)
             self.kicker.activate()
 
-        elif action == Action.downleftshoot:
+        elif action == Action.downforwardshoot:
             self.apply_force(UnitVec.downright if self.side == Side.red else UnitVec.downleft)
             self.kicker.activate()
 
@@ -78,50 +79,51 @@ class Player(Disc):
             self.apply_force(UnitVec.down)
             self.kicker.activate()
 
-        elif action == Action.downrightshoot:
+        elif action == Action.downbackwardshoot:
             self.apply_force(UnitVec.downleft if self.side == Side.red else UnitVec.downright)
             self.kicker.activate()
 
-        elif action == Action.rightshoot:
+        elif action == Action.backwardshoot:
             self.apply_force(UnitVec.left if self.side == Side.red else UnitVec.right)
             self.kicker.activate()
 
-        elif action == Action.uprightshoot:
+        elif action == Action.upbackwardshoot:
             self.apply_force(UnitVec.upleft if self.side == Side.red else UnitVec.upright)
             self.kicker.activate()
             
         elif action == Action.nomoveshoot:
             self.kicker.activate()
+
 #        if action == Action.up:
 #            self.apply_force(UnitVec.up)
 #            self.kicker.deactivate()
 #            
-#        elif action == Action.upforward:
-#            self.apply_force(UnitVec.upright if self.side == Side.red else UnitVec.upleft)
+#        elif action == Action.upleft:
+#            self.apply_force(UnitVec.upleft)
 #            self.kicker.deactivate()
 #        
-#        elif action == Action.forward:
-#            self.apply_force(UnitVec.right if self.side == Side.red else UnitVec.left)
+#        elif action == Action.left:
+#            self.apply_force(UnitVec.left)
 #            self.kicker.deactivate()
 #
-#        elif action == Action.downforward:
-#            self.apply_force(UnitVec.downright if self.side == Side.red else UnitVec.downleft)
+#        elif action == Action.downleft:
+#            self.apply_force(UnitVec.downleft)
 #            self.kicker.deactivate()
 #
 #        elif action == Action.down:
 #            self.apply_force(UnitVec.down)
 #            self.kicker.deactivate()
 #
-#        elif action == Action.downbackward:
-#            self.apply_force(UnitVec.downleft if self.side == Side.red else UnitVec.downright)
+#        elif action == Action.downright:
+#            self.apply_force(UnitVec.downright)
 #            self.kicker.deactivate()
 #
-#        elif action == Action.backward:
-#            self.apply_force(UnitVec.left if self.side == Side.red else UnitVec.right)
+#        elif action == Action.right:
+#            self.apply_force(UnitVec.right)
 #            self.kicker.deactivate()
 #
-#        elif action == Action.upbackward:
-#            self.apply_force(UnitVec.upleft if self.side == Side.red else UnitVec.upright)
+#        elif action == Action.upright:
+#            self.apply_force(UnitVec.upright)
 #            self.kicker.deactivate()
 #
 #        elif action == Action.nomove:
@@ -131,36 +133,37 @@ class Player(Disc):
 #            self.apply_force(UnitVec.up)
 #            self.kicker.activate()
 #            
-#        elif action == Action.upforwardshoot:
-#            self.apply_force(UnitVec.upright if self.side == Side.red else UnitVec.upleft)
+#        elif action == Action.upleftshoot:
+#            self.apply_force(UnitVec.upleft)
 #            self.kicker.activate()
 #        
-#        elif action == Action.forwardshoot:
-#            self.apply_force(UnitVec.right if self.side == Side.red else UnitVec.left)
+#        elif action == Action.leftshoot:
+#            self.apply_force(UnitVec.left)
 #            self.kicker.activate()
 #
-#        elif action == Action.downforwardshoot:
-#            self.apply_force(UnitVec.downright if self.side == Side.red else UnitVec.downleft)
+#        elif action == Action.downleftshoot:
+#            self.apply_force(UnitVec.downleft)
 #            self.kicker.activate()
 #
 #        elif action == Action.downshoot:
 #            self.apply_force(UnitVec.down)
 #            self.kicker.activate()
 #
-#        elif action == Action.downbackwardshoot:
-#            self.apply_force(UnitVec.downleft if self.side == Side.red else UnitVec.downright)
+#        elif action == Action.downrightshoot:
+#            self.apply_force(UnitVec.downright)
 #            self.kicker.activate()
 #
-#        elif action == Action.backwardshoot:
-#            self.apply_force(UnitVec.left if self.side == Side.red else UnitVec.right)
+#        elif action == Action.rightshoot:
+#            self.apply_force(UnitVec.right)
 #            self.kicker.activate()
 #
-#        elif action == Action.upbackwardshoot:
-#            self.apply_force(UnitVec.upleft if self.side == Side.red else UnitVec.upright)
+#        elif action == Action.uprightshoot:
+#            self.apply_force(UnitVec.upright)
 #            self.kicker.activate()
 #            
 #        elif action == Action.nomoveshoot:
 #            self.kicker.activate()
+#            
             
             
 

@@ -7,8 +7,8 @@ class ColorHex:
     border = "#C7E6BD"
 
 class Color:
-    red = (229, 110, 86)
-    blue = (86, 137, 229)
+    red = (229, 125, 86)
+    blue = (86, 125, 229)
     green = (104, 143, 86)
     black = (0, 0, 0)
     white = (255, 255, 255)

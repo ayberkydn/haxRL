@@ -1,17 +1,24 @@
-from collections import deque
 import numpy as np
 class StateSequence:
-    def __init__(self, shape):
+    def __init__(self, shape, length, format = "HWC"):
         self.shape = shape
-        self.states = np.zeros(shape)
+        self.format = format
+        if format == "HWC":
+            self.states = np.zeros([*shape, length])
+        elif format == "CHW":
+            self.states = np.zeros([length, *shape])
         
-    def append_state(self, state):
-        if (state.shape[:] == self.states.shape[:-1]):
-            state = np.expand_dims(state, -1)
+    def append_obs(self, obs):
+        assert len(obs.shape) < 3
+        if self.format == "HWC":    
+            obs = np.expand_dims(obs, -1)
+            self.states = np.append(self.states, obs, axis = -1)
+            self.states = self.states[:, :, 1:]
+        elif self.format == "CHW":
+            obs = np.expand_dims(obs, 0)
+            self.states = np.append(self.states, obs, axis = 0)
+            self.states = self.states[1:, :, :]
             
-        self.states = np.concatenate([self.states, state], axis = -1)
-        self.states = np.delete(self.states, 0, -1)
-        assert self.states.shape == tuple(self.shape)
         
     def get_sequence(self):
         return self.states[:]
