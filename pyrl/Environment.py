@@ -32,11 +32,12 @@ class HaxballEnvironment :
         self.step_limit = step_limit
         self.state_output_mode = state_output_mode
         self.rendering = rendering
+        self.ball_idle = 0
         if state_output_mode == 'pixels': self.rendering = True
         self.step_count = 0
         self.random_start = random_start
         self.action_repeat = action_repeat
-        self.episode_end_checker = lambda : (self.scene.check_goals() or self.step_count >= step_limit)
+        self.episode_end_checker = lambda : (self.scene.check_goals() or self.step_count >= step_limit) or self.ball_idle > 100
         
     
         self.scene =  Scene(c_width, c_height)
@@ -82,6 +83,9 @@ class HaxballEnvironment :
 
         if self.rendering == True:
             self.render()
+            
+        if self.ball.velocity.magnitude() < 0.1:
+            self.ball_idle += 1
         
         return self._get_state_reward_done_info()
     
@@ -91,7 +95,7 @@ class HaxballEnvironment :
         
     def reset(self):
         self.scene.reset()
-        
+        self.ball_idle = 0
         self.episode_end = False
         if (self.random_start) :
             self.scene.meta_objects['balls'][0].apply_impulse(Vector(random.random() - 0.5, random.random() - 0.5).mult(20))
@@ -162,7 +166,8 @@ class HaxballEnvironment :
     def _calculate_info(self):
         info = {
             "goal": [0, 0],
-            "ball_at_side": 0
+            "ball_at_side": -1,
+            "closer_player_to_ball": -1
         }
         
         
@@ -170,6 +175,8 @@ class HaxballEnvironment :
             info['ball_at_side'] = 1
         elif self.ball.center.x < c_width / 2:
             info['ball_at_side'] = 0
+        else:
+            info['ball_at_side'] = -1
         
         if self.scene.check_goals():
             if info['ball_at_side'] == 1:
@@ -177,6 +184,10 @@ class HaxballEnvironment :
             elif info['ball_at_side'] == 1:
                 info['goal'][1] = 1
         
+        if Vector.dist(self.player1.center, self.ball.center) < Vector.dist(self.player2.center, self.ball.center):
+            info["closer_player_to_ball"] = 0
+        else:
+            info["closer_player_to_ball"] = 1
         return info
         
         

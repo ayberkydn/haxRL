@@ -35,6 +35,8 @@ class Match:
             winner = 1
         elif info['ball_at_side'] == 1:
             winner = 0
+        else: #ball at center
+            winner = info['closer_player_to_ball']
         
         env.close()
         return winner
