@@ -21,17 +21,10 @@ class ConvLayer extends Layer {
             this.setInputShape(inputShape);
         }
 
+
     }
 
-
-
     setInputShape(inputShape) {
-
-        if (this.W && this.b) {
-            this.W.dispose();
-            this.b.dispose();
-        }
-
         if (inputShape.length != 3) {
             throw `Can't construct convolutional layer. Input shape = ${inputShape} must be [height, width, channel] format.`;
         }

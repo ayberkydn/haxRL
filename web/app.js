@@ -11,11 +11,6 @@
 //-networke input shape init
 
 
-
-dl.setBackend("webgl");
-
-
-
 // Gets the handles for rendering
 var canvas = document.getElementById("gameCanvas");
 var canvas2 = document.getElementById("agentVisionCanvas");
@@ -54,11 +49,10 @@ var postRadius = 8.5;
 var scaleH = 0.20;
 var scaleW = 0.20;
 //
-var env = new Environment( /*render*/ true, /*sound*/ false, /*resetDelay*/ true, /*randomStart*/ true);
+var env = new Environment( /*render*/ true, /*sound*/ true, /*resetDelay*/ true, /*randomStart*/ false);
 env.addAgent(new HumanAgent("w", "s", "a", "d", "q"), Side.red);
-env.addAgent(new HumanAgent("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "."), Side.blue);
-//env.addAgent(new ANNAgent(), Side.blue);
-//env.linkAgentsExperience();
+//env.addAgent(new HumanAgent("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "."), Side.blue);
+env.addAgent(new HumanAgent("8", "5", "4", "6", "0"), Side.blue);
 
 env.draw();
 
@@ -66,21 +60,3 @@ env.draw();
 setInterval(() => {
     env.update();
 }, 30);
-
-
-/*
-
- for (let n = 0; n < 500; n++) {
-     env.draw();
-     env.update();
- }
- let t1 = performance.now();
- for (let n = 0; n < 5000; n++) {
-     env.draw();
-     env.update();
- }
-
- let t2 = performance.now();
-
- console.log(t2 / 5000 - t1 / 5000, "ms per frame");
-*/

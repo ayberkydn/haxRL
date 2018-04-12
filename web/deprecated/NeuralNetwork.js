@@ -18,10 +18,6 @@ class NeuralNetwork {
         this.layers = [];
     }
 
-    copyFrom(nn2) {
-
-    }
-
     addLayer(layer) {
         if (this.layers.length == 0) {
             layer.setInputShape(this.inputShape);
@@ -32,6 +28,7 @@ class NeuralNetwork {
         return this;
 
     }
+
 
     copyWeightsFrom(nn2) {
         if (this.layers.length != nn2.layers.length) {
