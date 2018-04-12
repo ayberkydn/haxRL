@@ -1,5 +1,6 @@
 from Population import Population
 from GeneticAgent import GeneticAgent
+from Models import ANN, DQN
 import multiprocessing as mp
 
 class GeneticPlatform:
@@ -17,6 +18,9 @@ class GeneticPlatform:
             next_gen.add_member(offspring)
             next_gen.add_member(offspring.copy().mutate(0.3))
             next_gen.add_member(offspring.copy().mutate(1))
+            
+#            next_gen.add_member(GeneticAgent(model = DQN()))
+            next_gen.add_member(GeneticAgent(model = ANN()))
             
         self.generation = next_gen
         
@@ -46,6 +50,9 @@ class GeneticPlatformAsync:
             next_gen.add_member(offspring)
             next_gen.add_member(offspring.copy().mutate(0.3))
             next_gen.add_member(offspring.copy().mutate(1))
+
+#            next_gen.add_member(GeneticAgent(model = DQN()))
+            next_gen.add_member(GeneticAgent(model = ANN()))
             
 
         self.generation = next_gen

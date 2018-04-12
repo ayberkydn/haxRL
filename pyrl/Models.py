@@ -9,11 +9,14 @@ class ANN(nn.Module):
 
         self.input_shape = [4, 6]
         self.input_size = self.input_shape[0] * self.input_shape[1]
-        self.hidden_size = 200
+        self.hidden_size = 300
         self.output_size = 5
         
         
         self.fc1 = nn.Linear(self.input_size, self.hidden_size)
+        self.fc2 = nn.Linear(self.hidden_size, self.hidden_size)
+        self.fc3 = nn.Linear(self.hidden_size, self.hidden_size)
+        self.fc4 = nn.Linear(self.hidden_size, self.hidden_size)
         self.out= nn.Linear(self.hidden_size, self.output_size)
         
         for param in self.parameters():
@@ -23,7 +26,13 @@ class ANN(nn.Module):
         x = x.contiguous()
         x = x.view(x.size(0), -1)
         x = self.fc1(x)
-        x = F.tanh(x)
+        x = F.relu(x)
+        x = self.fc2(x)
+        x = F.relu(x)
+        x = self.fc3(x)
+        x = F.relu(x)
+        x = self.fc4(x)
+        x = F.relu(x)
         x = self.out(x)
         return x
     
