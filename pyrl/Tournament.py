@@ -13,7 +13,6 @@ class Tournament:
                 else:
                     match = Match(self.participants[n], self.participants[i])
                     winner_bool = match.play()
-                    print("winner is {}".format(winner_bool))
                     if winner_bool == 0:
                         self.points[n] += 1
                     elif winner_bool == 1:
@@ -22,5 +21,4 @@ class Tournament:
                         raise Exception
         
         print(self.points)
-        print("Tournament winner is {}".format(np.argmax(self.points)))
         return self.participants[np.argmax(self.points)]

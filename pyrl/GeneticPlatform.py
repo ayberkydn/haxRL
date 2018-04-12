@@ -22,6 +22,7 @@ class GeneticPlatform:
 #            next_gen.add_member(GeneticAgent(model = DQN()))
             next_gen.add_member(GeneticAgent(model = ANN()))
             
+        self.generation_no += 1
         self.generation = next_gen
         
 
@@ -34,6 +35,9 @@ class GeneticPlatformAsync:
         
     
     def progress_gen(self):
+        print("Generation: {}".format(self.generation_no))
+        print("Generation size: {}".format(self.generation.size))
+        
         next_gen = Population(0)
         
         while next_gen.size < self.generation.size:        
@@ -53,8 +57,9 @@ class GeneticPlatformAsync:
 
 #            next_gen.add_member(GeneticAgent(model = DQN()))
             next_gen.add_member(GeneticAgent(model = ANN()))
+            print("Creating generation {}: {}/{}".format(self.generation_no + 1, next_gen.size, self.generation.size))
             
-
+        self.generation_no += 1
         self.generation = next_gen
         
         
@@ -62,6 +67,3 @@ class GeneticPlatformAsync:
         
         
         
-platform = GeneticPlatformAsync(50)
-for n in range(500):
-    platform.progress_gen()

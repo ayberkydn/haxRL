@@ -1,6 +1,6 @@
-
-from GeneticPlatform import GeneticPlatform
+from GeneticPlatform import GeneticPlatformAsync
         
-platform = GeneticPlatform(15)
+
+platform = GeneticPlatformAsync(5)
 for n in range(500):
     platform.progress_gen()
