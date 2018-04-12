@@ -3,6 +3,8 @@ from Tournament import Tournament
 from Models import ANN, DQN
 import numpy as np
 import random
+from queue import Queue
+import multiprocessing as mp
 
 class Population:
     def __init__(self, size):
@@ -23,10 +25,4 @@ class Population:
         
         return winner
         
-    def create_offspring_async(self, output):
-        random.seed()
-        np.random.seed()
-        tournament = Tournament(np.random.choice(self.members, 4))
-        winner = tournament.conduct()
-        print("tournament started")
-        output.put(winner)
+        

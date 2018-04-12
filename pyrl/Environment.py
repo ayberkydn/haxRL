@@ -27,9 +27,10 @@ player_damping, player_kick_damping, player_kick_power
         
         
 class HaxballEnvironment :
-    def __init__(self, random_start = False, step_limit = 500, state_output_mode = 'locations', rendering = True, action_repeat=4):
+    def __init__(self, random_start = False, step_limit = 500, ball_idle_limit = 50, state_output_mode = 'locations', rendering = True, action_repeat=4):
         #self.episode_endChecker = () => (self.scene.check_goals() && !self.episode_end)
         self.step_limit = step_limit
+        self.ball_idle_limit = ball_idle_limit
         self.state_output_mode = state_output_mode
         self.rendering = rendering
         self.ball_idle = 0
@@ -37,7 +38,7 @@ class HaxballEnvironment :
         self.step_count = 0
         self.random_start = random_start
         self.action_repeat = action_repeat
-        self.episode_end_checker = lambda : (self.scene.check_goals() or self.step_count >= step_limit) or self.ball_idle > 100
+        self.episode_end_checker = lambda : (self.scene.check_goals() or self.step_count >= step_limit) or self.ball_idle > self.ball_idle_limit
         
     
         self.scene =  Scene(c_width, c_height)

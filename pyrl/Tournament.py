@@ -20,5 +20,4 @@ class Tournament:
                     else:
                         raise Exception
         
-        print(self.points)
         return self.participants[np.argmax(self.points)]
