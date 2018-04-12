@@ -6,10 +6,16 @@ class Match:
         self.member2 = member2
         
     def play(self):
-        env = HaxballEnvironment(random_start = False, step_limit=5000, state_output_mode='pixels', rendering=True)
+#        env = HaxballEnvironment(random_start = False, step_limit=5000, state_output_mode='pixels', rendering=False)
+#        state_seq1 = StateSequence([84,84], 4, "CHW")
+#        state_seq2 = StateSequence([84,84], 4, "CHW")
+
+        env = HaxballEnvironment(random_start = False, step_limit=5000, state_output_mode='locations', rendering=True)
+        state_seq1 = StateSequence([6], 4, "FC")
+        state_seq2 = StateSequence([6], 4, "FC")
+        
         done = False
-        state_seq1 = StateSequence([84,84], 4, "CHW")
-        state_seq2 = StateSequence([84,84], 4, "CHW")
+        
         obs1, obs2 = env.reset()
         state_seq1.append_obs(obs1)
         state_seq2.append_obs(obs2)
@@ -20,9 +26,12 @@ class Match:
             obs, _, done, info = env.step(action1, action2)
             obs1 = obs[0]
             obs2 = obs[1]
-            
-            state_seq1.append_obs(obs1 / 255)
-            state_seq2.append_obs(obs2 / 255)
+#            
+#            state_seq1.append_obs(obs1 / 255)
+#            state_seq2.append_obs(obs2 / 255)
+#            
+            state_seq1.append_obs(obs1)
+            state_seq2.append_obs(obs2)
         
             if info['goal'][0] == True:
                 winner = 0

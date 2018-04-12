@@ -2,13 +2,15 @@ from GeneticAgent import GeneticAgent
 from Tournament import Tournament
 from Models import ANN, DQN
 import numpy as np
+import random
 
 class Population:
     def __init__(self, size):
         self.members = []
         self.size = 0
         for n in range(size):
-            self.add_member(GeneticAgent(model = DQN()))
+            #self.add_member(GeneticAgent(model = DQN()))
+            self.add_member(GeneticAgent(model = ANN()))
             
     def add_member(self, member):
         self.members.append(member)
@@ -21,3 +23,10 @@ class Population:
         
         return winner
         
+    def create_offspring_async(self, output):
+        random.seed()
+        np.random.seed()
+        tournament = Tournament(np.random.choice(self.members, 4))
+        winner = tournament.conduct()
+        print("tournament started")
+        output.put(winner)

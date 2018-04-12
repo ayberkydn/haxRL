@@ -7,6 +7,8 @@ class StateSequence:
             self.states = np.zeros([*shape, length])
         elif format == "CHW":
             self.states = np.zeros([length, *shape])
+        elif format == "FC":
+            self.states = np.zeros([*shape, length])
         
     def append_obs(self, obs):
         assert len(obs.shape) < 3
@@ -18,7 +20,10 @@ class StateSequence:
             obs = np.expand_dims(obs, 0)
             self.states = np.append(self.states, obs, axis = 0)
             self.states = self.states[1:, :, :]
-            
+        elif self.format == "FC":
+            obs = np.expand_dims(obs, -1)
+            self.states = np.append(self.states, obs, axis = 1)
+            self.states = self.states[:, 1:]
         
     def get_sequence(self):
         return self.states[:]

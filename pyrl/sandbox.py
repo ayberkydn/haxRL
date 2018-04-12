@@ -1,4 +1,8 @@
-import tensorflow.contrib.eager as tfe
+from multiprocessing import Process
 
-tfe.enable_eager_execution()
+def f(name):
+    print('hello', name)
 
+p = Process(target=f, args=('bob',))
+p.start()
+p.join()

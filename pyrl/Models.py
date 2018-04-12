@@ -7,9 +7,11 @@ class ANN(nn.Module):
     def __init__(self):
         super().__init__()
 
-        self.input_size = 6
+        self.input_shape = [4, 6]
+        self.input_size = self.input_shape[0] * self.input_shape[1]
         self.hidden_size = 200
         self.output_size = 5
+        
         
         self.fc1 = nn.Linear(self.input_size, self.hidden_size)
         self.out= nn.Linear(self.hidden_size, self.output_size)
@@ -17,8 +19,9 @@ class ANN(nn.Module):
         for param in self.parameters():
             param.require_grad = False
         
-    def forward(self, input_tensor):
-        x = input_tensor
+    def forward(self, x):
+        x = x.contiguous()
+        x = x.view(x.size(0), -1)
         x = self.fc1(x)
         x = F.tanh(x)
         x = self.out(x)
