@@ -3,7 +3,7 @@ from collections import deque
 
 class ExperienceReplay:
     def __init__(self, capacity):
-        self.replay = deque(maxlen = capacity)
+        self.replay = deque(maxlen = int(capacity))
         
     def sample(self, batch_size):
         rand_ind = np.random.randint(0, len(self.replay), batch_size)
@@ -17,5 +17,3 @@ class ExperienceReplay:
         assert (type(exp) == tuple)        
         self.replay.append(exp)
             
-        
-    

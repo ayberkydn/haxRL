@@ -1,4 +1,4 @@
-from funcs import get_collision
+from utils import get_collision
 from Disc import Disc
 from Player import Player
 from Ball import Ball

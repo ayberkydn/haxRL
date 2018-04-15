@@ -3,6 +3,8 @@ from GeneticAgent import GeneticAgent
 from Models import ANN, DQN
 import multiprocessing as mp
 
+
+
 class GeneticPlatform:
     def __init__(self, pop_size):
         self.generation = Population(pop_size)
