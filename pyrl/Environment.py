@@ -195,8 +195,4 @@ class HaxballEnvironment :
     def close(self):
         pass
 
-        
 
-        
-        
-        

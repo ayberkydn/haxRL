@@ -7,6 +7,7 @@ class StateProcessor:
             self.output = tf.image.rgb_to_grayscale(self.input_state)
             self.output = tf.image.resize_images(self.output, [84, 84])
             self.output = tf.squeeze(self.output)
+            self.output = tf.cast(self.output, tf.uint8)
             
     def process(self, sess, state):
         return sess.run(self.output, {self.input_state: state})

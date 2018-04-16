@@ -12,7 +12,7 @@ class DQNPlatform:
     def __init__(self):
         self.env = gym.make("Pong-v0")
         self.env.unwrapped.frameskip = 4
-        self.exp_scale = 0.03
+        self.exp_scale = 0.1
         self.time_scale = 1
         self.frames_to_train = int(self.time_scale * 50000000)
         self.agent = DQNAgent(num_actions=self.env.action_space.n, 

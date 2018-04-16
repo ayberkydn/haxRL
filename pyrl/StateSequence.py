@@ -4,11 +4,11 @@ class StateSequence:
         self.shape = shape
         self.format = format
         if format == "HWC":
-            self.states = np.zeros([*shape, length])
+            self.states = np.zeros([*shape, length], dtype=np.uint8)
         elif format == "CHW":
-            self.states = np.zeros([length, *shape])
+            self.states = np.zeros([length, *shape], dtype=np.uint8)
         elif format == "FC":
-            self.states = np.zeros([*shape, length])
+            self.states = np.zeros([*shape, length], dtype=np.uint8)
         
     def append_obs(self, obs):
         assert len(obs.shape) < 3
