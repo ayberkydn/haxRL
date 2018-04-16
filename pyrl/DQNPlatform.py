@@ -14,7 +14,7 @@ class DQNPlatform:
         self.env.unwrapped.frameskip = 4
         self.exp_scale = 0.1
         self.time_scale = 1
-        self.frames_to_train = int(self.time_scale * 50000000)
+        self.frames_to_train = int(self.time_scale * 40000000)
         self.agent = DQNAgent(num_actions=self.env.action_space.n, 
                               experience_replay_capacity = 1000000 * self.exp_scale, 
                               frame_skip=self.env.unwrapped.frameskip, 
@@ -39,8 +39,6 @@ class DQNPlatform:
             state = self.sequence.get_sequence()
             action = self.agent.select_action(sess, state)
             obs, reward, done, info = self.env.step(action)
-            if reward == -1:
-                done = True
                 
             self.sequence.append_obs(self.processor.process(sess, obs))
             state_prime = self.sequence.get_sequence()
