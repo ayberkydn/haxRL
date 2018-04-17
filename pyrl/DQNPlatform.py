@@ -11,28 +11,28 @@ from time import sleep
 
 class DQNPlatform:
     def __init__(self):
-        self.env = gym.make("Pong-v0")
         self.frame_skip = 4
-        self.env.unwrapped.frameskip = self.frame_skip
-        self.env = PenaltyEnvironment() 
         self.exp_scale = 0.1
         self.time_scale = 1
         
         
-        self.frames_to_train = int(self.time_scale * 40000000)
+#        self.env = gym.make("Pong-v0")
+#        self.env.unwrapped.frameskip = self.frame_skip
+        self.env = PenaltyEnvironment() 
+        self.steps_to_train = int(self.time_scale * 5e7)
         self.agent = DQNAgent(num_actions=self.env.action_space.n, 
-                              experience_replay_capacity = 1000000 * self.exp_scale, 
+                              experience_replay_capacity = 1e6 * self.exp_scale, 
                               frame_skip=self.frame_skip, 
-                              starting_experience = 50000 * self.exp_scale, 
+                              starting_experience = 5e4 * self.exp_scale, 
                               discount = 0.99, 
                               batch_size = 32, 
                               update_frequency = 4 * self.time_scale, 
-                              target_update_frequency = 10000 * self.time_scale, 
+                              target_update_frequency = 1e4 * self.time_scale, 
                               starting_epsilon = 1, 
                               final_epsilon = 0.1,
-                              final_epsilon_frame = 1000000 * self.time_scale)
+                              final_epsilon_step = 1e6 * self.time_scale)
         
-        self.frames_played = 0
+        self.steps_played = 0
         self.env.reset()
         self.sequence = StateSequence([84, 84], 4)
         self.processor = StateProcessor()
@@ -40,7 +40,7 @@ class DQNPlatform:
 
 
     def train(self, sess):
-        for n in range(self.frames_to_train // self.frame_skip):
+        for n in range(self.steps_to_train):
             state = self.sequence.get_sequence()
             action = self.agent.select_action(sess, state)
             obs, reward, done, info = self.env.step(action)
@@ -52,9 +52,9 @@ class DQNPlatform:
             self.env.render()
             if done:
                 self.env.reset()
-            self.frames_played += self.frame_skip
+            self.steps_played += 1
             if n % 10000 == 0:
-                print(self.frames_played / self.frames_to_train * 100, "%")
+                print(self.steps_played / self.steps_to_train * 100, "%")
         
     def test(self, sess):
         self.agent.epsilon = 0

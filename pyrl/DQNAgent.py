@@ -15,7 +15,7 @@ class DQNAgent:
                  target_update_frequency,
                  starting_epsilon,
                  final_epsilon,
-                 final_epsilon_frame
+                 final_epsilon_step
                  ):
         self.num_actions = num_actions
         self.model = DQN("value_network", num_actions)
@@ -31,8 +31,8 @@ class DQNAgent:
         self.target_update_frequency = target_update_frequency
         self.starting_epsilon = starting_epsilon
         self.final_epsilon = final_epsilon
-        self.final_epsilon_frame = final_epsilon_frame
-        self.epsilon_annealing_rate = (self.final_epsilon - self.starting_epsilon) / (self.final_epsilon_frame * self.frame_skip)
+        self.final_epsilon_step = final_epsilon_step
+        self.epsilon_annealing_rate = (self.final_epsilon - self.starting_epsilon) / (self.final_epsilon_step * self.frame_skip)
         
         self.epsilon = self.starting_epsilon
         self.learn_step = 0
