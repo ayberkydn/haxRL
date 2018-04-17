@@ -3,24 +3,24 @@ import numpy as np
 import gym
 import matplotlib.pyplot as plt
 from DQNAgent import DQNAgent
+from ANNAgent import ANNAgent
 from Environments import PenaltyEnvironment
 from StateSequence import StateSequence
 from StateProcessor import StateProcessor
 from time import sleep
 
 
-class DQNPlatform:
+class ANNPlatform:
     def __init__(self):
-        self.env = gym.make("Pong-v0")
+        self.env = gym.make("Pong-ram-v0")
         self.frame_skip = 4
         self.env.unwrapped.frameskip = self.frame_skip
-        self.env = PenaltyEnvironment() 
         self.exp_scale = 0.1
         self.time_scale = 1
         
         
         self.frames_to_train = int(self.time_scale * 40000000)
-        self.agent = DQNAgent(num_actions=self.env.action_space.n, 
+        self.agent = ANNAgent(num_actions=self.env.action_space.n, 
                               experience_replay_capacity = 1000000 * self.exp_scale, 
                               frame_skip=self.frame_skip, 
                               starting_experience = 50000 * self.exp_scale, 
@@ -34,8 +34,7 @@ class DQNPlatform:
         
         self.frames_played = 0
         self.env.reset()
-        self.sequence = StateSequence([84, 84], 4)
-        self.processor = StateProcessor()
+        self.sequence = StateSequence([128], 4, "FC")
 
 
 
@@ -45,7 +44,7 @@ class DQNPlatform:
             action = self.agent.select_action(sess, state)
             obs, reward, done, info = self.env.step(action)
                 
-            self.sequence.append_obs(self.processor.process(sess, obs))
+            self.sequence.append_obs(obs)
             state_prime = self.sequence.get_sequence()
             self.agent.learn(sess, state, action, reward, state_prime, done)
 

@@ -14,6 +14,7 @@ from Action import Action
 from Side import Side
 import numpy as np
 from scipy.misc import imresize
+from ActionSpace import ActionSpace
 from config import c_width, c_height, middle_field_radius, topbottom_margin, \
 leftright_margin, border_restitution, goal_length, ball_radius, ball_mass, \
 ball_restitution, ball_damping, player_radius, player_mass, player_restitution, \
@@ -27,19 +28,19 @@ player_damping, player_kick_damping, player_kick_power
         
         
 class HaxballEnvironment :
-    def __init__(self, random_start = False, step_limit = 500, ball_idle_limit = 50, state_output_mode = 'locations', rendering = True, action_repeat=4):
-        #self.episode_endChecker = () => (self.scene.check_goals() && !self.episode_end)
+    def __init__(self, random_start = False, step_limit = 500, ball_idle_limit = 50, state_output_mode = 'locations', rendering = True, frame_skip=4):
+        self.action_space = ActionSpace([Action.up, Action.down, Action.forward, Action.backward])
         self.step_limit = step_limit
         self.ball_idle_limit = ball_idle_limit
         self.state_output_mode = state_output_mode
         self.rendering = rendering
         self.ball_idle = 0
+        self.step_limit = step_limit
         if state_output_mode == 'pixels': self.rendering = True
         self.step_count = 0
         self.random_start = random_start
-        self.action_repeat = action_repeat
-        self.episode_end_checker = lambda : (self.scene.check_goals() or self.step_count >= step_limit) or self.ball_idle > self.ball_idle_limit
-        
+        self.frame_skip = frame_skip
+    
     
         self.scene =  Scene(c_width, c_height)
         self.scene.add_object(Box(5, c_width - 5, 5, c_height - 5, 0))
@@ -75,10 +76,9 @@ class HaxballEnvironment :
         
         
     def step(self, action_red, action_blue = -1):
-        actions = list(Action)
-        for n in range(self.action_repeat):
-            self.player1.apply_action(actions[action_red])
-            self.player2.apply_action(actions[action_blue])
+        for n in range(self.frame_skip):
+            self.player1.apply_action(self.action_space[action_red])
+            self.player2.apply_action(self.action_space[action_blue])
             self.scene.update()
             self.step_count += 1
 
@@ -87,6 +87,9 @@ class HaxballEnvironment :
             
         if self.ball.velocity.magnitude() < 0.1:
             self.ball_idle += 1
+        else:
+            self.ball_idle = 0
+
         
         return self._get_state_reward_done_info()
     
@@ -109,7 +112,7 @@ class HaxballEnvironment :
         state = self._calculate_state()
         reward = self._calculate_reward()
         
-        done = self.episode_end_checker()
+        done = self._calculate_done()
         
         info = self._calculate_info()
         
@@ -118,6 +121,9 @@ class HaxballEnvironment :
     
     def _calculate_reward(self):
         pass
+        
+    def _calculate_done(self):
+            return self.scene.check_goals() or self.step_count >= self.step_limit or self.ball_idle > self.ball_idle_limit
         
     def _calculate_state(self):
         if self.state_output_mode == 'locations':    
@@ -196,3 +202,91 @@ class HaxballEnvironment :
         pass
 
 
+
+class PenaltyEnvironment:
+    def __init__(self, frame_skip = 2):
+        
+        height = 400
+        width = 600
+        goal_length = 300
+        self.scene =  Scene(width, height)
+        self.frame_skip = frame_skip
+        self.ball_idle = 0
+        self.ball_idle_limit = 3
+
+        self.action_space = ActionSpace([Action.up, Action.down, Action.nomoveshoot])
+       
+        self.box = Box(0, width, 0, height, 0)
+        self.goal1 = Goal(leftright_margin, height / 2, Way.left, goal_length)
+
+        self.player1 = Player(80, height / 2, player_radius, player_mass, \
+                                     player_restitution, player_damping, player_kick_damping, player_kick_power, Side.red)
+       
+       
+        self.ball = Ball(width - 100, height / 2, ball_radius, ball_mass, ball_restitution, ball_damping)
+        self.penalty_spot = Disc(self.ball.center.x, self.ball.center.y, 4, 0, 0, 0, Color.green).make_ghost().make_hollow()
+#        self.player_border_left = VerticalBorder(50, height / 2, height, 0, visible=True)
+#        self.player_border_right = VerticalBorder(100, height / 2, height, 0, visible=True)
+        
+        self.scene.add_object(self.goal1)
+        self.scene.add_object(self.player1)
+        self.scene.add_object(self.ball)
+        self.scene.add_object(self.penalty_spot)
+        self.scene.add_object(self.box)
+        self.reset()
+
+#        self.scene.add_object(self.player_border_left)
+#        self.scene.add_object(self.player_border_right)
+
+    def step(self, action=1):
+        for n in range(self.frame_skip):
+            self.player1.apply_action(self.action_space[action])
+            self.scene.update()
+        
+        if self.ball.velocity.magnitude() < 0.5:
+            self.ball_idle += 1
+            
+        return self._get_state_reward_done_info()
+
+    def reset(self):
+        self.scene.reset()
+        self.ball.apply_impulse(Vector(-25, random.random() * 16 - 8))
+        self.ball_idle = 0
+        
+        
+    def render(self):
+        self.scene.draw()
+        
+    
+    def _get_state_reward_done_info(self):
+        state = self._calculate_state()
+        reward = self._calculate_reward()
+        
+        done = self._calculate_done()
+        
+        info = self._calculate_info()
+        
+        return [state, reward, done, info]
+    
+    
+    def _calculate_state(self):
+        self.scene.draw()
+        obs = self.scene.get_scene_as_array()
+        return imresize(obs, [210,160])
+        
+    
+    def _calculate_reward(self):
+        if self.scene.check_goals():
+            return -1
+        elif self.ball_idle > self.ball_idle_limit:
+            return 1
+        else:
+            return 0
+    
+        
+    def _calculate_done(self):
+            return self.scene.check_goals() or self.ball_idle > self.ball_idle_limit
+        
+    
+    def _calculate_info(self):
+        return {}

@@ -96,9 +96,8 @@ class DQNAgent:
         
         target_model_output_on_ss = self.target_model.predict(sess, ss_batch)
         y_batch = r_batch + self.discount * np.max(target_model_output_on_ss, axis=1) * (1 - t_batch)
-
-
-        self.model.train_step(sess, s_batch, a_batch, y_batch)
+        loss = self.model.train_step(sess, s_batch, a_batch, y_batch)
+        print(loss)
         
         if self.learn_step % self.target_update_frequency == 0:
             self.model_parameters_copier.copy(sess)

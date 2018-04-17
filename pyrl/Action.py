@@ -3,9 +3,9 @@ class Action(Enum):
     
     up = "ACTION_UP"
     down = "ACTION_DOWN"
+    nomoveshoot = "ACTION_NOMOVE_SHOOT"
     forward = "ACTION_FORWARD"
     backward = "ACTION_BACKWARD"
-    nomoveshoot = "ACTION_NOMOVE_SHOOT"
     upforward = "ACTION_UP_FORWARD"
     downforward = "ACTION_DOWN_FORWARD"
     upbackward = "ACTION_UP_BACKWARD"

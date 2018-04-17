@@ -1,31 +1,28 @@
 import tensorflow as tf
 import numpy as np
-class DQN:
-    def __init__(self, scope, num_actions):
+class ANN:
+    def __init__(self, scope, input_shape, num_actions):
         self.scope = scope
+        self.input_shape = input_shape
         self.num_actions = num_actions
         with tf.variable_scope(scope):
             self._build_model()
             
 
     def _build_model(self):
-        self.X_pl = tf.placeholder(shape = [None, 84, 84, 4], dtype=tf.uint8, name="X")
+        self.X_pl = tf.placeholder(shape = [None, *self.input_shape], dtype=tf.uint8, name="X")
         self.y_pl = tf.placeholder(shape = [None], dtype=tf.float32, name="y")
-        self.actions_pl = tf.placeholder(shape=[None], dtype=tf.int32, name="actions")
+        self.actions_pl = tf.placeholder(shape = [None], dtype=tf.int32, name="actions")
         
         X = tf.to_float(self.X_pl) / 255.0
         batch_size = tf.shape(self.X_pl)[0]
         
-        conv1 = tf.layers.conv2d(
-            X, 32, 8, 4, activation=tf.nn.relu)
-        conv2 = tf.layers.conv2d(
-            conv1, 64, 4, 2, activation=tf.nn.relu)
-        conv3 = tf.layers.conv2d(
-            conv2, 64, 3, 1, activation=tf.nn.relu)
-
-        flattened = tf.layers.flatten(conv3)
-        fc1 = tf.layers.dense(flattened, 512)
-        self.predictions = tf.layers.dense(fc1, self.num_actions) 
+        flattened = tf.layers.flatten(X)
+        hidden1 = tf.layers.dense(inputs = flattened, units = 256, activation=tf.nn.relu)
+        hidden2 = tf.layers.dense(inputs = hidden1, units = 256, activation=tf.nn.relu)
+        hidden3 = tf.layers.dense(inputs = hidden2, units = 256, activation=tf.nn.relu)
+        
+        self.predictions = tf.layers.dense(inputs=hidden3, units=self.num_actions) 
         
         self.gather_indices = tf.range(batch_size) * tf.shape(self.predictions)[1] + self.actions_pl ##############deneme
         self.action_predictions = tf.gather(tf.reshape(self.predictions, [-1]), self.gather_indices)
@@ -38,7 +35,7 @@ class DQN:
         self.train_op = self.optimizer.minimize(self.loss)
         
     def predict(self, sess, s):
-        if len(s.shape) == 3:
+        if len(s.shape) == 2:
             s = np.expand_dims(s, 0)
         return sess.run(self.predictions, {self.X_pl: s})
     
@@ -50,4 +47,3 @@ class DQN:
         _, loss = sess.run([self.train_op, self.loss], feed_dict)
         return loss
         
-

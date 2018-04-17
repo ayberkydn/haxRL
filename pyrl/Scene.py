@@ -130,14 +130,13 @@ class Scene:
 
     def reset(self):
 
-        self.red_start_x = 100
-        self.blue_start_x = 700
-        self.meta_objects['players'][0].reset_position()
-        self.meta_objects['players'][0].velocity = self.meta_objects['players'][0].velocity.mult(0)
-        self.meta_objects['players'][1].reset_position()
-        self.meta_objects['players'][1].velocity = self.meta_objects['players'][1].velocity.mult(0)
-        self.meta_objects['balls'][0].reset_position()
-        self.meta_objects['balls'][0].velocity = self.meta_objects['balls'][0].velocity.mult(0)
+        for player in self.meta_objects['players']:
+            player.reset_position()
+            player.velocity = player.velocity.mult(0)
+
+        for ball in self.meta_objects['balls']:
+            ball.reset_position()
+            ball.velocity = ball.velocity.mult(0)
         
 
 
