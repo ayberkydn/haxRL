@@ -6,6 +6,7 @@ class Environment {
         this.randomStart = randomStart;
         this.agents = [];
         this.episodeEnd = false;
+        this.waitingForReset = false;
         //this.episodeEndChecker = () => (this.scene.checkGoals() && !this.episodeEnd);
         this.episode = 1;
         this.episodeEndChecker = () => (this.scene.checkGoals()) //|| this.step == 1000);
@@ -51,6 +52,7 @@ class Environment {
 
     resetScene() {
         this.scene.reset();
+        this.waitingForReset = false;
         this.episodeEnd = false;
         if (this.randomStart) {
             this.scene.metaObjects.balls[0].applyImpulse(new Vector(Math.random() - 0.5, Math.random() - 0.5).mult(20));
@@ -77,14 +79,22 @@ class Environment {
         }
 
         if (this.episodeEnd == true) {
+
             if (this.resetDelay) {
-                window.setTimeout(this.resetScene.bind(this), 2500);
+                if (this.waitingForReset == false) {
+                    window.setTimeout(this.resetScene.bind(this), 2500);
+                    if (this.sound == true) {
+                        new Audio("goalsound.mp3").play();
+                    }
+                    this.waitingForReset = true
+                }
+
             } else {
+                if (this.sound == true) {
+                    new Audio("goalsound.mp3").play();
+                }
                 this.resetScene();
-            }
-            if (this.sound == true) {
-                new Audio("goalsound.mp3").play();
-            }
+            } //such spaghetti much code wow, fix this
         }
 
         this.draw();
