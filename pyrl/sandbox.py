@@ -1,34 +1,12 @@
-import multiprocessing as mp
-import random
-import string
-
-random.seed(123)
-# Define an output queue
-output = mp.Queue()
-
-# define a example function
-def rand_string(output):
-    """ Generates a random string of numbers, lower- and uppercase chars. """
-    rand_str = ''.join(random.choice(
-                        string.ascii_lowercase
-                        + string.ascii_uppercase
-                        + string.digits)
-                   for i in range(5))
-    output.put(rand_str)
-
-# Setup a list of processes that we want to run
-processes = [mp.Process(target=rand_string, args=(output,)) for x in range(4)]
-
-# Run processes
-for p in processes:
-    p.start()
+import tensorflow as tf
+import numpy as np
+import gym
+from time import sleep
 
 
-# Exit the completed processes
-for p in processes:
-    p.join()
 
-results = [output.get() for p in processes]
-# Get process results from the output queue
+a = tf.range(8)
 
-print(results)
+sess = tf.InteractiveSession()
+
+a = sess.run(tf.nn.moments(a, 1))

@@ -1,14 +1,13 @@
 import numpy as np
 class StateSequence:
-    def __init__(self, shape, length, format = "HWC"):
-        self.shape = shape
+    def __init__(self, shape, format = "HWC"):
+        self.shape = shape[:-1]
+        self.length = shape[-1]
+        if len(shape) == 2:
+            format = "FC"
         self.format = format
-        if format == "HWC":
-            self.states = np.zeros([*shape, length], dtype=np.uint8)
-        elif format == "CHW":
-            self.states = np.zeros([length, *shape], dtype=np.uint8)
-        elif format == "FC":
-            self.states = np.zeros([*shape, length], dtype=np.uint8)
+        self.reset()
+        
         
     def append_obs(self, obs):
         assert len(obs.shape) < 3
@@ -24,6 +23,17 @@ class StateSequence:
             obs = np.expand_dims(obs, -1)
             self.states = np.append(self.states, obs, axis = 1)
             self.states = self.states[:, 1:]
+            
         
     def get_sequence(self):
         return self.states[:]
+    
+    
+    def reset(self):
+        if self.format == "HWC":
+            self.states = np.zeros([*self.shape, self.length], dtype=np.uint8)
+        elif self.format == "CHW":
+            self.states = np.zeros([self.length, *self.shape], dtype=np.uint8)
+        elif self.format == "FC":
+            self.states = np.zeros([*self.shape, self.length], dtype=np.uint8)
+        
