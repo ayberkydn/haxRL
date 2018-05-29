@@ -1,102 +1,117 @@
-from Hyperparameters import GAMMA, LAMBDA, RENDER, ACTIONS
+from Hyperparameters import GAMMA, LAMBDA, RENDER, ACTIONS, INPUT_SHAPE, STATE_TYPE
 import numpy as np
-from StateProcessor import StateProcessor
-from StateSequence import StateSequence
+import torch
 import matplotlib.pyplot as plt
-from Hyperparameters import INPUT_SHAPE, STATE_TYPE
-import tensorflow as tf
+import gym
+from atari_wrappers import make_atari, wrap_deepmind
+from utils import to_pytorch, flatten
+from Environments import HaxballEnvironment
 
 class RolloutWorker:
-    def __init__(self, agent, env_maker, env_maker_arg):
+    def __init__(self, agent, env_id, num_envs, timesteps):
         self.agent = agent
-        self.sequence = StateSequence(INPUT_SHAPE)
-        self.processor = StateProcessor(state_type=STATE_TYPE)
+        self.num_actions = len(ACTIONS)
+        self.num_envs = num_envs
+        self.envs = []
+        self.timesteps = timesteps
         
-        self.env = env_maker(env_maker_arg)
-        self.env._max_episode_steps = float('inf')
-        self.reset()
+        self.states       = np.zeros(shape=[num_envs, timesteps + 1, *INPUT_SHAPE], 
+                                     dtype=np.uint8)
+        self.actions      = np.zeros(shape=[num_envs, timesteps],
+                                     dtype=np.uint8)
+        self.action_log_probs = np.zeros(shape=[num_envs, timesteps],
+                                     dtype=np.float32)
+        self.rewards      = np.zeros(shape=[num_envs, timesteps],
+                                     dtype=np.float32)
+        self.returns      = np.zeros(shape=[num_envs, timesteps],
+                                   dtype=np.float32)
+        self.advantages   = np.zeros(shape=[num_envs, timesteps],
+                                     dtype=np.float32)
+        self.values       = np.zeros(shape=[num_envs, timesteps + 1],
+                                     dtype=np.float32)
+        self.news         = np.zeros(shape=[num_envs, timesteps + 1],
+                                     dtype=np.uint8)
+        
+        self.last_states     = np.zeros([num_envs, *INPUT_SHAPE], dtype = np.uint8)
+        
+        self.last_states_new = np.zeros(num_envs, dtype=np.uint8)
+        
+        
+        
+        for n in range(num_envs):    
+#            env = make_atari(env_id)
+#            env = wrap_deepmind(env, frame_stack=True, scale=False)
+            env = HaxballEnvironment()
+            self.envs.append(env)
+            state = env.reset()
+            self.last_states[n] = to_pytorch(state)
+            self.last_states_new[:] = 1
+            
+        
+    def rollout(self, train_mode=True):
+        self.states[:, 0] = self.last_states[:]
+        self.news[:, 0]   = self.last_states_new[:]
+        
+        for t in range(self.timesteps):
+            
+            values_t, actions_t, action_log_probs_t = self.agent.select_act(self.last_states, train_mode)
+            rewards_t = torch.empty(size=[self.num_envs], dtype=torch.float32)
+            
+            for n in range(self.num_envs):
+                state_n_t_, reward_n_t, done_n_t_, info = self.envs[n].step(ACTIONS[actions_t[n]])
+                self.envs[n].render()
+                if done_n_t_:
+                    state_n_t_ = self.envs[n].reset()
+                    
+                state_n_t_ = to_pytorch(state_n_t_)
+                self.last_states[n] = state_n_t_[:]
+                self.last_states_new[n] = torch.tensor(done_n_t_)
+                rewards_t[n] = reward_n_t
+#            plt.imshow(self.last_states[0]); plt.show(); print("")
                 
-        
-    def rollout(self, sess, max_timesteps):
-        states = [self.last_state[:]] 
-        actions = []
-        rewards = []
-        
-        for n in range(max_timesteps):
-            action = self.agent.policy_net.select_action(sess, self.last_state)
-            actions.append(action)
-            obs, reward, done, info = self.env.step(ACTIONS[action])
-            obs = self.processor.process(sess, obs)
-            self.sequence.append_obs(obs)
-            state = self.sequence.get_sequence()
-            rewards.append(reward)
-            states.append(state)
-            self.last_state = state
-            self.discounted_sum += reward * (GAMMA ** self.step)
-            self.undiscounted_sum += reward
-            self.step += 1
-            
-            if RENDER:
-                self.env.render()
-            if done:
-                print(self.undiscounted_sum)
-                self.reset()
-                break
-                
             
             
-        states = np.array(states)
-        actions = np.array(actions)
-        rewards = np.array(rewards)
+            self.action_log_probs[:,t] = action_log_probs_t
+            self.actions[:,t]  = actions_t
+            self.rewards[:,t]  = rewards_t
+            self.values[:, t] = values_t
+            self.states[:,t+1] = self.last_states
+            self.news[:,t+1]   = self.last_states_new
+            
+        values_t, _, _ = self.agent.select_act(self.last_states)
+        self.values[:, -1] = values_t #last states values
+            
+        return self._process()
 
+    def _process(self):
+        states = self.states
+        actions = self.actions
+        action_log_probs = self.action_log_probs
+        rewards = self.rewards
+        news = self.news
+        values = self.values
+        advantages = self.advantages
+        returns = np.empty_like(advantages)
         
- 
-        num_states = len(states)
-        predicted_values = self.agent.value_net.predict_batch(sess, states)
-        if done:
-            predicted_values[-1] = 0
-          
-        ##Value estimation
-        returns = np.zeros(num_states - 1)
-        R = 0 if done else predicted_values[-1]
-
-        
-        for t in reversed(range(num_states - 1)):
-            R = rewards[t] + GAMMA * R
-            returns[t] += R
+        for n in range(self.num_envs):
+            last_advantage = 0
+            for t in reversed(range(self.timesteps)):
+                nonterminal = 1-news[n,t+1]
+                delta = rewards[n,t] + GAMMA * values[n,t+1] * nonterminal - values[n,t]
+                advantages[n,t] = last_advantage = delta + GAMMA * LAMBDA * nonterminal * last_advantage
+            
+            returns[n, :] = advantages[n, :] + values[n, :-1]
 
             
-#        ##Duz advantage estimation
-#        advantages = returns - predicted_values[:-1]
-#        
- 
-        ##Generalized advantage estimation
-        deltas = rewards + GAMMA * predicted_values[1:] - predicted_values[:-1]
+        
+               
+        return flatten(states[:,:-1]), flatten(actions), flatten(action_log_probs), \
+               flatten(returns), flatten(advantages)
         
         
-        advantage_coefficients = (LAMBDA * GAMMA) ** np.arange(num_states - 1)
         
-        advantages = np.zeros_like(deltas)
         
-        for n in range(len(advantages)):
-            advantages[n] += np.sum(deltas[n:] * advantage_coefficients[:len(advantages) - n])
 
-        
-        
-        
-        return states[:-1], actions, returns, advantages, rewards      
-        
-            
-    def reset(self):
-        self.sequence.reset()
-        obs = self.env.reset()
-        with tf.Session() as sess2:
-            processed = self.processor.process(sess2, obs)
-        
-        for n in range(self.sequence.length):
-            self.sequence.append_obs(processed)
-        self.last_state = self.sequence.get_sequence()
-        self.discounted_sum = 0
-        self.undiscounted_sum = 0
-        self.step = 0
-        
+env = make_atari("PongNoFrameskip-v4")
+env = wrap_deepmind(env, frame_stack=True, scale=False)
+state = env.reset()

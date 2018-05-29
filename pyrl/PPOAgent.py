@@ -1,175 +1,184 @@
-from PolicyANN import PolicyANN
-from ValueANN import ValueANN
-from PolicyCNN import PolicyCNN
-from ValueCNN import ValueCNN
+from ActorCritic import ActorCritic
 from RolloutWorker import RolloutWorker
-import tensorflow as tf
 import numpy as np
+import torch
 import matplotlib.pyplot as plt
-from Hyperparameters import LEARNING_RATE, BATCH_SIZE, EPSILON, NUM_WORKERS, \
-T, C1, C2, ENV_MAKER, ENV_NAME, INPUT_SHAPE, ACTIONS, LR_ANNEALING_RATE, EPSILON_ANNEALING_RATE
+from Hyperparameters import LEARNING_RATE, NUM_MINIBATCHES, EPSILON, NUM_WORKERS, \
+T, C1, C2, ENV_ID, INPUT_SHAPE, ACTIONS, LR_ANNEALING_RATE, \
+NUM_EPOCHS, EPSILON_ANNEALING_RATE, CLIP_VALUE_LOSS, MAX_GRAD_NORM
+from utils import to_pytorch
+
+
+
 
 class PPOAgent:
     def __init__(self):
-        self._build_graph()
-        self.rollout_workers = []
-        self.train_history = {
-                "average_reward": [],
-                "average_returns": [],
-                "frames_trained": 0,
-                }
+        self.model = ActorCritic(num_actions = len(ACTIONS))
+        self.model.to("cuda")
         
-        self.num_workers = NUM_WORKERS
-        for n in range(self.num_workers):
-            self.rollout_workers.append(RolloutWorker(agent=self,
-                                                      env_maker=ENV_MAKER, 
-                                                      env_maker_arg=ENV_NAME))
-
-
-    def _build_graph(self):
-        self.policy_net = PolicyANN("policy_net", 
-                                        input_shape = INPUT_SHAPE,
-                                        num_actions = len(ACTIONS))
+        self.worker = RolloutWorker(self, ENV_ID, NUM_WORKERS, T)
         
-        self.old_policy_net = PolicyANN("old_policy_net", 
-                                        input_shape = INPUT_SHAPE, 
-                                        num_actions = len(ACTIONS),
-                                        is_trainable = False)
+        self.train_history = dict()
+        self.train_history['frames_trained'] = 0
+        self.train_history['average_entropy'] = []
+        self.train_history['average_values'] = []
         
-        
-        self.value_net = ValueANN("value_net",
-                                  input_shape = INPUT_SHAPE)
-        
-        self.advantages_ph = tf.placeholder(dtype=tf.float32, 
-                                            shape = [None],
-                                            name = "advantages_ph")
-        
-        
-        self.r = self.policy_net.actions_prob / (self.old_policy_net.actions_prob + 1e-8)
-        
-        self.clipped_r = tf.clip_by_value(self.r, 1-EPSILON, 1+EPSILON)
-        
-        self.L_CLIP_batch= tf.minimum(self.r * self.advantages_ph, 
-                                      self.clipped_r * self.advantages_ph)
-        
-        self.L_CLIP = -tf.reduce_mean(self.L_CLIP_batch)
-        
-        self.L_ENT_batch = -tf.reduce_sum(self.policy_net.policy * tf.log(self.policy_net.policy), 
-                                          axis = 1)
-        
-        self.L_ENT = -tf.reduce_mean(self.L_ENT_batch, 
-                                     axis = 0)
-        
-        
-        self.L_VF  = tf.losses.mean_squared_error(labels = self.value_net.values_ph, 
-                                                  predictions = self.value_net.values)
-                                                 
-      
-        self.loss = self.L_CLIP + C1 * self.L_VF + C2 * self.L_ENT
-       
-        self.learning_rate = tf.Variable(initial_value = LEARNING_RATE, 
-                                         dtype = tf.float32, 
-                                         trainable = False)
-        
-        self.epsilon = tf.Variable(initial_value = EPSILON, 
-                                   dtype = tf.float32, 
-                                   trainable = False)
-        
-        self.anneal_learning_rate = tf.assign_sub(self.learning_rate, 
-                                                  LR_ANNEALING_RATE)
-        self.anneal_epsilon = tf.assign_sub(self.epsilon, 
-                                            EPSILON_ANNEALING_RATE)
-        
-        self.optimizer = tf.train.AdamOptimizer(self.learning_rate)
-        self.optimize_op = self.optimizer.minimize(self.loss)
-        
-        self.copy_ops = []
-        for ref, value in zip(self.old_policy_net.params, self.policy_net.params):
-            self.copy_ops.append(tf.assign(ref, value))
-        
-        
-    def rollout(self, sess):
-        
-        states = []
-        actions = []
-        returns = []
-        advantages = []
-        rewards = []
-        
-        for worker in self.rollout_workers:
-            data_generated = 0
+    def select_act(self, states, train_mode=True):
+        states              = torch.tensor(states).to("cuda")
+        prob_dists, values  = self.model(states)
+        if train_mode:
+            actions = prob_dists.sample()
+        else:
+            actions = torch.argmax(prob_dists.probs, dim=1)
             
-            while data_generated < T:    
-                states_roll, \
-                actions_roll, \
-                returns_roll, \
-                advantages_roll, \
-                rewards_roll = worker.rollout(sess, max_timesteps=T-data_generated)
+        action_log_probs = prob_dists.log_prob(actions)
+
+        values = values.data.cpu().numpy()
+        actions = actions.data.cpu().numpy()
+        action_log_probs = action_log_probs.data.cpu().numpy()
+        return values, actions, action_log_probs        
+    
+    
+    def train_step(self):
+        states, actions, old_action_log_probs, returns, advantages \
+        = self.worker.rollout()
+        
+        states    = torch.tensor(states).to("cuda")
+        actions   = torch.tensor(actions).to("cuda")
+        old_action_log_probs = torch.tensor(old_action_log_probs).to("cuda")
+        returns    = torch.tensor(returns).to("cuda")
+        advantages = torch.tensor(advantages).to("cuda")
+        
+        optimizer = torch.optim.Adam(self.model.parameters(), lr=LEARNING_RATE, eps=1e-5)
+        
+        loss_surr = self._surrogate_loss(states, actions, old_action_log_probs, advantages)
+        loss_surr_before = loss_surr.data.cpu().numpy()
                 
-                data_generated += states_roll.shape[0]
-                [states.append(state) for state in states_roll]
-                [actions.append(action) for action in actions_roll]
-                [returns.append(return_) for return_ in returns_roll]
-                [advantages.append(advantage) for advantage in advantages_roll]
-                [rewards.append(reward) for reward in rewards_roll]
+        loss_value = self._value_loss(states,
+                                      returns)
+        loss_value_before = loss_value.data.cpu().numpy()        
+        
+        loss_ent = self._entropy_loss(states)
+        loss_ent_before = loss_ent.data.cpu().numpy()
+        
+        for epoch in range(NUM_EPOCHS):
+            dataset_size = states.shape[0]
+            batch_size = dataset_size // NUM_MINIBATCHES
+            random_indices = torch.randperm(dataset_size, device="cpu").to("cuda")
             
-            self.train_history['frames_trained'] += data_generated
+            
+            for n in range(NUM_MINIBATCHES):
+                batch_indices = random_indices[n * batch_size: n * batch_size + batch_size]
+                states_batch = states[batch_indices]
+                old_action_log_probs_batch = old_action_log_probs[batch_indices]
+                actions_batch = actions[batch_indices]
+                advantages_batch = advantages[batch_indices]
+                returns_batch = returns[batch_indices]
+                
+                advantages_batch = (advantages_batch - advantages_batch.mean()) / (advantages_batch.std() + 1e-6)
+                
+                loss_surr_batch = self._surrogate_loss(states_batch, 
+                                                       actions_batch, 
+                                                       old_action_log_probs_batch, 
+                                                       advantages_batch)
+                
+                loss_value_batch = self._value_loss(states_batch,
+                                                    returns_batch)
+                
+                loss_ent_batch = self._entropy_loss(states_batch)
+                
+                loss_batch = loss_surr_batch + C1 * loss_value_batch + C2 * loss_ent_batch
+                
+                
+                
+#                loss_batch_np = loss_batch.data.cpu().numpy()
+
+                
+                optimizer.zero_grad()
+                loss_batch.backward()
+                torch.nn.utils.clip_grad_norm_(self.model.parameters(), MAX_GRAD_NORM)
+                optimizer.step()
+                pass
+                
+            
+        loss_surr = self._surrogate_loss(states, actions, old_action_log_probs, advantages)
+        loss_surr_after = loss_surr.data.cpu().numpy()
+                
+        loss_value = self._value_loss(states,
+                                      returns)
+        loss_value_after = loss_value.data.cpu().numpy()        
         
+        loss_ent = self._entropy_loss(states)
+        loss_ent_after = loss_ent.data.cpu().numpy()
         
-        states = np.array(states)
-        actions = np.array(actions)
-        returns = np.array(returns)
-        advantages = np.array(advantages)
-        advantages -= advantages.mean()
-        advantages /= advantages.std() + 1e-6
+        self.train_history['frames_trained'] += 4 * states.shape[0]
+        self.train_history['average_entropy'].append(loss_ent_after)
+        
+        print("Frames trained: ", self.train_history['frames_trained'])
+        print("Loss before: {: .6f} {:.6f} {:.6f}".format(loss_surr_before, loss_value_before, loss_ent_before))
+        print("Loss after : {: .6f} {:.6f} {:.6f}".format(loss_surr_after, loss_value_after, loss_ent_after))
         
 
-        rewards = np.array(rewards)
-        
-        self.train_history["average_reward"].append(np.mean(rewards))
-        self.train_history["average_returns"].append(np.mean(returns))
-        
-        
-        print("frames trained:", self.train_history['frames_trained'])
-        print("average reward:", self.train_history['average_reward'][-1])
-        print("average values:", self.train_history['average_returns'][-1])
-        
-        return states, actions, returns, advantages, rewards
-        
+    def test_step(self):
+        self.worker.rollout(train_mode = False)
     
+    def _surrogate_loss(self, states, actions, old_action_log_probs, advantages):
+        advantages -= advantages.mean()
+        advantages /= advantages.std() + 1e-8
+#        advantages_np = advantages.data.cpu().numpy()
         
+        pd, _ = self.model(states)
+        
+        action_log_probs = pd.log_prob(actions)
+#        action_log_probs_np = action_log_probs.data.cpu().numpy()
+
+
+        r = torch.exp(action_log_probs - old_action_log_probs)
+#        r_np = r.data.cpu().numpy()
+
+
+        r_clip = torch.clamp(r, 1 - EPSILON, 1 + EPSILON)
+#        r_clip_np = r_clip.data.cpu().numpy()
+
+
+        surr1 = r * advantages
+#        surr1_np = surr1.data.cpu().numpy()
+
+        surr2 = r_clip * advantages
+#        surr2_np = surr2.data.cpu().numpy()
+
+        loss_policy_batch = -torch.min(surr1, surr2)
+#        loss_policy_batch_np = loss_policy_batch.data.cpu().numpy()
+                
+        loss_policy = torch.mean(loss_policy_batch, dim=0)
+#        loss_policy_np = loss_policy.data.cpu().numpy()
+        
+        
+        return loss_policy
     
-    def train(self, sess, states, actions, target_values, advantages, epochs):
-        sess.run(self.copy_ops)
+    def _entropy_loss(self, states):
         
+        pd, _ = self.model(states)
+        loss_entropy_batch = -pd.entropy()
+#        loss_entropy_batch_np = loss_entropy_batch.data.cpu().numpy()
         
+        loss_entropy = torch.mean(loss_entropy_batch)
+#        loss_entropy_np = loss_entropy.data.cpu().numpy()
+
+        return loss_entropy
+    
+    def _value_loss(self, states, returns):
         
-        for epoch in range(epochs):
-            dataset_size = states.shape[0]
-            iterations = dataset_size // BATCH_SIZE
-            for n in range(iterations):
-                random_indices = np.random.choice(np.arange(dataset_size), size=BATCH_SIZE)
-                states_batch = states[random_indices]
-                actions_batch = actions[random_indices]
-                advantages_batch = advantages[random_indices]
-                target_values_batch = target_values[random_indices]
-                _, = sess.run([self.optimize_op], 
-                                   feed_dict= {
-                                           self.policy_net.states_ph: states_batch,
-                                           self.old_policy_net.states_ph: states_batch,
-                                           self.value_net.states_ph: states_batch,
-                                           self.policy_net.actions_ph: actions_batch,
-                                           self.old_policy_net.actions_ph: actions_batch,
-                                           self.advantages_ph: advantages_batch,
-                                           self.value_net.values_ph: target_values_batch,
-                                           }
-                                   )
-             
-        
-        self.anneal(sess)
-        
+        _, values = self.model(states)
+#        values_np = values.data.cpu().numpy()
             
-    def anneal(self, sess):
-        a,b = sess.run([self.anneal_learning_rate, self.anneal_epsilon])
-        print(a,b)
+        loss_value_batch = (returns - values)**2
+#        loss_value_batch_np = loss_value_batch.data.cpu().numpy()
         
+        loss_value = 0.5 * torch.mean(loss_value_batch, dim=0)
+#        loss_value_np = loss_value.data.cpu().numpy()
+
+        return loss_value
+    
+    
+

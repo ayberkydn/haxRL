@@ -1,5 +1,5 @@
 from Box import Box
-from Vector import Vector
+from Vector import Vector, UnitVec
 from Goal import Goal
 from Disc import Disc
 from Ball import Ball
@@ -9,6 +9,8 @@ from Way import Way
 from VerticalBorder import VerticalBorder
 from HorizontalBorder import HorizontalBorder
 import random
+from StateSequence import StateSequence
+from StateProcessor import StateProcessor
 from Player import Player
 from Action import Action
 from Side import Side
@@ -28,8 +30,8 @@ player_damping, player_kick_damping, player_kick_power
         
         
 class HaxballEnvironment :
-    def __init__(self, random_start = False, step_limit = 500, ball_idle_limit = 50, state_output_mode = 'locations', rendering = True, frame_skip=4):
-        self.action_space = ActionSpace([Action.up, Action.down, Action.forward, Action.backward])
+    def __init__(self, random_start = False, step_limit = 500, ball_idle_limit = 50, state_output_mode = 'pixels', rendering = True, frame_skip=4):
+        self.action_space = ActionSpace([Action.up, Action.down, Action.forward, Action.backward, Action.nomoveshoot, Action.nomove])
         self.step_limit = step_limit
         self.ball_idle_limit = ball_idle_limit
         self.state_output_mode = state_output_mode
@@ -73,6 +75,9 @@ class HaxballEnvironment :
         self.scene.add_object(self.player2)
         self.scene.add_object(self.ball)
         
+        
+        self.sequence1 = StateSequence([84, 84, 4])
+        self.sequence2 = StateSequence([84, 84, 4])
         
         
     def step(self, action_red, action_blue = -1):
@@ -120,10 +125,28 @@ class HaxballEnvironment :
     
     
     def _calculate_reward(self):
-        pass
+        v_player = self.player1.velocity
+        v_ball   = self.ball.velocity
+        
+        player_to_ball_vec = Vector.sub(self.ball.center, self.player1.center)
+        
+        if Vector.dot(Vector.sub(v_player, v_ball), player_to_ball_vec) > 0:
+            player_to_ball = 1
+        else:
+            player_to_ball = 0
+            
+        ball_to_goal_vec = Vector.sub(self.goal2.center, self.ball.center)
+            
+        if Vector.dot(v_ball, ball_to_goal_vec) > 0:
+            ball_to_goal = 1
+        else:
+            ball_to_goal = 0
+            
+        #TODO gole reward ver
+        return -0.1 + ball_to_goal * 0.1 + player_to_ball * 0.1 
         
     def _calculate_done(self):
-            return self.scene.check_goals() or self.step_count >= self.step_limit or self.ball_idle > self.ball_idle_limit
+        return self.scene.check_goals() or self.step_count >= self.step_limit or self.ball_idle > self.ball_idle_limit
         
     def _calculate_state(self):
         if self.state_output_mode == 'locations':    
@@ -154,17 +177,20 @@ class HaxballEnvironment :
             pad_size = obs_size[0] // 2, obs_size[1] // 2
             obs = self.scene.get_scene_as_array()
             
-            obs = np.pad(obs[:,:,1], ((pad_size[0],), (pad_size[1],)) , 'edge')
+#            obs = np.pad(obs[:,:,1], ((pad_size[0],), (pad_size[1],)) , 'edge')
             
             p1x = int(self.player1.center.x + pad_size[1]) 
             p1y = int(self.player1.center.y + pad_size[0])
-            p2x = int(self.player2.center.x + pad_size[1]) 
-            p2y = int(self.player2.center.y + pad_size[0])
-            obs1 = obs[p1y - obs_size[0] // 2: p1y + obs_size[0] // 2, p1x - obs_size[1] // 2: p1x + obs_size[1] // 2]
-            obs2 = obs[p2y - obs_size[0] // 2: p2y + obs_size[0] // 2, p2x - obs_size[1] // 2: p2x + obs_size[1] // 2]
+#            p2x = int(self.player2.center.x + pad_size[1]) 
+#            p2y = int(self.player2.center.y + pad_size[0])
+#            obs1 = obs[p1y - obs_size[0] // 2: p1y + obs_size[0] // 2, p1x - obs_size[1] // 2: p1x + obs_size[1] // 2]
+#            obs2 = obs[p2y - obs_size[0] // 2: p2y + obs_size[0] // 2, p2x - obs_size[1] // 2: p2x + obs_size[1] // 2]
+            obs1 = obs[:,:,0]
             obs1 = imresize(obs1, (84, 84))
-            obs2 = imresize(obs2, (84, 84))
-            return obs1, obs2[:,::-1]
+#            obs2 = imresize(obs2, (84, 84))
+            self.sequence1.append_obs(obs1)
+#            self.sequence2.append_obs(obs2[:,::-1])
+            return self.sequence1.get_sequence()#, self.sequence1.get_sequence()
         else:
             raise Exception('invalid state output mode: {}'.format(self.state_output_mode))
         
@@ -202,7 +228,33 @@ class HaxballEnvironment :
         pass
 
 
-
+#####################################
+        
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 class PenaltyEnvironment:
     def __init__(self, frame_skip = 2):
         
