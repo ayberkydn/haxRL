@@ -30,7 +30,7 @@ player_damping, player_kick_damping, player_kick_power
         
         
 class HaxballEnvironment :
-    def __init__(self, random_start = False, step_limit = 500, ball_idle_limit = 50, state_output_mode = 'pixels', rendering = True, frame_skip=4):
+    def __init__(self, random_start = True, step_limit = 500, ball_idle_limit = 50, state_output_mode = 'pixels', rendering = True, frame_skip=4):
         self.action_space = ActionSpace([Action.up, Action.down, Action.forward, Action.backward, Action.nomoveshoot, Action.nomove])
         self.step_limit = step_limit
         self.ball_idle_limit = ball_idle_limit
@@ -81,9 +81,17 @@ class HaxballEnvironment :
         
         
     def step(self, action_red, action_blue = -1):
+        #ai action no frameskip
+        if self.player2.center.x > self.ball.center.x:
+            if random.random() < 0.04:
+                self.player2.apply_action(Action.nomoveshoot)
+            else:
+                self.player2.apply_action(Action.nomove)
+                
+        #agent action
         for n in range(self.frame_skip):
+            self.player2.apply_force(self.ai_select_force())
             self.player1.apply_action(self.action_space[action_red])
-            self.player2.apply_action(self.action_space[action_blue])
             self.scene.update()
             self.step_count += 1
 
@@ -98,6 +106,16 @@ class HaxballEnvironment :
         
         return self._get_state_reward_done_info()
     
+    def ai_select_force(self):
+        ai_agent_pos = self.player2.center
+        ball_pos = self.ball.center
+        goal_pos = self.goal1.center
+        unit_goal_to_ball = Vector.sub(ball_pos, goal_pos).normalize()
+        ball_edge_pos = ball_pos.add(unit_goal_to_ball.mult(self.ball.radius))
+        unit_agent_to_ball_edge = Vector.sub(ball_edge_pos, ai_agent_pos).normalize()
+        return unit_agent_to_ball_edge
+        
+        
     
     def render(self):
         self.scene.draw()
@@ -146,7 +164,18 @@ class HaxballEnvironment :
         return -0.1 + ball_to_goal * 0.1 + player_to_ball * 0.1 
         
     def _calculate_done(self):
-        return self.scene.check_goals() or self.step_count >= self.step_limit or self.ball_idle > self.ball_idle_limit
+        if self.step_limit == None or self.step_count < self.step_limit :
+            step_limit_reached = False
+        else:
+            step_limit_reached = True
+        
+        if self.ball_idle_limit == None or self.ball_idle < self.ball_idle_limit:
+            ball_idle_limit_reached = False
+        else:
+            ball_idle_limit_reached = True
+        
+        
+        return self.scene.check_goals() or step_limit_reached or ball_idle_limit_reached 
         
     def _calculate_state(self):
         if self.state_output_mode == 'locations':    
