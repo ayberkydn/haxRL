@@ -30,7 +30,7 @@ player_damping, player_kick_damping, player_kick_power
         
         
 class HaxballEnvironment :
-    def __init__(self, random_start = True, step_limit = 500, ball_idle_limit = 50, state_output_mode = 'pixels', rendering = True, frame_skip=4):
+    def __init__(self, random_start = True, step_limit = None, ball_idle_limit = None, state_output_mode = 'pixels', rendering = True, frame_skip=4):
         self.action_space = ActionSpace([Action.up, Action.down, Action.forward, Action.backward, Action.nomoveshoot, Action.nomove])
         self.step_limit = step_limit
         self.ball_idle_limit = ball_idle_limit
@@ -83,7 +83,7 @@ class HaxballEnvironment :
     def step(self, action_red, action_blue = -1):
         #ai action no frameskip
         if self.player2.center.x > self.ball.center.x:
-            if random.random() < 0.04:
+            if random.random() < 0.02:
                 self.player2.apply_action(Action.nomoveshoot)
             else:
                 self.player2.apply_action(Action.nomove)
@@ -111,9 +111,15 @@ class HaxballEnvironment :
         ball_pos = self.ball.center
         goal_pos = self.goal1.center
         unit_goal_to_ball = Vector.sub(ball_pos, goal_pos).normalize()
-        ball_edge_pos = ball_pos.add(unit_goal_to_ball.mult(self.ball.radius))
-        unit_agent_to_ball_edge = Vector.sub(ball_edge_pos, ai_agent_pos).normalize()
-        return unit_agent_to_ball_edge
+        
+        attract_point = ball_pos.add(unit_goal_to_ball.mult(self.ball.radius))
+        repel_point = ball_pos.sub(unit_goal_to_ball.mult(self.ball.radius))
+        
+        attract_force = Vector.sub(attract_point, ai_agent_pos)
+        repel_force   = Vector.sub(ai_agent_pos, repel_point).mult(0.2)
+        unit_total_force = Vector.add(attract_force, repel_force).normalize()
+        
+        return unit_total_force
         
         
     
@@ -160,9 +166,11 @@ class HaxballEnvironment :
         else:
             ball_to_goal = 0
             
-        #TODO gole reward ver
-        return -0.1 + ball_to_goal * 0.1 + player_to_ball * 0.1 
+        goal = self._calculate_info()['goal']
+        reward = goal
         
+        return reward
+    
     def _calculate_done(self):
         if self.step_limit == None or self.step_count < self.step_limit :
             step_limit_reached = False
@@ -227,8 +235,8 @@ class HaxballEnvironment :
     
     def _calculate_info(self):
         info = {
-            "goal": [0, 0],
-            "ball_at_side": -1,
+            "goal": 0,
+            "ball_at_side": 0,
             "closer_player_to_ball": -1
         }
         
@@ -236,15 +244,15 @@ class HaxballEnvironment :
         if self.ball.center.x > c_width / 2:
             info['ball_at_side'] = 1
         elif self.ball.center.x < c_width / 2:
-            info['ball_at_side'] = 0
-        else:
             info['ball_at_side'] = -1
+        else:
+            info['ball_at_side'] = 0
         
         if self.scene.check_goals():
             if info['ball_at_side'] == 1:
-                info['goal'][0] = 1
-            elif info['ball_at_side'] == 1:
-                info['goal'][1] = 1
+                info['goal'] = 1
+            elif info['ball_at_side'] == -1:
+                info['goal'] = -1
         
         if Vector.dist(self.player1.center, self.ball.center) < Vector.dist(self.player2.center, self.ball.center):
             info["closer_player_to_ball"] = 0

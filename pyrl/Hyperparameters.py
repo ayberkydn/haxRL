@@ -47,7 +47,6 @@
 
 
 
-
 GAMMA = 0.99
 LAMBDA = 0.95
 MAX_GRAD_NORM = 2.0
@@ -61,8 +60,7 @@ NUM_MINIBATCHES = 8
 RENDER = True
 C1 = 1.
 C2 = 0.01
-ENV_ID = "PongNoFrameskip-v4"
-STATE_TYPE = "PIXELS"
+ENV_ID = "Haxball"
 INPUT_SHAPE = [4, 84, 84]
 ACTIONS = [0, 1, 2, 3, 4, 5]
 NUM_STEPS = 4e7

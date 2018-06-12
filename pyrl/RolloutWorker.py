@@ -1,4 +1,4 @@
-from Hyperparameters import GAMMA, LAMBDA, RENDER, ACTIONS, INPUT_SHAPE, STATE_TYPE
+from Hyperparameters import GAMMA, LAMBDA, RENDER, ACTIONS, INPUT_SHAPE
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
@@ -39,9 +39,12 @@ class RolloutWorker:
         
         
         for n in range(num_envs):    
-#            env = make_atari(env_id)
-#            env = wrap_deepmind(env, frame_stack=True, scale=False)
-            env = HaxballEnvironment()
+            if env_id == "Haxball":
+                env = HaxballEnvironment()
+            else:                
+                env = make_atari(env_id)
+                env = wrap_deepmind(env, frame_stack=True, scale=False)
+                
             self.envs.append(env)
             state = env.reset()
             self.last_states[n] = to_pytorch(state)

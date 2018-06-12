@@ -7,21 +7,33 @@ from Hyperparameters import LEARNING_RATE, NUM_MINIBATCHES, EPSILON, NUM_WORKERS
 T, C1, C2, ENV_ID, INPUT_SHAPE, ACTIONS, LR_ANNEALING_RATE, \
 NUM_EPOCHS, EPSILON_ANNEALING_RATE, CLIP_VALUE_LOSS, MAX_GRAD_NORM
 from utils import to_pytorch
-
+import os
 
 
 
 class PPOAgent:
     def __init__(self):
-        self.model = ActorCritic(num_actions = len(ACTIONS))
+        
+        self.train_history = dict()
+
+        if os.path.isfile("./checkpoints/model.pt"):
+            self.model = torch.load("./checkpoints/model.pt")
+            self.train_history['frames_trained'] = torch.load("./checkpoints/frames_trained.pt")
+            self.train_history['average_entropy'] = torch.load("./checkpoints/average_entropy.pt")
+            self.train_history['average_values'] = torch.load("./checkpoints/average_values.pt")
+            print("Model loaded from last checkpoint.")
+        else:
+            self.model = ActorCritic(num_actions = len(ACTIONS))
+            self.train_history['frames_trained'] = torch.tensor(0)
+            self.train_history['average_entropy'] = torch.tensor([0], dtype=torch.float)
+            self.train_history['average_values'] = torch.tensor([0], dtype=torch.float)
+            print("New model created.")
         self.model.to("cuda")
         
         self.worker = RolloutWorker(self, ENV_ID, NUM_WORKERS, T)
         
-        self.train_history = dict()
-        self.train_history['frames_trained'] = 0
-        self.train_history['average_entropy'] = []
-        self.train_history['average_values'] = []
+
+        
         
     def select_act(self, states, train_mode=True):
         states              = torch.tensor(states).to("cuda")
@@ -112,13 +124,16 @@ class PPOAgent:
         loss_ent_after = loss_ent.data.cpu().numpy()
         
         self.train_history['frames_trained'] += 4 * states.shape[0]
-        self.train_history['average_entropy'].append(loss_ent_after)
+        self.train_history['average_entropy'] = torch.cat((self.train_history['average_entropy'], torch.tensor([float(loss_ent_after)])))
+        self.train_history['average_values']  = torch.cat((self.train_history['average_values'], torch.tensor([returns.mean()])))
         
-        print("Frames trained: ", self.train_history['frames_trained'])
+        print("Frames trained: ", self.train_history['frames_trained'].cpu().numpy())
         print("Loss before: {: .6f} {:.6f} {:.6f}".format(loss_surr_before, loss_value_before, loss_ent_before))
         print("Loss after : {: .6f} {:.6f} {:.6f}".format(loss_surr_after, loss_value_after, loss_ent_after))
-        
-
+        torch.save(self.model, "./checkpoints/model.pt")
+        torch.save(self.train_history['frames_trained'], "./checkpoints/frames_trained.pt") 
+        torch.save(self.train_history['average_entropy'],  "./checkpoints/average_entropy.pt")
+        torch.save(self.train_history['average_values'], "./checkpoints/average_values.pt")
     def test_step(self):
         self.worker.rollout(train_mode = False)
     
